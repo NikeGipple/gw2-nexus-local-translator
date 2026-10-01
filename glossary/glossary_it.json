@@ -3,7 +3,13 @@
   "exact": {
     "Waypoint": "Waypoint",
     "Skin Unlocked": "Estetica Sbloccata",
-    "Junk": "Ciarpame"
+    "Junk": "Ciarpame",
+    "Account Bound": "Legato all'Account",
+    "Soulbound": "Legato all'anima del Personaggio",
+    "Account Bound on Use": "Legato all'Account all'uso",
+    "Account Bound on Acquire": "Legato all'Account all'acquisizione",
+    "Soulbound on Use": "Legato all'anima del Personaggio all'uso",
+    "Soulbound on Acquire": "Legato all'anima del Personaggio all'acquisizione"
   },
   "patterns": {
     "{X} Longbow": "Arco lungo {X}",
@@ -660,8 +666,6 @@
     "Shortbows": "Archi Corti",
     "shortbows": "archi corti",
     "Skin Unlocked": "Estetica Sbloccata",
-    "Junk": "Ciarpame",
-    "junk": "ciarpame",
     "Berserker's": "Berserker's",
     "Assassin's": "Assassin's",
     "Valkyrie": "Valkyrie",
@@ -708,6 +712,12 @@
     "Apostate's": "Apostate's",
     "Forsaken": "Forsaken",
     "Malign": "Malign",
+    "Junk": "Ciarpame",
+    "junk": "ciarpame",
+    "Account Bound": "Legato all'Account",
+    "account bound": "legato all'account",
+    "Soulbound": "Legato all'anima del Personaggio",
+    "soulbound": "legato all'anima del personaggio",
     "Cleric": "Cleric",
     "Assassin": "Assassin",
     "Harrier": "Harrier",
