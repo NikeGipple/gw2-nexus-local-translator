@@ -741,6 +741,26 @@
     "Settler": "Settler",
     "Vagabond": "Vagabond",
     "Deserter": "Deserter",
-    "Apostate": "Apostate"
+    "Apostate": "Apostate",
+    "Armorsmith": "Armaiolo",
+    "armorsmith": "armaiolo",
+    "Artificer": "Artigiano",
+    "artificer": "artigiano",
+    "Chef": "Cuoco",
+    "chef": "cuoco",
+    "Huntsman": "Costruttore d'armi da caccia",
+    "huntsman": "costruttore d'armi da caccia",
+    "Jeweler": "Gioielliere",
+    "jeweler": "gioielliere",
+    "Leatherworker": "Conciatore",
+    "leatherworker": "conciatore",
+    "Scribe": "Scriba",
+    "scribe": "scriba",
+    "Tailor": "Sarto",
+    "tailor": "sarto",
+    "Weaponsmith": "Fabbro",
+    "weaponsmith": "fabbro",
+    "Handiworker": "Manovale",
+    "handiworker": "manovale"
   }
 }
