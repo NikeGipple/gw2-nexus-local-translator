@@ -1,6 +1,6 @@
-# GW2 Nexus Local Translator (Italian)
+# GW2 Nexus Local Translator
 
-Offline, in-game Italian translation for **Guild Wars 2**, delivered as [Nexus](https://raidcore.gg/Nexus) addons.
+Offline, in-game translation for **Guild Wars 2**, delivered as [Nexus](https://raidcore.gg/Nexus) addons. **Italian is the first supported language**; others are planned.
 
 Translation runs entirely on your own PC with [OPUS-MT](https://github.com/Helsinki-NLP/Opus-MT) and [CTranslate2](https://github.com/OpenNMT/CTranslate2). No accounts, no API keys, and the game text never leaves your computer.
 
@@ -8,7 +8,7 @@ Translation runs entirely on your own PC with [OPUS-MT](https://github.com/Helsi
 
 ## Features
 
-- Translates in-game text to Italian locally, on the CPU (no GPU needed).
+- Translates in-game text locally, on the CPU (no GPU needed). Currently available: Italian.
 - Starts and stops by itself together with the game: nothing to launch manually.
 - Downloads its translation model automatically on first run.
 - Keeps game-specific names and terms consistent through a glossary that updates itself from this repository.
@@ -24,7 +24,7 @@ Translation runs entirely on your own PC with [OPUS-MT](https://github.com/Helsi
 
 1. Go to the [Releases](../../releases) page and download `Local_Translator_IT.zip` from the newest release whose tag starts with `v` (for example `v0.1.0`). Releases tagged `model-...` only contain translation models, which the server downloads by itself: you do not need them.
 2. Extract it into your **Guild Wars 2** folder. The `addons` folder inside the zip merges with the one you already have; your other addons are not touched.
-3. Start the game. If the addons are not enabled automatically, enable **Traduzione IT** and **Local Translator Server** from the Nexus addon list.
+3. Start the game. If the addons are not enabled automatically, enable **Local Client** and **Local Translator Server** from the Nexus addon list.
 
 On the very first start the model is downloaded and loaded, which takes a little while. Until then text is not translated. Later starts are immediate.
 
@@ -32,12 +32,12 @@ After installation your `addons` folder contains:
 
 ```
 addons\
-  Local_Translator.dll             the translation addon (shown in Nexus as "Traduzione IT")
+  Local_Translator.dll             the in-game addon: sends text to the local server (listed in Nexus as "Local Client")
   Local_Translator_Launcher.dll    starts and stops the translation server with the game
   Local_Translator_IT.exe          the local translation server
   Local_Translator\                created automatically
-    IT\
-      model\                       Italian model (downloaded automatically)
+    IT\                            Italian files (one folder per language)
+      model\                       model for the language (downloaded automatically)
       glossary_it.json             glossary (updated automatically)
     lt-server.log                  server log
     launcher.log                   launcher log
