@@ -1,7 +1,12 @@
 {
-  "_comment": "exact = whole-string overrides; terms = names protected/translated inside sentences (case-sensitive, whole words). Policy: GW2 proper names, boons and conditions stay in English; only names with an established Italian form are translated.",
+  "_comment": "exact = whole-string overrides; terms = names protected/translated inside sentences (case-sensitive, whole words). Policy: GW2 proper names, boons and conditions stay in English; only names with an established Italian form are translated. patterns = whole-line rules for item names, {X} = the prefix words (e.g. \"{X} Longbow\": \"Arco lungo {X}\").",
   "exact": {
     "Waypoint": "Waypoint"
+  },
+  "patterns": {
+    "{X} Longbow": "Arco lungo {X}",
+    "{X} Short Bow": "Arco corto {X}",
+    "{X} Shortbow": "Arco corto {X}"
   },
   "terms": {
     "Lion's Arch": "Arco del Leone",
@@ -639,6 +644,18 @@
     "Warclaws": "Warclaws",
     "Skyscales": "Skyscales",
     "Siege Turtles": "Siege Turtles",
-    "Skiffs": "Skiffs"
+    "Skiffs": "Skiffs",
+    "Longbow": "Arco Lungo",
+    "longbow": "arco lungo",
+    "Longbows": "Archi Lunghi",
+    "longbows": "archi lunghi",
+    "Short Bow": "Arco Corto",
+    "short bow": "arco corto",
+    "Short Bows": "Archi Corti",
+    "short bows": "archi corti",
+    "Shortbow": "Arco Corto",
+    "shortbow": "arco corto",
+    "Shortbows": "Archi Corti",
+    "shortbows": "archi corti"
   }
 }
