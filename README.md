@@ -18,12 +18,12 @@ Translation runs entirely on your own PC with [OPUS-MT](https://github.com/Helsi
 
 - Guild Wars 2 on Windows (64-bit)
 - [Nexus](https://raidcore.gg/Nexus) addon loader
-- 70 MB disk space for model download
+- Internet connection on first run (about 70 MB model download)
 
 ## Installation
 
-1. Go to the [Releases](../../releases) page and download the latest `Local_Translator_IT.zip` file with the most recent version.
-2. Extract the file into the `addons` folder for **Guild Wars 2**. This folder is included in the ZIP file and will be added to the one you already have; your other add-ons will remain unchanged
+1. Go to the [Releases](../../releases) page and download `Local_Translator_IT.zip` from the newest release whose tag starts with `v` (for example `v0.1.0`). Releases tagged `model-...` only contain translation models, which the server downloads by itself: you do not need them.
+2. Extract it into your **Guild Wars 2** folder. The `addons` folder inside the zip merges with the one you already have; your other addons are not touched.
 3. Start the game. If the addons are not enabled automatically, enable **Local Client** and **Local Translator Server** from the Nexus addon list.
 
 On the very first start the model is downloaded and loaded, which takes a little while. Until then text is not translated. Later starts are immediate.
@@ -32,7 +32,7 @@ After installation your `addons` folder contains:
 
 ```
 addons\
-  Local_Translator.dll             the in-game addon: sends text to the local server (listed in Nexus as "Local Client")
+  Local_Translator.dll             translation client ("Local Client" in Nexus)
   Local_Translator_Launcher.dll    starts and stops the translation server with the game
   Local_Translator_IT.exe          the local translation server
   Local_Translator\                created automatically
