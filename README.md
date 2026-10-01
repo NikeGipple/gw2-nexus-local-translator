@@ -4,6 +4,9 @@ Offline, in-game translation for **Guild Wars 2**, delivered as [Nexus](https://
 
 Translation runs entirely on your own PC with [OPUS-MT](https://github.com/Helsinki-NLP/Opus-MT) and [CTranslate2](https://github.com/OpenNMT/CTranslate2). No accounts, no API keys, and the game text never leaves your computer.
 
+> **Based on Ideka's work:** the in-game addon (`Local_Translator.dll`) is a modified build of the *Japanese Text* addon by [Ideka](https://github.com/Ideka). 
+> It is not an original work of this project.
+
 > **Status:** early testing. Expect rough edges and breaking changes.
 
 ## Features
@@ -69,7 +72,7 @@ If texts stay in English right after the first launch, the model is probably sti
 
 ## Credits
 
-- **Ideka**, author of the *Japanese Text* addon on which the translation addon is based.
+- **Ideka**, author of the *Japanese Text* addon. `Local_Translator.dll` is a modified build of that addon, not an original work of this project; all credit for it goes to Ideka.
 - **Helsinki-NLP**, for the [OPUS-MT](https://github.com/Helsinki-NLP/Opus-MT) models, released under CC BY 4.0.
 - **OpenNMT**, for [CTranslate2](https://github.com/OpenNMT/CTranslate2).
 - **Raidcore**, for Nexus.
@@ -78,4 +81,4 @@ This is an unofficial community project. It is not affiliated with or endorsed b
 
 ## License
 
-Released under the [MIT License](LICENSE). Third-party components and models keep their own licenses.
+The code of this project is released under the [MIT License](LICENSE). `Local_Translator.dll` (modified from Japanese Text) and other third-party components and models keep their original authors' rights and licenses.
