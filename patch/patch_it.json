@@ -1,6 +1,9 @@
 {
- "version": 1,
- "strings": {},
+ "version": 2,
+ "strings": {
+  "47160": "Gioca",
+  "47734": "Disconnetti"
+ },
  "auto": {
   "10": "Fare doppio clic per ottenere il karma.",
   "34": "Inquisizione Lunatica Regolare",
@@ -348,7 +351,6 @@
   "47101": "Costruttore d'armi da caccia",
   "47135": "Monete",
   "47153": "Risultati",
-  "47160": "Riproduci",
   "47238": "Umano",
   "47252": "Fessura di Aggiornamento Non Usata",
   "47309": "Salute",
@@ -362,7 +364,6 @@
   "47605": "Esotico",
   "47681": "Pistola",
   "47707": "Opzioni",
-  "47734": "Esci",
   "47793": "Mano principale",
   "47808": "Armatura a mano",
   "47843": "Possibilità critica",
