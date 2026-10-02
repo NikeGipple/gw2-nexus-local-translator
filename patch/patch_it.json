@@ -1,5 +1,5 @@
 {
- "version": 8,
+ "version": 9,
  "strings": {
   "47160": "Gioca",
   "47734": "Disconnetti",
@@ -12023,5 +12023,13 @@
   "1201709": "(Ripetibile) Leyspring Hollows: Accampamento dell'Alleanza Assemblage, Reputazione Cuore",
   "1202744": "A cavallo",
   "1203490": "Il velo si sta assottigliando nelle Leyspring Hollows. \"Convergence: Nexus of Eternity\" inizierà tra 10 minuti."
- }
+ },
+ "drop": [
+  23091,
+  26013,
+  26063,
+  170367,
+  170389,
+  272658
+ ]
 }
