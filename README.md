@@ -15,6 +15,7 @@ Translation runs entirely on your own PC with [OPUS-MT](https://github.com/Helsi
 - Starts and stops by itself together with the game: nothing to launch manually.
 - Downloads its translation model automatically on first run.
 - Keeps game-specific names and terms consistent through a glossary that updates itself from this repository.
+- Ships curated translations (the *patch*) that update themselves from this repository: texts covered by the patch are translated from the first launch, the rest is translated locally.
 - Built so that other languages can be added later.
 
 ## Requirements
@@ -42,6 +43,9 @@ addons\
     IT\                            Italian files (one folder per language)
       model\                       model for the language (downloaded automatically)
       glossary_it.json             glossary (updated automatically)
+      patch_it.json                curated translations (updated automatically)
+      cache_it.jsonl               local translation cache
+      map_it.db                    local map of the texts seen in game
     lt-server.log                  server log
     launcher.log                   launcher log
 ```
@@ -51,8 +55,23 @@ addons\
 1. The launcher addon starts `Local_Translator_IT.exe` when the game loads it, and stops it when the game closes (also if the game crashes).
 2. The translation addon sends the game text to the server on `127.0.0.1:47831`, which only accepts connections from your own PC.
 3. The server translates with OPUS-MT through CTranslate2, applies the glossary, and sends the result back.
+4. At start the server writes the curated translations of the patch into the addon's database, so those texts are never machine-translated.
 
-The only network connections made are to this repository on GitHub: the glossary check (at start and every few hours) and the one-time model download.
+The only network connections made are to this repository on GitHub: the glossary and patch checks (at start and every few hours) and the one-time model download.
+
+## Translation patch
+
+[`patch/patch_it.json`](patch/patch_it.json) contains curated Italian translations identified by the game's internal string ID:
+
+```json
+{ "version": 1, "strings": { "1017171": "Riconquista il runaro" } }
+```
+
+It contains no English game text. To report a wrong translation, open an issue with the Italian text you see in game and where you saw it.
+
+## Your local files
+
+`cache_it.jsonl`, `map_it.db` and the addon's `lang.db` are built on your PC while you play and contain game text owned by ArenaNet. They are for your own use only: please do not share or publish them.
 
 ## Glossary
 
