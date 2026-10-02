@@ -6,9 +6,9 @@
     "Junk": "Ciarpame",
     "Account Bound": "Legato all'Account",
     "Soulbound": "Legato all'anima del Personaggio",
-    "Account Bound on Use": "Legato all'Account all'uso",
+    "Account Bound on Use": "Legato all'Account dopo l'uso",
     "Account Bound on Acquire": "Legato all'Account all'acquisizione",
-    "Soulbound on Use": "Legato all'anima del Personaggio all'uso",
+    "Soulbound on Use": "Legato all'anima del Personaggio dopo l'uso",
     "Soulbound on Acquire": "Legato all'anima del Personaggio all'acquisizione"
   },
   "patterns": {
@@ -761,6 +761,7 @@
     "Weaponsmith": "Fabbro",
     "weaponsmith": "fabbro",
     "Handiworker": "Manovale",
+	"Raid God": "Dio dei Raid",
     "handiworker": "manovale"
   }
 }
