@@ -761,7 +761,10 @@
     "Weaponsmith": "Fabbro",
     "weaponsmith": "fabbro",
     "Handiworker": "Manovale",
-	"Raid God": "Dio dei Raid",
-    "handiworker": "manovale"
+    "handiworker": "manovale",
+    "Raid God": "Dio dei Raid",
+    "raid god": "dio dei raid",
+    "Fractal God": "Dio dei Fractal",
+    "fractal god": "dio dei fractal"
   }
 }
