@@ -1,5 +1,5 @@
 {
- "version": 11,
+ "version": 12,
  "strings": {
   "47160": "Gioca",
   "47734": "Disconnetti",
@@ -6398,7 +6398,7 @@
   "769727": "Difensore di Niflhel",
   "769763": "Contiene una selezione di frammenti di armi leggendarie.",
   "769794": "Alimentazione",
-  "769842": "Eredità di Foefire",
+  "769842": "L'eredità di Foefire",
   "769863": "Esplosione",
   "769926": "Might del Vindictive",
   "770013": "Eroe del Crepuscolo",
@@ -9570,7 +9570,7 @@
   "1010763": "Ritorna a Silverwastes 2",
   "1010769": "Ritorna a Cornered",
   "1010850": "Ritorna a \"Le azioni di un'ombra\"",
-  "1010877": "Ritorna a Foefire Cleansing",
+  "1010877": "Ritorna a Foefire: Purificazione",
   "1010962": "Statuette della Porta di Giada",
   "1011028": "Ritorna a \"Fuori dall'Ombra\"",
   "1011062": "Ritorna ad Aurene, la precoce",
