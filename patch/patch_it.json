@@ -1,5 +1,5 @@
 {
- "version": 10,
+ "version": 11,
  "strings": {
   "47160": "Gioca",
   "47734": "Disconnetti",
@@ -8248,7 +8248,7 @@
   "929542": "Fare doppio clic per visualizzare l'interfaccia del Dispositivo Portale. Permette di monitorare le operazioni del Patto all'interno di Heart of Maguuma, attivare/disattivare gli avvisi e utilizzare il portale per unirsi alle forze del Patto.",
   "929572": "Silenzio",
   "929618": "Maestro delle Monete, Mondo 2",
-  "929619": "Uccidere ogni giorno creature dell'Underworld a Dragonfall",
+  "929619": "Uccidere quotidianamente creature nell'Underworld di Dragonfall",
   "929704": "Incontra il tuo Imperatore",
   "929825": "È richiesta assistenza da parte del Patto! È necessario aiuto sul luogo dell'incidente entro 10 minuti.",
   "929843": "Slayer di creazione di dominio perso di Dragonfall Melandru",
@@ -9794,7 +9794,7 @@
   "1018852": "Echovald Wilds: Pozzo del Cimitero",
   "1018901": "Ballare come se Bei Fung stesse osservando",
   "1018916": "Aetherblade senza fine",
-  "1018982": "Insight nelle Echovald Wilds: Fort Aspenwood",
+  "1018982": "Echovald Wilds: Fort Aspenwood",
   "1019003": "Medaglia onoraria Kestrel",
   "1019019": "Un sabotatore tra noi",
   "1019023": "L'Altare Maledetto",
@@ -13428,7 +13428,7 @@
   "1178958": "<c=@flavor>Questo oggetto viene utilizzato per creare l'oggetto leggendario Stella Radians.<br><br>Combina questo oggetto nella Mystic Forge con:<br>• 1 Regalo di Galdra<br>• 1 Regalo di Pietre d'Ombra<br>• 1 Offerta Mistica</c>",
   "1178966": "Salvatore di Gwyldell",
   "1179050": "Regali dell'esplorazione del giardino di Eternity",
-  "1179126": "Completa un meta evento in Cantha, eventi in una mappa con un meta evento idoneo, o eventi in Giungla di Maguuma. Completando il meta evento si conclude immediatamente questo obiettivo; gli eventi nella sua mappa valgono due punti verso il completamento.<br> Meta-Eventi ammissibili:<br>Aetherblade Assault (Seitung Province)<br>Kaineng Blackout (New Kaineng City)<br>Gang War of Echovald (Echovald Wilds)<br>Distruggere il Ravenous Wanderer (Gyala Delve)<br>Battle per il Jade Sea (Dragon's End)",
+  "1179126": "Completa il meta evento in Cantha, gli eventi in una mappa con un meta evento idoneo, o gli eventi in Giungla di Maguuma. Completando il meta evento termina immediatamente questo obiettivo; gli eventi nella sua mappa valgono due punti verso il completamento.<br>Eligible Meta-Events:<br>Aetherblade Assault (Seitung Province)<br>Kaineng Blackout (New Kaineng City)<br>Gang War of Echovald (Echovald Wilds)<br>Distruggere il Ravenane Wanderer (Gyala Delve)<br>Battle per il Jade Sea (Dragon's End)",
   "1179138": "Incontri settimanali di raid rapidi",
   "1179149": "Splendore del Dio Sole",
   "1179160": "Giocatore frequente di Raid Quickplay",
