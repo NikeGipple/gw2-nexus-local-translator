@@ -1,0 +1,10 @@
+{
+  "_comment": "exact = whole-string overrides; terms = names protected/translated inside sentences. Sample entries, edit freely.",
+  "exact": {
+    "Waypoint": "Waypoint"
+  },
+  "terms": {
+    "Lion's Arch": "Arco del Leone",
+    "Divinity's Reach": "Distesa della Divinità"
+  }
+}

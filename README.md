@@ -94,6 +94,23 @@ Each language is a separate module (`local_translator_<language>`) with its own 
 - Open the Nexus log: lines starting with `[Text Translator] [Italiano (Local Translator)]` come from the module. The same messages are in `local_translator_it.log`.
 - If texts stay in English right after the first launch, the model is probably still downloading.
 
+## Source code
+
+The source code of the module is in [`src/`](src):
+
+- `lt_module.py`: the Text Translator module (module protocol, patch and cache handling, local map);
+- `lt_server.py`: glossary, patch and the OPUS-MT engine, used by the module as a library;
+- `text_translator/`: the `module.toml` and the initial `settings.toml` shipped in the zip.
+
+To build the module yourself on Windows with Python 3.12:
+
+```
+pip install -r src/requirements.txt pyinstaller
+pyinstaller --noconsole --onedir --name Local_Translator_IT --paths src --collect-all ctranslate2 --add-data "src/glossary_it.default.json;." src/lt_module.py
+```
+
+Then copy the content of `dist\Local_Translator_IT\` and `src\text_translator\module.toml` into `addons\text_translator\modules\local_translator_it\`.
+
 ## Credits
 
 - **Ideka**, author of *Text Translator* (and of *Japanese Text*, used by the previous version of this project).

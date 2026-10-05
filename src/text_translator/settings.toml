@@ -1,0 +1,8 @@
+active_module = { Windows = [108, 111, 99, 97, 108, 95, 116, 114, 97, 110, 115, 108, 97, 116, 111, 114, 95, 105, 116] }
+show_translated = true
+pause_refreshes = false
+pause_translations = false
+
+[refresh_debounce]
+secs = 0
+nanos = 500000000

@@ -1,0 +1,5 @@
+# L'addon cerca il comando nella cartella del gioco, non in quella del modulo:
+# cmd /c lo avvia dalla cartella del modulo (working dir impostata dall'addon).
+name = "Italiano (Local Translator)"
+command = "cmd.exe"
+args = ["/d", "/c", "Local_Translator_IT.exe"]
