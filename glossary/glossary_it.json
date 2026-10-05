@@ -1,5 +1,5 @@
 {
-  "_comment": "exact = whole-string overrides; terms = names protected/translated inside sentences (case-sensitive, whole words). Policy: GW2 proper names, boons, conditions and crafting materials stay in English; only names with an established Italian form are translated. patterns = whole-line rules for item names, {X} = the prefix words (e.g. \"{X} Longbow\": \"Arco lungo {X}\").",
+  "_comment": "exact = whole-string overrides; terms = names protected/translated inside sentences (whole words; single words are case-sensitive, terms of two or more words also match all lower case or with only the first letter capitalized). Policy: GW2 proper names, boons, conditions and crafting materials stay in English; only names with an established Italian form are translated. patterns = whole-line rules for item names, {X} = the prefix words (e.g. \"{X} Longbow\": \"Arco lungo {X}\").",
   "exact": {
     "Waypoint": "Waypoint",
     "Account Bound": "Legato all'Account",
