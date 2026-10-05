@@ -12,7 +12,8 @@ This module brings the game into **Italian**; other languages are planned.
   - the **patch** holds curated translations of whole texts, identified by the game's string ID: they replace the machine translation and appear instantly.
 - **Ready for other languages.** Nothing is specific to Italian except the model, the glossary and the patch: the same module can be built for any language with an OPUS-MT model from English.
 
-> **Credits:** `text_translator.dll` is Ideka's *Text Translator*, included unmodified so that one zip contains everything. This project only provides the module, built on Ideka's public [module protocol](https://github.com/ideka/modulep).
+> **Credits:** `text_translator.dll` is Ideka's *Text Translator*, included so that one zip contains everything. 
+> This project only provides the module, built on Ideka's public module protocol.
 
 > **Status:** early testing. Expect rough edges and breaking changes.
 
