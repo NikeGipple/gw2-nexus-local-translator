@@ -28,7 +28,7 @@ GLOSSARY_URL = (
     "https://raw.githubusercontent.com/NikeGipple/"
     "gw2-nexus-local-translator/main/glossary/glossary_it.json"
 )
-# Curated translations by string ID (key -> Italian), applied by the module.
+# Curated translations by string ID (key -> translation), applied by the module.
 PATCH_URL = (
     "https://raw.githubusercontent.com/NikeGipple/"
     "gw2-nexus-local-translator/main/patch/patch_it.json"
@@ -234,10 +234,10 @@ class GlossaryUpdater(threading.Thread):
 # Patch: curated translations by string ID, shared through GitHub
 # --------------------------------------------------------------------------- #
 # key = the game's internal string ID (same for every player). The patch only contains
-# key -> Italian: no English game text. Text Translator keeps the translations it receives in
+# key -> translation: no English game text. Text Translator keeps the translations it receives in
 # cache.db; the patch is applied to it by lt_module.CachePatch.
 class Patch:
-    """Two sections, both key -> Italian:
+    """Two sections, both key -> translation:
 
     strings  reviewed translations: always used, replace whatever the addon's database has, and
              are never removed by a glossary change.
@@ -390,14 +390,14 @@ class PatchUpdater(GlossaryUpdater):
 
 
 # --------------------------------------------------------------------------- #
-# Local map: string ID <-> English <-> Italian (private, never shared)
+# Local map: string ID <-> English <-> translation (private, never shared)
 # --------------------------------------------------------------------------- #
 def norm(text: str) -> str:
     return html.unescape(text).strip()
 
 
 class KeyMap:
-    """Map string ID -> English -> Italian (map_it.db), filled by the module with every text it
+    """Map string ID -> English -> translation (map_<lang>.db), filled by the module with every text it
     answers. It stays on this PC: it contains English game text."""
 
     def __init__(self, path: Path) -> None:
@@ -588,7 +588,7 @@ class Engine:
         """
         new_terms = dict(self.glossary.terms)
         new_exact = dict(self.glossary.exact)
-        purge: set[str] = set()  # old Italian texts to remove from the addon database
+        purge: set[str] = set()  # old translated texts to remove from the addon database
         with self.cv:
             self.gen += 1
             old = self._read_snapshot() if self.snapshot_path else None
@@ -724,7 +724,7 @@ def export_review(map_path: Path, patch_path: Path, out: Path) -> int:
 
     One row for every text in the map or in the patch; 'italiano_attuale' is what players will
     see once the patch is published. Any text seen
-    in game can be found by its Italian text; 'inglese' is empty when the map does not know it.
+    in game can be found by its translated text; 'inglese' is empty when the map does not know it.
     Contains English game text: keep it on your PC, never publish it.
     """
     import csv
@@ -831,8 +831,8 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
     """Rebuild the 'auto' section by translating again the English text of every known string
     (map) with the current glossary.
 
-    translations     line -> Italian already available (cache); missing lines are translated
-    translate_lines  function(list of lines) -> {line: Italian}; it also saves its own cache,
+    translations     line -> translation already available (cache); missing lines are translated
+    translate_lines  function(list of lines) -> {line: translation}; it also saves its own cache,
                      so an interrupted run continues where it stopped
     Rows that would stay identical to the English text are skipped: they add nothing and would
     publish English game text. Strings without English in the map keep their old entry.
