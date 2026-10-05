@@ -9,7 +9,7 @@ This module brings the game into **Italian**; other languages are planned.
 - **Local, on-the-fly translation.** Every text is translated on your own PC, as soon as the game shows it, with [OPUS-MT](https://github.com/Helsinki-NLP/Opus-MT) and [CTranslate2](https://github.com/OpenNMT/CTranslate2). It runs on the CPU: no GPU, no accounts, no API keys, and the game text never leaves your computer.
 - **Corrected by hand.** Machine translation alone gets game names and terms wrong. Two hand-maintained files, published in this repository, fix that and update themselves at every game start:
   - the **glossary** keeps names and terms consistent in every sentence (for example *Lion's Arch* → *Arco del Leone*, while boons and proper names stay in English);
-  - the **patch** holds curated translations of whole texts, identified by the game's string ID: they replace the machine translation and need no translation time.
+  - the **patch** holds curated translations of texts, identified by the game's string ID: they replace the machine translation and need no translation time.
 - **Ready for other languages.** Nothing is specific to Italian except the model, the glossary and the patch: the same module can be built for any language with an OPUS-MT model from English.
 
 > **Credits:** `text_translator.dll` is Ideka's *Text Translator*, included so that one zip contains everything. 
