@@ -1,27 +1,27 @@
 # GW2 Nexus Local Translator
 
-Offline, in-game translation for **Guild Wars 2**, running as a translation module for the [Nexus](https://raidcore.gg/Nexus) addon *Text Translator* by Ideka. **Italian is the first supported language**; others are planned.
+A translation module for **Text Translator**, the [Nexus](https://raidcore.gg/Nexus) addon by [Ideka](https://github.com/ideka) that translates Guild Wars 2 in real time as you play.
 
-Translation runs entirely on your own PC with [OPUS-MT](https://github.com/Helsinki-NLP/Opus-MT) and [CTranslate2](https://github.com/OpenNMT/CTranslate2). No accounts, no API keys, and the game text never leaves your computer.
+This module brings the game into **Italian**; other languages are planned.
 
-> **Based on Ideka's work:** `text_translator.dll` is the *Text Translator* addon by [Ideka](https://github.com/ideka), included unmodified. This project only provides the Italian translation module, built on Ideka's public [module protocol](https://github.com/ideka/modulep).
+## What makes this module different
+
+- **Local, on-the-fly translation.** Every text is translated on your own PC, as soon as the game shows it, with [OPUS-MT](https://github.com/Helsinki-NLP/Opus-MT) and [CTranslate2](https://github.com/OpenNMT/CTranslate2). It runs on the CPU: no GPU, no accounts, no API keys, and the game text never leaves your computer.
+- **Corrected by hand.** Machine translation alone gets game names and terms wrong. Two hand-maintained files, published in this repository, fix that and update themselves at every game start:
+  - the **glossary** keeps names and terms consistent in every sentence (for example *Lion's Arch* → *Arco del Leone*, while boons and proper names stay in English);
+  - the **patch** holds curated translations of whole texts, identified by the game's string ID: they replace the machine translation and appear instantly.
+- **Ready for other languages.** Nothing is specific to Italian except the model, the glossary and the patch: the same module can be built for any language with an OPUS-MT model from English.
+
+> **Credits:** `text_translator.dll` is Ideka's *Text Translator*, included unmodified so that one zip contains everything. This project only provides the module, built on Ideka's public [module protocol](https://github.com/ideka/modulep).
 
 > **Status:** early testing. Expect rough edges and breaking changes.
-
-## Features
-
-- Translates in-game text locally, on the CPU (no GPU needed). Currently available: Italian.
-- Starts and stops by itself together with the game: nothing to launch manually.
-- Downloads its translation model automatically on first run.
-- Keeps game-specific names and terms consistent through a glossary that updates itself from this repository.
-- Ships curated translations (the *patch*) that update themselves from this repository: texts covered by the patch are translated instantly, the rest is translated locally.
-- Built so that other languages can be added later.
 
 ## Requirements
 
 - Guild Wars 2 on Windows (64-bit), **game language set to English**
 - [Nexus](https://raidcore.gg/Nexus) addon loader
-- Internet connection on first run (about 70 MB model download)
+- About **500 MB of free RAM** while playing, on top of what the game uses. The translator runs on the CPU (up to 4 threads) only while new texts are being translated.
+- About **250 MB of free disk space**
 
 ## Installation
 
@@ -58,7 +58,7 @@ addons\
 
 1. Text Translator starts the module when the game loads and stops it when the game closes.
 2. It sends the module every game text with its internal string ID.
-3. The module answers from the curated patch, from the glossary or from the local OPUS-MT model.
+3. The module answers from the curated patch if the text is there; otherwise it translates it locally with OPUS-MT, applying the glossary.
 4. Text Translator saves the translations in `cache.db` and shows them in game.
 
 The only network connections made by the module are to this repository on GitHub: the glossary and patch checks (at start and every few hours) and the one-time model download. Text Translator itself also connects to its author's server.
@@ -80,6 +80,10 @@ It contains no English game text. To report a wrong translation, open an issue w
 ## Glossary
 
 The glossary lives in [`glossary/glossary_it.json`](glossary/glossary_it.json). Suggestions and corrections are welcome through issues or pull requests.
+
+## Other languages
+
+Each language is a separate module (`local_translator_<language>`) with its own OPUS-MT model, glossary (`glossary_<language>.json`) and patch (`patch_<language>.json`). If you would like to maintain one, open an issue.
 
 - `exact`: whole-text overrides, used when a text must be translated exactly in one way.
 - `terms`: names that must be translated (or kept) in a fixed way inside any sentence.
