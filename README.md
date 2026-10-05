@@ -1,6 +1,6 @@
 # GW2 Nexus Local Translator
 
-A translation module for **Text Translator**, the [Nexus](https://raidcore.gg/Nexus) addon by [Ideka](https://github.com/ideka) that translates Guild Wars 2 in real time as you play.
+A translation module for [**Text Translator**](https://github.com/ideka/text-translator-public), the [Nexus](https://raidcore.gg/Nexus) addon by [Ideka](https://github.com/ideka) that translates Guild Wars 2 in real time as you play.
 
 This module brings the game into **Italian**; other languages are planned.
 
@@ -9,7 +9,7 @@ This module brings the game into **Italian**; other languages are planned.
 - **Local, on-the-fly translation.** Every text is translated on your own PC, as soon as the game shows it, with [OPUS-MT](https://github.com/Helsinki-NLP/Opus-MT) and [CTranslate2](https://github.com/OpenNMT/CTranslate2). It runs on the CPU: no GPU, no accounts, no API keys, and the game text never leaves your computer.
 - **Corrected by hand.** Machine translation alone gets game names and terms wrong. Two hand-maintained files, published in this repository, fix that and update themselves at every game start:
   - the **glossary** keeps names and terms consistent in every sentence (for example *Lion's Arch* → *Arco del Leone*, while boons and proper names stay in English);
-  - the **patch** holds curated translations of whole texts, identified by the game's string ID: they replace the machine translation and appear instantly.
+  - the **patch** holds curated translations of whole texts, identified by the game's string ID: they replace the machine translation and need no translation time.
 - **Ready for other languages.** Nothing is specific to Italian except the model, the glossary and the patch: the same module can be built for any language with an OPUS-MT model from English.
 
 > **Credits:** `text_translator.dll` is Ideka's *Text Translator*, included so that one zip contains everything. 
@@ -31,8 +31,6 @@ This module brings the game into **Italian**; other languages are planned.
 3. Start the game. If needed, enable **Text Translator** from the Nexus addon list: the *Italiano (Local Translator)* module starts by itself.
 
 On the very first start the model is downloaded and loaded, which takes a little while. Until then text stays in English. Later starts are immediate.
-
-**Updating from the previous version** (`Local_Translator.dll` + `Local_Translator_Launcher.dll`): just extract the new zip. On its first start the module disables the old version (renamed to `.dll.off`, nothing is deleted) and reuses its model and data; restart the game once.
 
 After installation your `addons` folder contains:
 
@@ -80,14 +78,17 @@ It contains no English game text. To report a wrong translation, open an issue w
 
 ## Glossary
 
-The glossary lives in [`glossary/glossary_it.json`](glossary/glossary_it.json). Suggestions and corrections are welcome through issues or pull requests.
+The glossary lives in [`glossary/glossary_it.json`](glossary/glossary_it.json). It has three sections:
+
+- `exact`: whole-text overrides, used when a text must be translated exactly in one way.
+- `terms`: names that must be translated (or kept) in a fixed way inside any sentence.
+- `patterns`: whole-text rules where `{X}` stands for one or more capitalized words, e.g. `"{X} Longbow": "Arco lungo {X}"`.
+
+Suggestions and corrections are welcome through issues or pull requests.
 
 ## Other languages
 
 Each language is a separate module (`local_translator_<language>`) with its own OPUS-MT model, glossary (`glossary_<language>.json`) and patch (`patch_<language>.json`). If you would like to maintain one, open an issue.
-
-- `exact`: whole-text overrides, used when a text must be translated exactly in one way.
-- `terms`: names that must be translated (or kept) in a fixed way inside any sentence.
 
 ## Troubleshooting
 
@@ -100,7 +101,7 @@ Each language is a separate module (`local_translator_<language>`) with its own 
 The source code of the module is in [`src/`](src):
 
 - `lt_module.py`: the Text Translator module (module protocol, patch and cache handling, local map);
-- `lt_server.py`: glossary, patch and the OPUS-MT engine, used by the module as a library;
+- `lt_server.py`: glossary, patch, local map and the OPUS-MT engine, used by the module as a library;
 - `text_translator/`: the `module.toml` and the initial `settings.toml` shipped in the zip.
 
 To build the module yourself on Windows with Python 3.12:
@@ -114,7 +115,7 @@ Then copy the content of `dist\Local_Translator_IT\` and `src\text_translator\mo
 
 ## Credits
 
-- **Ideka**, author of *Text Translator* (and of *Japanese Text*, used by the previous version of this project).
+- **Ideka**, author of [*Text Translator*](https://github.com/ideka/text-translator-public) and of its [module protocol](https://github.com/ideka/modulep).
 - **Helsinki-NLP**, for the [OPUS-MT](https://github.com/Helsinki-NLP/Opus-MT) models, released under CC BY 4.0.
 - **OpenNMT**, for [CTranslate2](https://github.com/OpenNMT/CTranslate2).
 - **Raidcore**, for Nexus.

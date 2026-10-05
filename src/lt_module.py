@@ -5,11 +5,10 @@ Protocol: https://github.com/ideka/modulep (version 1). The addon starts this ex
 on stdout; stderr goes to the Nexus log. The addon keeps the translations in cache.db next to
 this exe (table translations: id, cache_key, version, timestamp, text).
 
-Everything else (glossary, patch, OPUS-MT engine, map) is reused from lt_server.py, which is
-used as a library (its HTTP server is the previous version, no longer distributed).
+Glossary, patch, OPUS-MT engine and map come from lt_server.py, imported as a library.
+Data lives in IT\\ next to this exe (model, glossary, patch, cache_it.jsonl, map_it.db).
 
-Data lives in IT\\ next to this exe. On the first start, the files of an existing old install
-(addons\\Local_Translator\\IT: model, map, cache, glossary) are COPIED, never moved or changed.
+Developer commands (strumenti.bat options 4 and 5): --export-review and --import-review.
 """
 from __future__ import annotations
 
@@ -19,7 +18,6 @@ import logging
 import os
 import queue
 import re
-import shutil
 import sqlite3
 import struct
 import sys
@@ -39,11 +37,6 @@ CACHE_KEY = "it"
 MAX_MESSAGE = 0x10_0000
 KIND_TEXT, KIND_CANCEL = 0, 1
 
-# Markup that must come out untouched. lt_server protects %str1% and <c=...>; the raw game
-# strings also contain markers such as [s], [the], [null], [pl:"Foci"], [f:"Goddess"]
-# (Japanese Text removed them before sending, Text Translator does not). A broken marker can
-# crash the game, so they are protected too.
-lt.TOKEN_RE = re.compile(r'%[A-Za-z]+\d*%|</?[A-Za-z][^<>\n]*>|\[[^\[\]\n]*\]')
 TRIVIAL_RE = re.compile(r"\(\(\d+\)\)|\(new string\)")
 
 log = logging.getLogger("lt")
@@ -155,7 +148,7 @@ def has_table(db: Path) -> bool:
 
 
 class CachePatch(lt.Patch):
-    """Same rules as lt_server.Patch, applied to cache.db instead of lang.db.
+    """Same rules as lt_server.Patch, applied to Text Translator's cache.db.
 
     New texts are NOT written in advance: the addon asks for them and the module answers from
     the patch at once (so the map also learns their English text). Here only rows the addon
@@ -274,76 +267,11 @@ class ModuleEngine(lt.Engine):
 
 
 # --------------------------------------------------------------------------- #
-# First start: copy (never move) the files of the old install
-# --------------------------------------------------------------------------- #
-def copy_old_install(old_dir: Path, lang_dir: Path) -> None:
-    flag = lang_dir / "copied_from_old.json"
-    if flag.exists() or not old_dir.is_dir():
-        return
-    done = []
-    try:
-        src = old_dir / "map_it.db"
-        dst = lang_dir / "map_it.db"
-        if src.is_file() and not dst.exists():
-            a = sqlite3.connect(f"file:{src}?mode=ro", uri=True, timeout=10)
-            b = sqlite3.connect(str(dst))
-            try:
-                a.backup(b)
-            finally:
-                a.close()
-                b.close()
-            done.append("map_it.db")
-        for name in ("cache_it.jsonl", "cache_it.glossary.json", "glossary_it.json"):
-            if (old_dir / name).is_file() and not (lang_dir / name).exists():
-                shutil.copy2(old_dir / name, lang_dir / name)
-                done.append(name)
-        flag.write_text(json.dumps({"from": str(old_dir), "files": done, "at": int(time.time())}),
-                        encoding="utf-8")
-        if done:
-            log.info("copied from the old install %s: %s", old_dir, ", ".join(done))
-    except Exception as exc:  # noqa: BLE001 - optional: the module also works from scratch
-        log.warning("cannot copy files from the old install: %s", exc)
-
-
-def prepare_model(model: Path, old_model: Path, lang_dir: Path, url: str) -> None:
-    if not (model / "model.bin").is_file() and (old_model / "model.bin").is_file():
-        tmp = model.with_name(model.name + ".tmp")
-        shutil.rmtree(tmp, ignore_errors=True)
-        shutil.copytree(old_model, tmp)
-        os.replace(tmp, model)
-        log.info("model copied from the old install (%s)", old_model)
-    lt.ensure_model(model, lang_dir, url)
-
-
-def disable_old_version(addons: Path) -> None:
-    """The previous version (modified Japanese Text + launcher + HTTP server) must not run together
-    with this module. Its two DLLs are renamed to .dll.off (Nexus ignores them): nothing is deleted,
-    and its data folders stay where they are. Takes effect at the next game start."""
-    done = []
-    for name in ("Local_Translator.dll", "Local_Translator_Launcher.dll"):
-        dll = addons / name
-        if not dll.is_file():
-            continue
-        try:
-            off = dll.with_name(name + ".off")
-            if off.exists():
-                off.unlink()
-            dll.rename(off)
-            done.append(name)
-        except OSError as exc:
-            log.warning("old version still installed (%s), cannot disable it: %s. "
-                        "Disable it in Nexus: two translators together can conflict", name, exc)
-    if done:
-        log.warning("old version disabled (%s renamed to .dll.off): restart the game once",
-                    ", ".join(done))
-
-
-# --------------------------------------------------------------------------- #
 # Requests
 # --------------------------------------------------------------------------- #
 class IdCheck:
-    """Checks that Text Translator's string IDs are the ones of the patch (Japanese Text's
-    lang.db keys) by comparing the English text with the map copied from the old install.
+    """Checks that the string IDs Text Translator sends are the ones the patch was built with,
+    by comparing the English text it sends with the map (e.g. after an update of the addon).
     If too many differ, the patch is no longer used (it would show the wrong texts)."""
 
     def __init__(self, keymap: lt.KeyMap | None) -> None:
@@ -368,10 +296,10 @@ class IdCheck:
             self.reported = True
             if self.mismatch > self.match:
                 self.failed = True
-                log.error("string IDs do not match the old map (%d equal, %d different): "
+                log.error("string IDs do not match the map (%d equal, %d different): "
                           "patch DISABLED", self.match, self.mismatch)
             else:
-                log.info("string IDs check: %d equal, %d different -> same IDs as Japanese Text",
+                log.info("string IDs check: %d equal, %d different -> same IDs as the map",
                          self.match, self.mismatch)
 
 
@@ -462,7 +390,7 @@ class Dispatcher:
                      self.answered, len(self.pending), len(self.engine.queue))
         if self.keymap and not self.ids.failed:
             try:
-                self.keymap._save([(k, en, it, "live") for k, en, it in out
+                self.keymap.save([(k, en, it, "live") for k, en, it in out
                                    if en.strip() and en != it])
             except Exception as exc:  # noqa: BLE001
                 log.debug("map save failed: %s", exc)
@@ -484,24 +412,31 @@ def cache_db_watcher(patch: CachePatch, cache_db: Path) -> None:
 # --------------------------------------------------------------------------- #
 def main() -> int:
     module_dir = lt.app_dir()  # ...\addons\text_translator\modules\<folder>
-    addons = module_dir.parents[2] if len(module_dir.parents) > 2 else module_dir
     ap = argparse.ArgumentParser()
     ap.add_argument("--fake", action="store_true", help="answer '[IT] text', no model (test)")
     ap.add_argument("--lang-dir", type=Path, default=module_dir / "IT")
-    ap.add_argument("--old-dir", type=Path, default=addons / "Local_Translator" / "IT",
-                    help="old install to copy model, map and cache from (first start only)")
     ap.add_argument("--cache-db", type=Path, default=module_dir / "cache.db")
     ap.add_argument("--patch-file", type=Path, default=None, help="local patch (developers)")
     ap.add_argument("--no-update", action="store_true")
     ap.add_argument("--debug", action="store_true")
     ap.add_argument("--export-review", type=Path, metavar="CSV",
                     help="developers: write the ID/English/Italian map of this module to a CSV, then exit")
+    ap.add_argument("--import-review", type=Path, metavar="CSV",
+                    help="developers: merge the 'nuova_traduzione' column of a reviewed CSV into "
+                         "--patch-file, then exit")
     args = ap.parse_args()
 
-    if args.export_review:  # developer command, not started by the addon
+    if args.export_review:  # developer commands, not started by the addon
         n = lt.export_review(args.lang_dir / "map_it.db", args.patch_file or args.lang_dir / "patch_it.json",
-                             args.export_review, None)
+                             args.export_review)
         print(f"{n} rows written to {args.export_review}")
+        return 0
+    if args.import_review:
+        if not args.patch_file:
+            print("--import-review needs --patch-file (the repository's patch\\patch_it.json)")
+            return 1
+        changed, removed = lt.import_review(args.import_review, args.patch_file)
+        print(f"patch {args.patch_file}: {changed} added/changed, {removed} removed")
         return 0
 
     rx, tx, err = binary_streams()
@@ -522,8 +457,6 @@ def main() -> int:
         handlers.append(h)
     logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO, handlers=handlers)
     log.info("Local Translator IT module started (protocol %d, result version %d)", PROTOCOL, RESULT_VERSION)
-
-    disable_old_version(addons)
 
     # Requests are read and buffered from the very start, while the rest gets ready.
     early: list[tuple[int, str]] = []
@@ -553,7 +486,6 @@ def main() -> int:
 
     threading.Thread(target=reader, daemon=True, name="stdin-reader").start()
 
-    copy_old_install(args.old_dir, args.lang_dir)
     glossary = lt.Glossary()
     if not glossary.load_file(args.lang_dir / "glossary_it.json"):
         glossary.load_file(lt.bundled_dir() / "glossary_it.default.json")
@@ -564,7 +496,7 @@ def main() -> int:
                           args.lang_dir / "cache_it.jsonl", args.cache_db, patch=patch)
     keymap = None
     try:
-        keymap = lt.KeyMap(args.lang_dir / "map_it.db", None, None)
+        keymap = lt.KeyMap(args.lang_dir / "map_it.db")
         log.info("map: %d strings known", keymap.count())
     except Exception as exc:  # noqa: BLE001
         log.warning("map disabled: %s", exc)
@@ -583,7 +515,7 @@ def main() -> int:
         def load_model() -> None:
             model = args.lang_dir / "model"
             try:
-                prepare_model(model, args.old_dir / "model", args.lang_dir, lt.MODEL_URL)
+                lt.ensure_model(model, args.lang_dir, lt.MODEL_URL)
                 threads = max(1, min(4, (os.cpu_count() or 2) // 2))
                 engine.translator = lt.CT2Translator(model, threads=threads)
                 log.info("model loaded")
