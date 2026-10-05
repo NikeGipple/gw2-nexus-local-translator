@@ -1,10 +1,10 @@
 {
-  "_comment": "exact = whole-string overrides; terms = names protected/translated inside sentences. Sample entries, edit freely.",
+  "_comment": "Fallback glossary bundled in the exe, used only until glossary_it.json is downloaded from GitHub (first start, or offline). Keep it consistent with glossary/glossary_it.json.",
   "exact": {
     "Waypoint": "Waypoint"
   },
   "terms": {
     "Lion's Arch": "Arco del Leone",
-    "Divinity's Reach": "Distesa della Divinità"
+    "Divinity's Reach": "Divinity's Reach"
   }
 }

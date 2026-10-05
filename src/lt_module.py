@@ -1,4 +1,8 @@
-"""Italian translation module (Local Translator) for Ideka's "Text Translator" Nexus addon.
+"""Local Translator: local translation module for Ideka's "Text Translator" Nexus addon.
+
+Local Translator is meant for any language the game can be translated into from English; each
+language is built as its own module (local_translator_<lang>). Italian is the first one, and for
+now the language is set in the code (CACHE_KEY, IT\\ folder, *_it files, the GitHub URLs).
 
 Protocol: https://github.com/ideka/modulep (version 1). The addon starts this exe itself
 (module.toml), sends every game text with its string ID on stdin and reads the translations
@@ -236,7 +240,7 @@ class CachePatch(lt.Patch):
 
 
 class ModuleEngine(lt.Engine):
-    """lt_server.Engine whose glossary cleanup works on cache.db (rows found by Italian text)."""
+    """lt_server.Engine whose glossary cleanup works on cache.db (rows found by their translated text)."""
 
     def _purge_addon_db(self, texts: set[str]) -> None:
         db = self.addon_db
@@ -420,7 +424,7 @@ def main() -> int:
     ap.add_argument("--no-update", action="store_true")
     ap.add_argument("--debug", action="store_true")
     ap.add_argument("--export-review", type=Path, metavar="CSV",
-                    help="developers: write the ID/English/Italian map of this module to a CSV, then exit")
+                    help="developers: write the ID/English/translation map of this module to a CSV, then exit")
     ap.add_argument("--import-review", type=Path, metavar="CSV",
                     help="developers: merge the 'nuova_traduzione' column of a reviewed CSV into "
                          "--patch-file, then exit")

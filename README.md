@@ -41,7 +41,7 @@ addons\
     settings.toml                     addon settings
     modules\local_translator_it\
       module.toml                     module description for the addon
-      Local_Translator_IT.exe         the Italian translation module
+      Local_Translator_IT.exe         the module (Italian build)
       _internal\                      libraries used by the module
       cache.db                        translations saved by the addon
       IT\                             Italian files (one folder per language)
