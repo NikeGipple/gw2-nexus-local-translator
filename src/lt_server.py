@@ -47,6 +47,9 @@ TOKEN_RE = re.compile(r'%[A-Za-z]+\d*%|</?[A-Za-z][^<>\n]*>|\[[^\[\]\n]*\]')
 # cached lines translated with the old rules are dropped once (see Engine.sync_glossary).
 #   2 = glossary terms glued to markup ("Large Bone[s]", "Plaza of<br>Dwayna") are protected
 PROTECT_VERSION = 2
+# Control characters: a string that contains them is undecoded game data, not text
+# (e.g. key 508192 arrived as "\x8e6]2T\x93..."); it is never translated nor published.
+GARBLED_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
 
 log = logging.getLogger("lt")
 
@@ -686,6 +689,8 @@ class Engine:
     # -- lines -------------------------------------------------------------------------------
     @staticmethod
     def _needs_translation(line: str) -> bool:
+        if GARBLED_RE.search(line):
+            return False  # undecoded game data: shown as it is
         return re.search(r"[A-Za-z]{2}", TOKEN_RE.sub("", line)) is not None
 
     # -- worker side ------------------------------------------------------------------------
@@ -751,7 +756,7 @@ class Engine:
         for i, out in zip(model_idx, model_outs):
             outs[i] = out
         for line, (_, restore), out in zip(lines, prepared, outs):
-            if not all(ph in out for ph in restore):
+            if not out.strip() or not all(ph in out for ph in restore):
                 results[line] = line  # a placeholder got lost: keep the English text, never break markup
                 continue
             for ph, original in restore.items():
@@ -923,6 +928,9 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
     for key, en in english.items():
         lines = en.split("\n")
         outs = [result(line) for line in lines]
+        if GARBLED_RE.search(en) or not "\n".join(outs).strip():
+            skipped += 1  # undecoded game data or an empty result: never published
+            continue
         if "\n".join(outs).strip() == en.strip() or any(
                 o.strip() == e.strip() and Engine._needs_translation(e) for e, o in zip(lines, outs)):
             skipped += 1  # still (partly) in English: names kept as they are, failed lines
