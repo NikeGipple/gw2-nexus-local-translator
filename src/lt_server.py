@@ -43,6 +43,10 @@ UPDATE_INTERVAL = 6 * 3600  # seconds
 # and the markers of the raw game strings such as [s], [the], [null], [pl:"Foci"], [f:"Goddess"]
 # (Text Translator sends them as they are; a broken marker can crash the game).
 TOKEN_RE = re.compile(r'%[A-Za-z]+\d*%|</?[A-Za-z][^<>\n]*>|\[[^\[\]\n]*\]')
+# Version of the glossary protection rules, saved with the cache snapshot. When it grows, the
+# cached lines translated with the old rules are dropped once (see Engine.sync_glossary).
+#   2 = glossary terms glued to markup ("Large Bone[s]", "Plaza of<br>Dwayna") are protected
+PROTECT_VERSION = 2
 
 log = logging.getLogger("lt")
 
@@ -84,11 +88,22 @@ class Glossary:
 
     def term_regex(self, src: str) -> re.Pattern:
         """Whole-word regex for a glossary term, compiled only the first time it is needed.
-        (Compiling ~10k regexes for every line made each batch take many seconds.)"""
+        (Compiling ~10k regexes for every line made each batch take many seconds.)
+
+        Used on lines where the game markup is already replaced by placeholders (QZ0QZ), so a
+        placeholder glued to the term also counts as a word boundary: "Large Bone[s]" becomes
+        "Large BoneQZ0QZ" and "Plaza of<br>Dwayna" becomes "Plaza ofQZ0QZDwayna"."""
         rx = self._term_rx.get(src)
         if rx is None:
-            rx = self._term_rx[src] = re.compile(r"(?<!\w)" + re.escape(src) + r"(?!\w)")
+            rx = self._term_rx[src] = re.compile(
+                r"(?:(?<!\w)|(?<=\dQZ))" + re.escape(src) + r"(?:(?!\w)|(?=QZ\d))")
         return rx
+
+    @staticmethod
+    def old_term_regex(src: str) -> re.Pattern:
+        """Boundaries used up to v0.2.0: a term glued to markup was not protected. Only used once,
+        to find the cached lines translated with that bug (Engine.sync_glossary)."""
+        return re.compile(r"(?<!\w)" + re.escape(src) + r"(?!\w)")
 
     def load_dict(self, data: dict) -> None:
         exact = data.get("exact", {})
@@ -576,7 +591,21 @@ class Engine:
             data = {"terms": data, "exact": None}
         return {"terms": {str(k): str(v) for k, v in data["terms"].items()},
                 "exact": None if data.get("exact") is None else
-                {str(k): str(v) for k, v in data["exact"].items()}}
+                {str(k): str(v) for k, v in data["exact"].items()},
+                "protect": int(data.get("protect", 1))}
+
+    def _glued_term(self, line: str) -> bool:
+        """True if the line has a glossary term glued to markup, that the protection rules before
+        PROTECT_VERSION 2 left to the model (e.g. "Large Bone[s]" -> "Grande Bone[s]")."""
+        if not TOKEN_RE.search(line):
+            return False
+        protected = TOKEN_RE.sub("QZ0QZ", line)
+        g = self.glossary
+        for src, _ in g.terms:
+            if src in protected and g.term_regex(src).search(protected) \
+                    and not g.old_term_regex(src).search(protected):
+                return True
+        return False
 
     def sync_glossary(self) -> None:
         """Called at startup and when the glossary changes.
@@ -618,13 +647,25 @@ class Engine:
                         purge.add(self.cache.pop(s))
                     dropped = len(stale)
                 changed = changed | exact_changed
+                if old["protect"] < PROTECT_VERSION and self.cache:
+                    # translated with older protection rules: translate these lines again
+                    glued = [s for s in self.cache if self._glued_term(s)]
+                    for s in glued:
+                        purge.add(self.cache.pop(s))
+                    dropped += len(glued)
+                    if glued:
+                        log.info("glossary sync: %d cached lines with terms glued to markup "
+                                 "dropped (translated again)", len(glued))
+            upgrade = old is not None and old["protect"] < PROTECT_VERSION
             try:
                 if dropped or purge or (changed is None and self.cache_path
                                         and self.cache_path.exists()):
                     self._rewrite_cache()
-                if self.snapshot_path and (changed is None or changed or old["exact"] is None):
+                if self.snapshot_path and (changed is None or changed or upgrade
+                                           or old["exact"] is None):
                     tmp = self.snapshot_path.with_suffix(".tmp")
-                    tmp.write_text(json.dumps({"terms": new_terms, "exact": new_exact},
+                    tmp.write_text(json.dumps({"terms": new_terms, "exact": new_exact,
+                                               "protect": PROTECT_VERSION},
                                               ensure_ascii=False, indent=0), encoding="utf-8")
                     os.replace(tmp, self.snapshot_path)
             except OSError as exc:
@@ -702,7 +743,13 @@ class Engine:
     def _translate_lines(self, lines: list[str]) -> dict[str, str]:
         results: dict[str, str] = {}
         prepared = [self._protect(line) for line in lines]
-        outs = self.translator.translate([p for p, _ in prepared])
+        # lines made only of markup and glossary terms ("Large Bone[s]") need no model
+        model_idx = [i for i, (p, _) in enumerate(prepared)
+                     if re.search(r"[A-Za-z]", re.sub(r"QZ\d+QZ", "", p))]
+        model_outs = self.translator.translate([prepared[i][0] for i in model_idx]) if model_idx else []
+        outs = [p for p, _ in prepared]
+        for i, out in zip(model_idx, model_outs):
+            outs[i] = out
         for line, (_, restore), out in zip(lines, prepared, outs):
             if not all(ph in out for ph in restore):
                 results[line] = line  # a placeholder got lost: keep the English text, never break markup
