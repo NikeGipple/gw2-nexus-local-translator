@@ -120,7 +120,11 @@ Then copy the content of `dist\Local_Translator_IT\` and `src\text_translator\mo
 - **OpenNMT**, for [CTranslate2](https://github.com/OpenNMT/CTranslate2).
 - **Raidcore**, for Nexus.
 
-This is an unofficial community project. It is not affiliated with or endorsed by ArenaNet, NCSoft, Raidcore, Ideka or Helsinki-NLP.
+## Disclaimer
+
+This is an unofficial community project. It is not affiliated with or endorsed by ArenaNet, NCSOFT, Raidcore, Ideka or Helsinki-NLP.
+
+© ArenaNet LLC. All rights reserved. NCSOFT, ArenaNet, Guild Wars, Guild Wars 2, GW2, Heart of Thorns, Path of Fire, End of Dragons, Secrets of the Obscure, Janthir Wilds, Visions of Eternity, and all associated logos, designs, and composite marks are trademarks or registered trademarks of NCSOFT Corporation. All other trademarks are the property of their respective owners.
 
 ## License
 
