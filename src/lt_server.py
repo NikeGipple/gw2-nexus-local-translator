@@ -46,7 +46,18 @@ TOKEN_RE = re.compile(r'%[A-Za-z]+\d*%|</?[A-Za-z][^<>\n]*>|\[[^\[\]\n]*\]')
 # Version of the glossary protection rules, saved with the cache snapshot. When it grows, the
 # cached lines translated with the old rules are dropped once (see Engine.sync_glossary).
 #   2 = glossary terms glued to markup ("Large Bone[s]", "Plaza of<br>Dwayna") are protected
-PROTECT_VERSION = 2
+#   3 = English plural markers resolved before translating ("Edible Mushroom[s]" -> "Edible
+#       Mushrooms"): kept in the Italian text, the game added an English "s" ("Funghi commestibilis")
+PROTECT_VERSION = 3
+# Plural markers of the raw game strings: "Piece[s]" adds "s", "Box[pl:\"Boxes\"]" replaces the
+# word before it. They only work for English, so the text is translated in its plural form.
+PLURAL_RE = re.compile(r'(?<=\w)\[s\]|[\w\'’-]+\[pl:"([^"\[\]\n]*)"\]')
+
+
+def resolve_plural(line: str) -> str:
+    """English plural form of a raw game string: "Piece[s] of Gear" -> "Pieces of Gear",
+    "Recovered Tool Box[pl:\"Boxes\"]" -> "Recovered Tool Boxes"."""
+    return PLURAL_RE.sub(lambda m: "s" if m.group(1) is None else m.group(1), line)
 # Control characters: a string that contains them is undecoded game data, not text
 # (e.g. key 508192 arrived as "\x8e6]2T\x93..."); it is never translated nor published.
 GARBLED_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
@@ -597,6 +608,11 @@ class Engine:
                 {str(k): str(v) for k, v in data["exact"].items()},
                 "protect": int(data.get("protect", 1))}
 
+    def outdated(self, line: str, version: int) -> bool:
+        """True if a translation made with protection rules `version` must be redone."""
+        return ((version < 3 and PLURAL_RE.search(line) is not None)
+                or (version < 2 and self._glued_term(line)))
+
     def _glued_term(self, line: str) -> bool:
         """True if the line has a glossary term glued to markup, that the protection rules before
         PROTECT_VERSION 2 left to the model (e.g. "Large Bone[s]" -> "Grande Bone[s]")."""
@@ -652,13 +668,13 @@ class Engine:
                 changed = changed | exact_changed
                 if old["protect"] < PROTECT_VERSION and self.cache:
                     # translated with older protection rules: translate these lines again
-                    glued = [s for s in self.cache if self._glued_term(s)]
-                    for s in glued:
+                    redo = [s for s in self.cache if self.outdated(s, old["protect"])]
+                    for s in redo:
                         purge.add(self.cache.pop(s))
-                    dropped += len(glued)
-                    if glued:
-                        log.info("glossary sync: %d cached lines with terms glued to markup "
-                                 "dropped (translated again)", len(glued))
+                    dropped += len(redo)
+                    if redo:
+                        log.info("glossary sync: %d cached lines made with older protection "
+                                 "rules dropped (translated again)", len(redo))
             upgrade = old is not None and old["protect"] < PROTECT_VERSION
             try:
                 if dropped or purge or (changed is None and self.cache_path
@@ -747,7 +763,7 @@ class Engine:
 
     def _translate_lines(self, lines: list[str]) -> dict[str, str]:
         results: dict[str, str] = {}
-        prepared = [self._protect(line) for line in lines]
+        prepared = [self._protect(resolve_plural(line)) for line in lines]
         # lines made only of markup and glossary terms ("Large Bone[s]") need no model
         model_idx = [i for i, (p, _) in enumerate(prepared)
                      if re.search(r"[A-Za-z]", re.sub(r"QZ\d+QZ", "", p))]
@@ -931,8 +947,9 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
         if GARBLED_RE.search(en) or not "\n".join(outs).strip():
             skipped += 1  # undecoded game data or an empty result: never published
             continue
-        if "\n".join(outs).strip() == en.strip() or any(
-                o.strip() == e.strip() and Engine._needs_translation(e) for e, o in zip(lines, outs)):
+        if "\n".join(outs).strip() in (en.strip(), resolve_plural(en).strip()) or any(
+                o.strip() in (e.strip(), resolve_plural(e).strip()) and Engine._needs_translation(e)
+                for e, o in zip(lines, outs)):
             skipped += 1  # still (partly) in English: names kept as they are, failed lines
             continue
         auto[key] = "\n".join(outs)
