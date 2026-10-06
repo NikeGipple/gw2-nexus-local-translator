@@ -156,8 +156,10 @@ class CachePatch(lt.Patch):
 
     New texts are NOT written in advance: the addon asks for them and the module answers from
     the patch at once (so the map also learns their English text). Here only rows the addon
-    already has are fixed: reviewed texts that differ, automatic texts of an older patch version,
-    and texts that left the patch ('drop' and rows written earlier by us).
+    already has are fixed, following the priority reviewed > automatic > local server:
+    reviewed texts that differ, valid automatic texts that differ (whoever wrote the row: an
+    older patch or the local server, also when it kept the English text), and texts that left
+    the patch ('drop' and rows written earlier by us).
     """
 
     def apply(self, db: Path | None) -> int:
@@ -178,8 +180,7 @@ class CachePatch(lt.Patch):
                 now_text = current.get(k)
                 if now_text is None or now_text == v or k in skipped:
                     continue
-                if now_text == applied.get(k):
-                    write.append((k, v))
+                write.append((k, v))  # a valid automatic text beats the local server's one
             published = {k for k, _ in reviewed} | {k for k, _ in auto}
             remove = {k for k, t in applied.items()
                       if k not in published and current.get(k) == t} if auto else set()
@@ -197,6 +198,11 @@ class CachePatch(lt.Patch):
                                 [(CACHE_KEY, k) for k in remove])
         finally:
             con.close()
+        if self.auto_current() and self.skip_path and self.skip_path.exists():
+            try:  # patch made with the player's glossary: the old blocks are no longer needed
+                self.skip_path.unlink()
+            except OSError as exc:
+                log.warning("cannot remove %s: %s", self.skip_path, exc)
         for k in remove:
             current.pop(k, None)
         dpath = self._dropped_path()
@@ -318,7 +324,7 @@ class Dispatcher:
         self.pending: dict[int, str] = {}
         self.ids = IdCheck(keymap)
         self.skipped: set[int] = set()
-        self.skipped_version = -1
+        self.skipped_version: tuple = ()
         self.answered = 0
 
     def submit(self, key: int, text: str) -> None:
@@ -347,8 +353,9 @@ class Dispatcher:
             with e.cv:
                 if self.inbox.empty():
                     e.cv.wait(0.5)
-                if self.patch.version != self.skipped_version:
-                    self.skipped, self.skipped_version = self.patch._skipped(), self.patch.version
+                state = self.patch.skipped_state()  # patch or glossary changed: check again
+                if state != self.skipped_version:
+                    self.skipped, self.skipped_version = self.patch._skipped(), state
                 while True:  # new requests
                     try:
                         key, text = self.inbox.get_nowait()
@@ -496,6 +503,7 @@ def main() -> int:
     fake = args.fake or (args.lang_dir / "fake.txt").is_file()
     patch = CachePatch(skip_path=args.lang_dir / "patch_it.skip.json")
     patch.load_file(args.patch_file or args.lang_dir / "patch_it.json")
+    patch.glossary = glossary  # to know whether 'auto' was made with this glossary
     engine = ModuleEngine(lt.FakeTranslator() if fake else None, glossary,
                           args.lang_dir / "cache_it.jsonl", args.cache_db, patch=patch)
     keymap = None
@@ -530,7 +538,16 @@ def main() -> int:
     threading.Thread(target=cache_db_watcher, args=(patch, args.cache_db), daemon=True,
                      name="cache-db").start()
     if not args.no_update:
-        lt.GlossaryUpdater(glossary, args.lang_dir, engine.sync_glossary, lt.GLOSSARY_URL).start()
+        def glossary_changed() -> None:
+            engine.sync_glossary()
+            # automatic rows blocked until now may be valid with the new glossary
+            try:
+                if has_table(args.cache_db):
+                    patch.apply(args.cache_db)
+            except Exception as exc:  # noqa: BLE001
+                log.warning("cannot apply the patch to %s: %s", args.cache_db, exc)
+
+        lt.GlossaryUpdater(glossary, args.lang_dir, glossary_changed, lt.GLOSSARY_URL).start()
         if not args.patch_file:
             lt.PatchUpdater(patch, args.lang_dir, args.cache_db, lt.PATCH_URL).start()
 

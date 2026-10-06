@@ -1,5 +1,5 @@
 {
- "version": 23,
+ "version": 24,
  "strings": {
   "47160": "Gioca",
   "47734": "Disconnetti",
@@ -21420,6 +21420,7 @@
   "1133827": "Attiva \"Slipstream Boost\" per aumentare l'altezza ottenibile quando si utilizza la skill \"Hover\", oltre ad aumentare la velocità di movimento di base per tutta la durata della skill.",
   "1133830": "Gettoni d'acqua",
   "1133839": "Aumento temporaneo",
+  "1133873": "Esperto in incursioni su Mount Balrior",
   "1133888": "Collezionista di armi \"Luna Rossa\"",
   "1133904": "%str1%%str2%Martello della Luna Sanguinaria%str3%%str4%",
   "1133912": "Finalmente in pace",
@@ -23023,6 +23024,7 @@
   "1175182": "Corallo di Castoran: Protegge l'Acqua",
   "1175192": "Padronanza di Renown dell'Isola di Artigiano",
   "1175200": "Specchio da parete, dimensioni 360 x 100",
+  "1175205": "L'Eterno della Hall of Chains",
   "1175208": "Bringer della Salvezza",
   "1175210": "Ricompensa per la Raid: Costruisci",
   "1175214": "Cornici per muri, 720 x 200",
@@ -25900,5 +25902,6 @@
   1200063,
   1200270,
   1200887
- ]
+ ],
+ "glossary": "faef3dad02f7a552"
 }

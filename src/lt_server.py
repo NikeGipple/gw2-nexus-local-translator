@@ -98,6 +98,7 @@ class Glossary:
         self.terms: list[tuple[str, str]] = []
         self.patterns: list[tuple[re.Pattern, str]] = []
         self.version = 0
+        self.fingerprint = ""  # identifies the glossary content (see fingerprint_of)
         self._term_rx: dict[str, re.Pattern] = {}  # compiled term regexes, built once per term
 
     def term_regex(self, src: str) -> re.Pattern:
@@ -138,7 +139,18 @@ class Glossary:
         # longest first, so "Lion's Arch Keep" wins over "Lion's Arch"
         self.terms = sorted(terms.items(), key=lambda kv: -len(kv[0]))
         self.patterns = sorted(compiled, key=lambda p: -len(p[0].pattern))
+        self.fingerprint = self.fingerprint_of(data)
         self.version += 1
+
+    @staticmethod
+    def fingerprint_of(data: dict) -> str:
+        """Short code computed from the content of exact, terms and patterns (not from the order
+        of the entries nor from "_comment"). Option 6 writes it into the patch ("glossary"), so the
+        module knows whether the automatic translations were made with the glossary it has."""
+        content = {name: {str(k): str(v) for k, v in data.get(name, {}).items()}
+                   for name in ("exact", "terms", "patterns")}
+        raw = json.dumps(content, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+        return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
 
     @staticmethod
     def case_variants(terms: dict[str, str]) -> dict[str, str]:
@@ -284,6 +296,8 @@ class Patch:
         self.auto: dict[int, str] = {}
         self.drop: set[int] = set()
         self.version = 0
+        self.glossary_fp = ""  # fingerprint of the glossary option 6 used for 'auto' ("" = unknown)
+        self.glossary: Glossary | None = None  # the player's glossary (set by the module)
         self.lock = threading.Lock()
         self.skip_path = skip_path  # auto keys purged since this version: {"version": n, "keys": [...]}
 
@@ -312,11 +326,20 @@ class Patch:
             raise ValueError("patch: 'drop' must be a list of keys")
         return {int(k) for k in drop}
 
+    @staticmethod
+    def parse_glossary(data: dict) -> str:
+        fp = data.get("glossary", "")
+        if not isinstance(fp, str):
+            raise ValueError("patch: 'glossary' must be a string")
+        return fp
+
     def load_dict(self, data: dict) -> None:
         version, strings, auto = self.parse(data)
         drop = self.parse_drop(data) - set(strings) - set(auto)
+        fp = self.parse_glossary(data)
         with self.lock:
             self.version, self.strings, self.auto, self.drop = version, strings, auto, drop
+            self.glossary_fp = fp
 
     def load_file(self, path: Path) -> bool:
         try:
@@ -335,24 +358,46 @@ class Patch:
                     "auto": {str(k): self.auto[k] for k in sorted(self.auto)}}
             if self.drop:
                 data["drop"] = sorted(self.drop)
+            if self.glossary_fp:
+                data["glossary"] = self.glossary_fp
             return data
 
     def keys(self) -> set[int]:
-        """Reviewed keys: protected from glossary purges."""
+        """Keys protected from glossary purges: reviewed ones, and automatic ones when the patch
+        was made with the player's glossary."""
         with self.lock:
-            return set(self.strings)
+            keys = set(self.strings)
+            auto = set(self.auto)
+        return keys | auto if self.auto_current() else keys
 
-    # -- auto keys removed by a glossary change -------------------------------------------
+    # -- validity of the automatic translations --------------------------------------------
+    # Priority: reviewed (strings) > automatic (auto) > translation of the local server.
+    # An automatic translation is valid when the patch was made with the player's glossary (same
+    # fingerprint). If not, the keys purged by a glossary change (skip file) are left to the local
+    # server until a patch made with the new glossary arrives; all other keys stay valid.
+    def auto_current(self) -> bool:
+        """True if 'auto' was made with the player's glossary: every automatic row is valid."""
+        g = self.glossary
+        return bool(self.glossary_fp) and g is not None and self.glossary_fp == g.fingerprint
+
     def _skipped(self) -> set[int]:
-        if not self.skip_path:
+        if not self.skip_path or self.auto_current():
             return set()
         try:
             data = json.loads(self.skip_path.read_text(encoding="utf-8"))
+            keys = {int(k) for k in data.get("keys", [])}
+            if self.glossary_fp:
+                return keys  # valid until a patch made with the player's glossary arrives
             if int(data.get("version", -1)) == self.version:
-                return {int(k) for k in data.get("keys", [])}
+                return keys  # patch without fingerprint (older option 6): old rule
         except Exception:  # noqa: BLE001 - missing or damaged: nothing skipped
             pass
         return set()
+
+    def skipped_state(self) -> tuple:
+        """Changes whenever the result of _skipped() may change (patch or glossary updated)."""
+        g = self.glossary
+        return self.version, self.glossary_fp, g.fingerprint if g is not None else ""
 
     def suppress(self, keys: set[int]) -> None:
         """Remember auto keys just purged from the addon's database, so they are not filled again."""
@@ -825,6 +870,7 @@ def export_review(map_path: Path, patch_path: Path, out: Path) -> int:
 def _write_patch(patch: Patch, path: Path) -> None:
     data = patch.to_dict()
     Patch.parse(data)  # never write an invalid file
+    Patch.parse_glossary(data)
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
     tmp.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -955,9 +1001,10 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
         auto[key] = "\n".join(outs)
     # keys leaving 'auto' go into 'drop': players still holding their old text get it removed
     drop = (patch.drop | (set(patch.auto) - set(auto))) - set(auto) - set(patch.strings)
-    if auto != patch.auto or drop != patch.drop:
+    if auto != patch.auto or drop != patch.drop or patch.glossary_fp != g.fingerprint:
         patch.auto = auto
         patch.drop = drop
+        patch.glossary_fp = g.fingerprint  # the module checks it against the player's glossary
         patch.version += 1
         _write_patch(patch, patch_path)
     return len(auto), skipped, done
