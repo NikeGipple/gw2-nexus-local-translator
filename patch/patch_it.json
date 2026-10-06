@@ -1,5 +1,5 @@
 {
- "version": 24,
+ "version": 25,
  "strings": {
   "47160": "Gioca",
   "47734": "Disconnetti",
@@ -1159,6 +1159,7 @@
   "31949": "Waypoint: Terrazza di Nebo",
   "31959": "Enclave di Pinnacle Waypoint",
   "31960": "Waypoint Mistriven",
+  "31965": "Tristezza Waypoint",
   "31968": "Rinvio Waypoint",
   "32067": "Leggenda raccontata due volte",
   "32243": "Docks di rifugio",
@@ -3450,6 +3451,7 @@
   "166959": "Nuotare",
   "166972": "Gufo giovani",
   "166973": "Aquile giovani",
+  "166975": "Ragni giovani delle grotte",
   "166976": "Ragni della giungla giovani",
   "166977": "Ragni forestali giovani",
   "166978": "Ragni femmina nera giovani",
@@ -6451,6 +6453,7 @@
   "301776": "Deposita tutti i materiali",
   "301777": "Zaino",
   "301779": "Collezione",
+  "301791": "Punti di conquista",
   "301795": "Punti",
   "301799": "Ricompense:",
   "301849": "Individua il tipo di materiale",
@@ -9685,6 +9688,7 @@
   "613248": "Candele di base",
   "613252": "Requisiti",
   "613268": "Abilità che possono essere sviluppate nelle mappe di Heart of Thorns.",
+  "613300": "I punti esperienza vengono guadagnati completando le sfide in uno qualsiasi dei tre principali modalità di Guild Wars 2: PvE, PvP o WvW. A diversi livelli di punti esperienza, si sbloccano ricompense specifiche per l'account, nonché casse bonus che contengono oggetti, skin di oggetti uniche e bonus che possono essere assegnati ai personaggi presenti sul proprio account.",
   "613305": "Anello di Orichalcum Freshwater Pearl",
   "613392": "Rifugio degli anziani",
   "613401": "Zaino del Portatore della Luce",
@@ -9804,7 +9808,7 @@
   "617109": "Progressione",
   "617118": "Il rango WvW viene ottenuto partecipando alla modalità World vs. World. Permette di allenare le abilità WvW, che sono poteri avanzati che si ottengono per tutti i personaggi del proprio account.",
   "617144": "Orco erboso",
-  "617158": "Livello di competenza",
+  "617158": "Livello di Mastery",
   "617161": "Il livello PvP viene ottenuto giocando in modalità PvP. Man mano che sali di livello, sbloccherai nuove abilità di fine, che potrai utilizzare per dimostrare la tua abilità quando sconfiggi gli avversari.",
   "617199": "Cesti base",
   "617200": "Chak Killer – Esperto",
@@ -10024,7 +10028,7 @@
   "623666": "Focolari quadrati",
   "623772": "Poltrona in velluto",
   "623842": "<c=@flavor>Un tempo, questa pianta era molto comune ad Ascalon, ma da quando è iniziata la \"Incinerazione\", è diventata piuttosto rara.<c>",
-  "623854": "Tutte le Mastery points che hai utilizzato per sbloccare le abilità di Mastery in tutte le regioni costituiscono il tuo livello di Mastery.",
+  "623854": "Tutte le Mastery points che hai utilizzato per sbloccare le abilità di Maestria in tutte le regioni costituiscono il tuo Livello di mastery.",
   "623976": "Tavoli Eleganti",
   "623978": "%str1% ha iniziato la missione %str2%",
   "623995": "Guadagna esperienza nel mondo",
@@ -23412,6 +23416,7 @@
   "1181389": "Artigiano, per favore! La vostra reputazione di gentilezza vi precede, e desideriamo il vostro aiuto. Qualcosa non va molto bene.",
   "1181429": "Visione del collasso",
   "1181432": "Mura di Ferro, 240 x 240",
+  "1181449": "Melodista Celeste",
   "1181450": "Specchio Magico",
   "1181531": "Magia instabile del Ley",
   "1181548": "Manovre di combattimento",
@@ -25903,5 +25908,5 @@
   1200270,
   1200887
  ],
- "glossary": "faef3dad02f7a552"
+ "glossary": "9c85030a48ddc6db"
 }
