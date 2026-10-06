@@ -67,7 +67,7 @@ The only network connections made by the module are to this repository on GitHub
 [`patch/patch_it.json`](patch/patch_it.json) contains curated Italian translations identified by the game's internal string ID:
 
 ```json
-{ "version": 1, "strings": { "1017171": "Riconquista il runaro" } }
+{ "version": 1, "strings": { "272657": "Raffina per ottenere Bloodstone Brick." } }
 ```
 
 It contains no English game text. To report a wrong translation, open an issue with the Italian text you see in game and where you saw it.
