@@ -41,6 +41,8 @@ CACHE_KEY = "it"
 MAX_MESSAGE = 0x10_0000
 KIND_TEXT, KIND_CANCEL = 0, 1
 
+STATS_EVERY = 300  # default seconds between two "stats" lines in the log (--stats-every)
+
 TRIVIAL_RE = re.compile(r"\(\(\d+\)\)|\(new string\)")
 
 log = logging.getLogger("lt")
@@ -118,6 +120,36 @@ class Channel:
         return bytes([KIND_CANCEL]) + struct.pack("<I", key)
 
 
+BELOW_NORMAL_PRIORITY_CLASS = 0x4000
+
+
+def lower_priority() -> None:
+    """Run below normal priority (model threads included), so the game always gets the CPU first."""
+    if os.name != "nt":
+        return
+    try:
+        import ctypes
+        k32 = ctypes.windll.kernel32
+        k32.GetCurrentProcess.restype = ctypes.c_void_p
+        k32.SetPriorityClass.argtypes = (ctypes.c_void_p, ctypes.c_uint32)
+        k32.SetPriorityClass.restype = ctypes.c_int
+        if k32.SetPriorityClass(k32.GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS):
+            log.info("process priority: below normal")
+        else:
+            log.warning("cannot lower the process priority (Windows error %d)", ctypes.GetLastError())
+    except Exception as exc:  # noqa: BLE001
+        log.warning("cannot lower the process priority: %s", exc)
+
+
+def model_threads(requested: int | None = None) -> int:
+    """CPU threads for the model: --threads if given (module.toml), otherwise a quarter of the
+    logical CPUs, at most 2 (the game needs the rest)."""
+    cpus = os.cpu_count() or 2
+    if requested and requested > 0:
+        return min(requested, cpus)
+    return max(1, min(2, cpus // 4))
+
+
 class StderrHandler(logging.Handler):
     """Nexus log lines: 'e: ', 'w: ', 'i: ', 'd: ' prefixes, '\\0' instead of newlines."""
 
@@ -154,12 +186,14 @@ def has_table(db: Path) -> bool:
 class CachePatch(lt.Patch):
     """Same rules as lt_server.Patch, applied to Text Translator's cache.db.
 
-    New texts are NOT written in advance: the addon asks for them and the module answers from
-    the patch at once (so the map also learns their English text). Here only rows the addon
-    already has are fixed, following the priority reviewed > automatic > local server:
-    reviewed texts that differ, valid automatic texts that differ (whoever wrote the row: an
-    older patch or the local server, also when it kept the English text), and texts that left
-    the patch ('drop' and rows written earlier by us).
+    The whole patch is written into cache.db in advance (since 2026-10-07): the addon reads
+    cache.db when the game starts, so from the next start every patch text is Italian the first
+    time it appears, also with "Pause Refreshes" on (no refresh needed). Priority: reviewed >
+    automatic > local server; automatic rows purged by a glossary change (skip file) are not
+    written. Texts that left the patch ('drop' and rows written earlier by us) are removed.
+
+    If the string IDs check fails (IdCheck), the patch rows are removed from cache.db and the
+    patch stays off (marker file patch_it.ids_failed.json) until a later check passes.
     """
 
     def apply(self, db: Path | None) -> int:
@@ -169,18 +203,21 @@ class CachePatch(lt.Patch):
             drop = set(self.drop)
         if not (reviewed or auto or drop) or not has_table(db):
             return 0
+        if self.ids_failed():
+            log.warning("patch not applied: the string IDs did not match the map (%s)",
+                        self._ids_failed_path().name)
+            return 0
         con = sqlite3.connect(str(db), timeout=10)
         try:
             current = dict(con.execute("SELECT id, text FROM translations WHERE cache_key = ?",
                                        (CACHE_KEY,)))
             skipped = self._skipped() if auto else set()
             applied = self._read_applied()
-            write = [(k, v) for k, v in reviewed if k in current and current[k] != v]
+            write = [(k, v) for k, v in reviewed if current.get(k) != v]
             for k, v in auto:
-                now_text = current.get(k)
-                if now_text is None or now_text == v or k in skipped:
+                if current.get(k) == v or k in skipped:
                     continue
-                write.append((k, v))  # a valid automatic text beats the local server's one
+                write.append((k, v))  # new, or a valid automatic text beats the local server's one
             published = {k for k, _ in reviewed} | {k for k, _ in auto}
             remove = {k for k, t in applied.items()
                       if k not in published and current.get(k) == t} if auto else set()
@@ -236,6 +273,60 @@ class CachePatch(lt.Patch):
         except OSError as exc:
             log.warning("cannot save %s: %s", path, exc)
 
+    # -- string IDs check failed: patch off -----------------------------------------------
+    def _ids_failed_path(self) -> Path | None:
+        return self.skip_path.with_name("patch_it.ids_failed.json") if self.skip_path else None
+
+    def ids_failed(self) -> bool:
+        path = self._ids_failed_path()
+        return bool(path and path.exists())
+
+    def withdraw(self, db: Path | None, reason: str) -> int:
+        """The string IDs do not match: remove from cache.db every row that holds a patch text
+        (the addon asks for them again) and keep the patch off until a check passes."""
+        path = self._ids_failed_path()
+        if path:
+            try:
+                path.write_text(json.dumps({"patch_version": self.version, "reason": reason,
+                                            "time": int(time.time())}), encoding="utf-8")
+            except OSError as exc:
+                log.warning("cannot save %s: %s", path, exc)
+        if not has_table(db):
+            return 0
+        with self.lock:
+            texts = dict(self.auto)
+            texts.update(self.strings)
+        con = sqlite3.connect(str(db), timeout=10)
+        try:
+            current = dict(con.execute("SELECT id, text FROM translations WHERE cache_key = ?",
+                                       (CACHE_KEY,)))
+            remove = [k for k, t in current.items() if texts.get(k) == t]
+            with con:
+                con.executemany("DELETE FROM translations WHERE cache_key = ? AND id = ?",
+                                [(CACHE_KEY, k) for k in remove])
+        finally:
+            con.close()
+        applied = self._applied_path()
+        if applied and applied.exists():
+            try:
+                applied.unlink()
+            except OSError as exc:
+                log.warning("cannot remove %s: %s", applied, exc)
+        log.error("patch: %d patch texts removed from cache.db (string IDs do not match)", len(remove))
+        return len(remove)
+
+    def ids_ok(self, db: Path | None) -> None:
+        """A check passed: if the patch was off because of an earlier failed check, turn it on."""
+        path = self._ids_failed_path()
+        if path and path.exists():
+            try:
+                path.unlink()
+            except OSError as exc:
+                log.warning("cannot remove %s: %s", path, exc)
+                return
+            log.info("string IDs match again: patch turned back on")
+            self.apply(db)
+
     def answer(self, key: int, skipped: set[int]) -> str | None:
         with self.lock:
             if key in self.strings:
@@ -284,8 +375,9 @@ class IdCheck:
     by comparing the English text it sends with the map (e.g. after an update of the addon).
     If too many differ, the patch is no longer used (it would show the wrong texts)."""
 
-    def __init__(self, keymap: lt.KeyMap | None) -> None:
+    def __init__(self, keymap: lt.KeyMap | None, on_fail=None, on_pass=None) -> None:
         self.keymap = keymap
+        self.on_fail, self.on_pass = on_fail, on_pass  # run in a thread (they use cache.db)
         self.match = self.mismatch = 0
         self.failed = False
         self.reported = False
@@ -308,24 +400,109 @@ class IdCheck:
                 self.failed = True
                 log.error("string IDs do not match the map (%d equal, %d different): "
                           "patch DISABLED", self.match, self.mismatch)
+                if self.on_fail:
+                    threading.Thread(target=self.on_fail, args=(f"{self.match} equal, "
+                                     f"{self.mismatch} different",), daemon=True,
+                                     name="patch-withdraw").start()
             else:
                 log.info("string IDs check: %d equal, %d different -> same IDs as the map",
                          self.match, self.mismatch)
+                if self.on_pass:
+                    threading.Thread(target=self.on_pass, daemon=True, name="patch-ids-ok").start()
+
+
+class Stats:
+    """Counters for the periodic "stats" log line, to see where time goes while playing:
+
+    requests  texts received, by how they were answered: patch, cache (already translated, glossary
+              or nothing to translate), model (had to wait for the translation), empty (no text)
+    wait      seconds from arrival to answer of the "model" requests: average, 95th percentile, max
+    queue     longest queue of lines waiting for the model
+    model     lines translated, how long the worker was busy (glossary protection + model)
+    cpu       CPU used by the whole module (all threads), in % of one core: 100% = one core busy
+    The line is written only if something happened (requests, translations or CPU >= 1%).
+    """
+
+    def __init__(self, engine: ModuleEngine, every: float = STATS_EVERY) -> None:
+        self.engine = engine
+        self.every = every
+        self.since = time.monotonic()
+        self.cpu_since = time.process_time()
+        self.base = self._totals()
+        self.counts = {"patch": 0, "cache": 0, "model": 0, "empty": 0}
+        self.waits: list[float] = []
+        self.queue_max = 0
+        self.sends = 0  # groups of answers sent to the addon (each one can cause an addon refresh)
+
+    def _totals(self) -> tuple[int, float, float, int]:
+        e = self.engine
+        return e.done_count, e.time_prepare, e.time_model, len(e.given_up)
+
+    def due(self) -> bool:
+        return time.monotonic() - self.since >= self.every
+
+    def report(self, waiting: dict[int, float]) -> str | None:
+        """Text of the stats line for the period just ended (None if nothing happened), then reset."""
+        now = time.monotonic()
+        cpu_now = time.process_time()
+        elapsed = max(now - self.since, 1e-6)
+        cpu = (cpu_now - self.cpu_since) * 100 / elapsed  # % of one core
+        period = f"{elapsed / 60:.0f} min" if elapsed >= 90 else f"{elapsed:.0f} s"
+        done, prep, model, gave_up = (a - b for a, b in zip(self._totals(), self.base))
+        total = sum(self.counts.values())
+        text = None
+        if total or done or cpu >= 1:
+            parts = ", ".join(f"{k} {v * 100 / total:.0f}%" for k, v in self.counts.items()) if total else ""
+            text = (f"stats {period}: cpu {cpu:.0f}% of one core ({os.cpu_count() or '?'} cores); "
+                    f"{total} requests" + (f" ({parts})" if parts else ""))
+            if self.waits:
+                w = sorted(self.waits)
+                p95 = w[min(len(w) - 1, int(len(w) * 0.95))]
+                text += (f"; model wait avg {sum(w) / len(w):.1f} s, p95 {p95:.1f} s, "
+                         f"max {w[-1]:.1f} s")
+            if waiting:
+                text += (f"; still waiting {len(waiting)} "
+                         f"(oldest {now - min(waiting.values()):.0f} s)")
+            text += f"; queue max {self.queue_max} lines; sent {self.sends} groups"
+            busy = prep + model
+            speed = f"{done / busy:.1f} lines/s, " if busy > 0 else ""
+            text += (f"; translated {done} lines in {busy:.1f} s ({speed}glossary {prep:.1f} s, "
+                     f"model {model:.1f} s)")
+            if gave_up:
+                text += f"; given up {gave_up} lines"
+        self.since, self.cpu_since, self.base = now, cpu_now, self._totals()
+        self.counts = dict.fromkeys(self.counts, 0)
+        self.waits = []
+        self.queue_max = 0
+        self.sends = 0
+        return text
 
 
 class Dispatcher:
     """Receives texts, answers at once when possible (patch, glossary, cache) and otherwise
-    waits for the translation worker. Each answer is also saved in the map (key, en, it)."""
+    waits for the translation worker. Each answer is also saved in the map (key, en, it).
+
+    Requests waiting for the model are indexed by line, so when a batch is finished only the
+    requests waiting for those lines are checked (before, every waiting request was checked
+    again at every wake-up, holding the lock the worker needs: 66 ms with 5,000 requests)."""
 
     def __init__(self, engine: ModuleEngine, patch: CachePatch, keymap: lt.KeyMap | None,
-                 channel: Channel) -> None:
+                 channel: Channel, stats_every: float = STATS_EVERY,
+                 cache_db: Path | None = None) -> None:
         self.engine, self.patch, self.keymap, self.channel = engine, patch, keymap, channel
         self.inbox: queue.SimpleQueue[tuple[int, str]] = queue.SimpleQueue()
-        self.pending: dict[int, str] = {}
-        self.ids = IdCheck(keymap)
+        self.pending: dict[int, str] = {}        # key -> English text, waiting for the model
+        self.missing: dict[int, set[str]] = {}   # key -> lines not translated yet
+        self.waiting: dict[str, set[int]] = {}   # line -> keys waiting for it
+        self.ids = IdCheck(keymap, on_fail=lambda why: patch.withdraw(cache_db, why),
+                           on_pass=lambda: patch.ids_ok(cache_db))
         self.skipped: set[int] = set()
         self.skipped_version: tuple = ()
         self.answered = 0
+        self.arrived: dict[int, float] = {}      # key -> when it started waiting for the model
+        self.stats = Stats(engine, stats_every)
+        with engine.cv:
+            engine.finished = []  # the worker now lists the lines of every finished batch
 
     def submit(self, key: int, text: str) -> None:
         self.inbox.put((key, text))
@@ -337,7 +514,8 @@ class Dispatcher:
         return fixed if fixed is not None else self.engine.cache.get(line, line)
 
     def _ready(self, line: str) -> bool:
-        return (line in self.engine.cache or self.engine.glossary.lookup(line) is not None
+        e = self.engine
+        return (line in e.cache or line in e.given_up or e.glossary.lookup(line) is not None
                 or not lt.Engine._needs_translation(line))
 
     def _enqueue(self, line: str) -> None:
@@ -346,43 +524,86 @@ class Dispatcher:
             e.queued.add(line)
             e.queue.append(line)
 
+    def _try(self, key: int, text: str, out: list[tuple[int, str, str]]) -> bool:
+        """Answer the key if all its lines are ready; otherwise register the missing lines and
+        queue them. Called with engine.cv held. Returns True if lines were queued."""
+        lines = text.split("\n")
+        missing = {line for line in lines if not self._ready(line)}
+        if not missing:
+            self.pending.pop(key, None)
+            self.missing.pop(key, None)
+            started = self.arrived.pop(key, None)
+            if started is None:
+                self.stats.counts["cache"] += 1
+            else:
+                self.stats.counts["model"] += 1
+                self.stats.waits.append(time.monotonic() - started)
+            out.append((key, text, "\n".join(self._result(line) for line in lines)))
+            return False
+        self.pending[key] = text
+        self.missing[key] = missing
+        self.arrived.setdefault(key, time.monotonic())
+        for line in missing:
+            self.waiting.setdefault(line, set()).add(key)
+            self._enqueue(line)
+        return True
+
+    def _forget(self, key: int) -> None:
+        """The addon sent a key that is already waiting: drop the old registration."""
+        self.arrived.pop(key, None)
+        if self.pending.pop(key, None) is None:
+            return
+        for line in self.missing.pop(key, ()):
+            keys = self.waiting.get(line)
+            if keys is not None:
+                keys.discard(key)
+                if not keys:
+                    del self.waiting[line]
+
     def run(self) -> None:
         e = self.engine
         while True:
             out: list[tuple[int, str, str]] = []
             with e.cv:
-                if self.inbox.empty():
+                if self.inbox.empty() and not e.finished:
                     e.cv.wait(0.5)
                 state = self.patch.skipped_state()  # patch or glossary changed: check again
                 if state != self.skipped_version:
                     self.skipped, self.skipped_version = self.patch._skipped(), state
+                queued = False
                 while True:  # new requests
                     try:
                         key, text = self.inbox.get_nowait()
                     except queue.Empty:
                         break
+                    self._forget(key)
                     self.ids.see(key, text)
                     if not text.strip() or TRIVIAL_RE.fullmatch(text.strip()):
+                        self.stats.counts["empty"] += 1
                         out.append((key, text, text))
                         continue
-                    fixed = None if self.ids.failed else self.patch.answer(key, self.skipped)
+                    fixed = (None if self.ids.failed or self.patch.ids_failed()
+                             else self.patch.answer(key, self.skipped))
                     if fixed is not None:
+                        self.stats.counts["patch"] += 1
                         out.append((key, text, fixed))
                         continue
-                    self.pending[key] = text
-                    for line in text.split("\n"):
-                        if not self._ready(line):
-                            self._enqueue(line)
+                    queued = self._try(key, text, out) or queued
+                done, e.finished = e.finished, []
+                for line in done:  # finished batches: only the keys waiting for those lines
+                    for key in self.waiting.pop(line, ()):
+                        left = self.missing.get(key)
+                        if left is None:
+                            continue
+                        left.discard(line)
+                        if not left:  # check all its lines again (one may have left the cache)
+                            queued = self._try(key, self.pending[key], out) or queued
+                if queued:
                     e.cv.notify_all()
-                for key, text in list(self.pending.items()):  # finished translations
-                    lines = text.split("\n")
-                    missing = [line for line in lines if not self._ready(line)]
-                    if missing:
-                        for line in missing:  # e.g. dropped from the cache by a glossary change
-                            self._enqueue(line)
-                        continue
-                    del self.pending[key]
-                    out.append((key, text, "\n".join(self._result(line) for line in lines)))
+                self.stats.queue_max = max(self.stats.queue_max, len(e.queue))
+                report = self.stats.report(self.arrived) if self.stats.due() else None
+            if report:
+                log.info("%s", report)
             if out:
                 self._send(out)
 
@@ -394,6 +615,7 @@ class Dispatcher:
             except ValueError:  # translation longer than the game allows: keep the original
                 msgs.append(Channel.text(key, en))
         self.channel.send(msgs)
+        self.stats.sends += 1
         before = self.answered
         self.answered += len(out)
         if before // 1000 != self.answered // 1000:
@@ -430,12 +652,18 @@ def main() -> int:
     ap.add_argument("--patch-file", type=Path, default=None, help="local patch (developers)")
     ap.add_argument("--no-update", action="store_true")
     ap.add_argument("--debug", action="store_true")
+    ap.add_argument("--threads", type=int, default=None,
+                    help="CPU threads for the model (default: a quarter of the CPUs, at most 2)")
+    ap.add_argument("--stats-every", type=int, default=STATS_EVERY, metavar="SECONDS",
+                    help=f"seconds between two 'stats' lines in the log (default {STATS_EVERY}, min 10)")
     ap.add_argument("--export-review", type=Path, metavar="CSV",
                     help="developers: write the ID/English/translation map of this module to a CSV, then exit")
     ap.add_argument("--import-review", type=Path, metavar="CSV",
                     help="developers: merge the 'nuova_traduzione' column of a reviewed CSV into "
                          "--patch-file, then exit")
-    args = ap.parse_args()
+    # Unknown arguments (e.g. a newer module.toml with an older exe) must not stop the module:
+    # argparse would exit before the log exists, and the game would stay untranslated.
+    args, unknown = ap.parse_known_args()
 
     if args.export_review:  # developer commands, not started by the addon
         n = lt.export_review(args.lang_dir / "map_it.db", args.patch_file or args.lang_dir / "patch_it.json",
@@ -468,10 +696,14 @@ def main() -> int:
         handlers.append(h)
     logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO, handlers=handlers)
     log.info("Local Translator IT module started (protocol %d, result version %d)", PROTOCOL, RESULT_VERSION)
+    lower_priority()
+    if unknown:
+        log.warning("ignored unknown arguments: %s", " ".join(unknown))
 
     # Requests are read and buffered from the very start, while the rest gets ready.
     early: list[tuple[int, str]] = []
     holder: dict[str, Dispatcher] = {}
+    maps: list[lt.KeyMap] = []  # closed by the reader on exit
     ready = threading.Event()
 
     def reader() -> None:
@@ -492,6 +724,11 @@ def main() -> int:
         except Exception:  # noqa: BLE001
             log.exception("stdin reader failed")
         log.info("addon closed the connection: exiting")
+        for m in maps:  # merge map_it.db-wal into map_it.db before exiting
+            try:
+                m.close()
+            except Exception as exc:  # noqa: BLE001
+                log.warning("map not closed cleanly: %s", exc)
         logging.shutdown()
         os._exit(0)
 
@@ -509,11 +746,13 @@ def main() -> int:
     keymap = None
     try:
         keymap = lt.KeyMap(args.lang_dir / "map_it.db")
+        maps.append(keymap)
         log.info("map: %d strings known", keymap.count())
     except Exception as exc:  # noqa: BLE001
         log.warning("map disabled: %s", exc)
 
-    dispatcher = Dispatcher(engine, patch, keymap, channel)
+    dispatcher = Dispatcher(engine, patch, keymap, channel, max(10, args.stats_every),
+                            args.cache_db)
     holder["d"] = dispatcher
     ready.set()
     for key, text in early:
@@ -528,9 +767,12 @@ def main() -> int:
             model = args.lang_dir / "model"
             try:
                 lt.ensure_model(model, args.lang_dir, lt.MODEL_URL)
-                threads = max(1, min(4, (os.cpu_count() or 2) // 2))
-                engine.translator = lt.CT2Translator(model, threads=threads)
-                log.info("model loaded")
+                threads = model_threads(args.threads)
+                translator = lt.CT2Translator(model, threads=threads)
+                with engine.cv:
+                    engine.translator = translator
+                    engine.cv.notify_all()  # wake the worker now, not at its next check
+                log.info("model loaded (%d threads)", threads)
             except Exception:  # noqa: BLE001
                 log.exception("could not prepare the translation model in %s", model)
         threading.Thread(target=load_model, daemon=True, name="model-loader").start()

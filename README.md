@@ -21,7 +21,7 @@ This module brings the game into **Italian**; other languages are planned.
 
 - Guild Wars 2 on Windows (64-bit), **game language set to English**
 - [Nexus](https://raidcore.gg/Nexus) addon loader
-- About **500 MB of free RAM** while playing, on top of what the game uses. The translator runs on the CPU (up to 4 threads) only while new texts are being translated.
+- About **500 MB of free RAM** while playing, on top of what the game uses. The translator runs on the CPU (2 threads by default, at below-normal priority so the game always comes first) only while new texts are being translated.
 - About **250 MB of free disk space**
 
 ## Installation
@@ -31,6 +31,15 @@ This module brings the game into **Italian**; other languages are planned.
 3. Start the game. If needed, enable **Text Translator** from the Nexus addon list: the *Italiano (Local Translator)* module starts by itself.
 
 On the very first start the model is downloaded and loaded, which takes a little while. Until then text stays in English. Later starts are immediate.
+
+The texts of the curated patch are written in advance into the addon's `cache.db`: from the **second** game start they are in Italian the first time they appear.
+
+### Smooth play: *Pause Refreshes*
+
+Every time new translations arrive, Text Translator refreshes all the text in the game, and each refresh causes a short stutter (about one second, as the addon itself explains in its options). For this reason the zip turns on **Pause Refreshes** in Text Translator's options (*Settings* tab):
+
+- with **Pause Refreshes on** (default): no stutters. Texts already translated are shown in Italian; a text seen for the first time stays in English until it appears again (for example, talking to the same NPC again), or until you press **Refresh Now**;
+- with **Pause Refreshes off**: new texts switch to Italian a moment after they appear, but the game stutters at each refresh. Raising *Refresh Debounce Time* makes refreshes less frequent.
 
 After installation your `addons` folder contains:
 
@@ -59,6 +68,9 @@ addons\
 2. It sends the module every game text with its internal string ID.
 3. The module answers from the curated patch if the text is there; otherwise it translates it locally with OPUS-MT, applying the glossary.
 4. Text Translator saves the translations in `cache.db` and shows them in game.
+5. At every start, and whenever a new patch is published, the module also writes the whole patch into `cache.db`, so Text Translator already has those translations at the next start.
+
+Before using the patch, the module checks that the string IDs sent by Text Translator still match the texts it knows. If they do not (for example after a change in the addon), the patch translations are removed from `cache.db` and the patch stays off until the IDs match again.
 
 The only network connections made by the module are to this repository on GitHub: the glossary and patch checks (at start and every few hours) and the one-time model download. Text Translator itself also connects to its author's server.
 
@@ -95,6 +107,9 @@ Each language is a separate module (`local_translator_<language>`) with its own 
 - The game must be set to **English**: the module translates from English only.
 - Open the Nexus log: lines starting with `[Text Translator] [Italiano (Local Translator)]` come from the module. The same messages are in `local_translator_it.log`.
 - If texts stay in English right after the first launch, the model is probably still downloading.
+- If new texts stay in English, check *Pause Refreshes* in Text Translator's options (see [Smooth play](#smooth-play-pause-refreshes)): press **Refresh Now** or turn it off.
+- If the game stutters every few seconds, turn **Pause Refreshes** on.
+- Advanced: the `args` line of `module.toml` accepts `--threads N` (CPU threads used by the translator, default 2) and `--stats-every SECONDS` (writes a performance line in the log every SECONDS, default 300). Example: `args = ["--threads", "1"]`.
 
 ## Source code
 

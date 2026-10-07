@@ -15,6 +15,7 @@ import logging
 import os
 import re
 import shutil
+import sqlite3
 import sys
 import threading
 import time
@@ -39,6 +40,9 @@ MODEL_URL = (
     "releases/download/model-it-v1/opus-mt-en-it-ct2.zip"
 )  # a matching "<url>.sha256" file is downloaded and checked too
 UPDATE_INTERVAL = 6 * 3600  # seconds
+# Largest glossary or patch accepted (GitHub refuses files over 100 MB). The old limit of 5 MB cut
+# bigger files: the JSON could not be read and the update failed with only "update skipped".
+MAX_DOWNLOAD = 100_000_000
 # Game markup that must come out of the translation untouched: %str1%, %num1%, <lb>, <c=...>, </c>,
 # and the markers of the raw game strings such as [s], [the], [null], [pl:"Foci"], [f:"Goddess"]
 # (Text Translator sends them as they are; a broken marker can crash the game).
@@ -254,13 +258,18 @@ class GlossaryUpdater(threading.Thread):
             req.add_header("If-None-Match", self.etag_path.read_text().strip())
         try:
             with urllib.request.urlopen(req, timeout=10) as resp:
-                body = resp.read(5_000_000)
+                body = resp.read(MAX_DOWNLOAD + 1)
                 etag = resp.headers.get("ETag", "")
+                length = resp.headers.get("Content-Length")
         except urllib.error.HTTPError as exc:
             if exc.code == 304:
                 log.info("%s up to date", self.what)
                 return
             raise
+        if len(body) > MAX_DOWNLOAD:
+            raise ValueError(f"file larger than {MAX_DOWNLOAD} bytes")
+        if length and length.strip().isdigit() and int(length) != len(body):
+            raise ValueError(f"download incomplete ({len(body)} of {int(length)} bytes)")
         data = json.loads(body.decode("utf-8"))
         self.validate(data)  # validate before replacing anything
         tmp = self.path.with_suffix(".tmp")
@@ -475,9 +484,13 @@ class KeyMap:
     answers. It stays on this PC: it contains English game text."""
 
     def __init__(self, path: Path) -> None:
-        import sqlite3
         self.path = path
+        self.closed = False
         self.con = sqlite3.connect(str(path), timeout=10, check_same_thread=False)
+        # WAL + synchronous=NORMAL: each save is appended to map_<lang>.db-wal without forcing a
+        # write to disk every time (before: one forced disk write for every answer).
+        self.con.execute("PRAGMA journal_mode=WAL")
+        self.con.execute("PRAGMA synchronous=NORMAL")
         self.con.execute("""CREATE TABLE IF NOT EXISTS texts (
             key INTEGER PRIMARY KEY NOT NULL,
             en TEXT NOT NULL,
@@ -485,6 +498,15 @@ class KeyMap:
             how TEXT,          -- 'live' (seen while playing), 'contrib...' (merged from a contributor)
             seen INTEGER)""")
         self.con.commit()
+        # The addon ends the module without closing the connection, so close() does not run when
+        # the game closes. Merge now what the previous session left in the -wal, so map_<lang>.db
+        # alone is complete (e.g. when a contributor sends it). A failure here is harmless.
+        try:
+            busy, _, _ = self.con.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
+            if busy:
+                log.debug("map: checkpoint at start not completed (file in use)")
+        except sqlite3.Error as exc:
+            log.debug("map: checkpoint at start failed: %s", exc)
         self.lock = threading.Lock()
 
     def save(self, rows: list[tuple[int, str, str, str]]) -> int:
@@ -493,6 +515,8 @@ class KeyMap:
             return 0
         now = int(time.time())
         with self.lock:
+            if self.closed:
+                return 0
             with self.con:
                 before = self.con.total_changes
                 self.con.executemany(
@@ -506,6 +530,23 @@ class KeyMap:
     def count(self) -> int:
         with self.lock:
             return self.con.execute("SELECT count(*) FROM texts").fetchone()[0]
+
+    def close(self) -> None:
+        """Write the -wal file into map_<lang>.db and go back to a single file, then close.
+        Called when the addon closes the connection; the addon usually ends the module instead,
+        so the same merge is also done at the next start (__init__)."""
+        with self.lock:
+            if self.closed:
+                return
+            self.closed = True
+            try:
+                self.con.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+                try:
+                    self.con.execute("PRAGMA journal_mode=DELETE")
+                except sqlite3.Error:
+                    pass  # another tool has the file open: it stays in WAL mode, no harm
+            finally:
+                self.con.close()
 
 
 # --------------------------------------------------------------------------- #
@@ -586,6 +627,7 @@ class Engine:
     """
 
     BATCH = 24
+    MAX_FAILURES = 2  # failed batches before a line is left in English (until restart)
 
     def __init__(self, translator, glossary: Glossary, cache_path: Path | None = None,
                  addon_db: Path | None = None, patch: "Patch | None" = None) -> None:
@@ -601,6 +643,15 @@ class Engine:
         self.gen = 0  # bumped at every glossary change; batches started before it are discarded
         self.done_count = 0
         self.patch = patch                 # its reviewed rows are never purged
+        # Lines of every finished batch (translated or failed), read by lt_module.Dispatcher so it
+        # checks only the requests waiting for those lines. None = nobody reads it (not filled).
+        self.finished: list[str] | None = None
+        self.failures: dict[str, int] = {}  # line -> failed batches so far
+        self.given_up: set[str] = set()     # failed MAX_FAILURES times: English until restart
+        # Seconds spent so far preparing lines (glossary protection) and inside the model; only the
+        # worker writes them, the module reads them for its periodic "stats" log line.
+        self.time_prepare = 0.0
+        self.time_model = 0.0
         self._load_cache()
         self.sync_glossary()
         threading.Thread(target=self._work, daemon=True, name="translator-worker").start()
@@ -766,16 +817,37 @@ class Engine:
                 results = self._translate_lines(batch)
             except Exception:  # noqa: BLE001
                 log.exception("translation of a batch failed")
-                results = {}
+                results = None
             with self.cv:
                 if gen != self.gen:
                     # glossary changed while translating: redo this batch with the new terms
                     self.queue.extendleft(reversed(batch))
                     self.cv.notify_all()
                     continue
+                if results is None:
+                    # failed: tried again when asked again; after MAX_FAILURES the line stays in
+                    # English until the next start (never saved in the cache)
+                    results = {}
+                    gave_up = 0
+                    for line in batch:
+                        n = self.failures.get(line, 0) + 1
+                        if n >= self.MAX_FAILURES:
+                            self.failures.pop(line, None)
+                            self.given_up.add(line)
+                            gave_up += 1
+                        else:
+                            self.failures[line] = n
+                    if gave_up:
+                        log.warning("%d lines failed %d times: left in English until restart",
+                                    gave_up, self.MAX_FAILURES)
+                else:
+                    for line in results:
+                        self.failures.pop(line, None)
                 self.cache.update(results)
                 for line in batch:
                     self.queued.discard(line)
+                if self.finished is not None:
+                    self.finished.extend(batch)
                 self.done_count += len(results)
                 self._append_cache(results)  # under the lock, so it never races a rewrite
                 self.cv.notify_all()
@@ -808,11 +880,17 @@ class Engine:
 
     def _translate_lines(self, lines: list[str]) -> dict[str, str]:
         results: dict[str, str] = {}
+        t0 = time.perf_counter()
         prepared = [self._protect(resolve_plural(line)) for line in lines]
         # lines made only of markup and glossary terms ("Large Bone[s]") need no model
         model_idx = [i for i, (p, _) in enumerate(prepared)
                      if re.search(r"[A-Za-z]", re.sub(r"QZ\d+QZ", "", p))]
-        model_outs = self.translator.translate([prepared[i][0] for i in model_idx]) if model_idx else []
+        t1 = time.perf_counter()
+        self.time_prepare += t1 - t0
+        try:
+            model_outs = self.translator.translate([prepared[i][0] for i in model_idx]) if model_idx else []
+        finally:
+            self.time_model += time.perf_counter() - t1
         outs = [p for p, _ in prepared]
         for i, out in zip(model_idx, model_outs):
             outs[i] = out
@@ -841,7 +919,6 @@ def export_review(map_path: Path, patch_path: Path, out: Path) -> int:
     Contains English game text: keep it on your PC, never publish it.
     """
     import csv
-    import sqlite3
     patch = Patch()
     patch.load_file(patch_path)
     english: dict[int, str] = {}
@@ -953,7 +1030,6 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
 
     Returns (rows in auto, rows skipped, lines translated now).
     """
-    import sqlite3
     patch = Patch()
     patch.load_file(patch_path)
     m = sqlite3.connect(f"file:{map_path}?mode=ro", uri=True)
