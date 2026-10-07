@@ -32,14 +32,14 @@ This module brings the game into **Italian**; other languages are planned.
 
 On the very first start the model is downloaded and loaded, which takes a little while. Until then text stays in English. Later starts are immediate.
 
-The texts of the curated patch are written in advance into the addon's `cache.db`: from the **second** game start they are in Italian the first time they appear.
+The texts of the curated patch are written in advance into the addon's `cache.db`: from your next game start they appear translated right away, even the ones you have never seen before.
 
 ### Smooth play: *Pause Refreshes*
 
 Every time new translations arrive, Text Translator refreshes all the text in the game, and each refresh causes a short stutter (about one second, as the addon itself explains in its options). For this reason the zip turns on **Pause Refreshes** in Text Translator's options (*Settings* tab):
 
-- with **Pause Refreshes on** (default): no stutters. Texts already translated are shown in Italian; a text seen for the first time stays in English until it appears again (for example, talking to the same NPC again), or until you press **Refresh Now**;
-- with **Pause Refreshes off**: new texts switch to Italian a moment after they appear, but the game stutters at each refresh. Raising *Refresh Debounce Time* makes refreshes less frequent.
+- with **Pause Refreshes on** (default): no stutters. Texts already translated are shown translated; a text seen for the first time stays in English until it appears again (for example, talking to the same NPC again), or until you press **Refresh Now**;
+- with **Pause Refreshes off**: new texts appear translated a moment after they show up, but the game stutters at each refresh. Raising *Refresh Debounce Time* makes refreshes less frequent.
 
 After installation your `addons` folder contains:
 
