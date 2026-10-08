@@ -52,7 +52,9 @@ TOKEN_RE = re.compile(r'%[A-Za-z]+\d*%|</?[A-Za-z][^<>\n]*>|\[[^\[\]\n]*\]')
 #   2 = glossary terms glued to markup ("Large Bone[s]", "Plaza of<br>Dwayna") are protected
 #   3 = English plural markers resolved before translating ("Edible Mushroom[s]" -> "Edible
 #       Mushrooms"): kept in the Italian text, the game added an English "s" ("Funghi commestibilis")
-PROTECT_VERSION = 3
+#   4 = a single "%" in the translation becomes "%%" (fix_percent): GW2 formats texts like printf
+#       and a lone "%" cuts the text after it
+PROTECT_VERSION = 4
 # Plural markers of the raw game strings: "Piece[s]" adds "s", "Box[pl:\"Boxes\"]" replaces the
 # word before it. They only work for English, so the text is translated in its plural form.
 PLURAL_RE = re.compile(r'(?<=\w)\[s\]|[\w\'’-]+\[pl:"([^"\[\]\n]*)"\]')
@@ -65,6 +67,24 @@ def resolve_plural(line: str) -> str:
 # Control characters: a string that contains them is undecoded game data, not text
 # (e.g. key 508192 arrived as "\x8e6]2T\x93..."); it is never translated nor published.
 GARBLED_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
+# "%%" (literal %), game codes %num1% / %str1% (also glued: %str1%%str2%) or a lone "%"
+PERCENT_RE = re.compile(r"%[A-Za-z]+\d*%|%%|%")
+
+
+def fix_percent(text: str, english: str | None = None) -> str:
+    """GW2 formats texts like printf: "%%" is a literal %, "%num1%" a game value. A lone "%" in
+    the translation ("aumenta del 5% la forza") breaks the text, so it becomes "%%".
+    With the English text: nothing is touched when the English has no "%" or is undecoded data."""
+    if not text or "%" not in text:
+        return text
+    if english is not None and ("%" not in english or GARBLED_RE.search(english)):
+        return text
+    return PERCENT_RE.sub(lambda m: "%%" if m.group(0) == "%" else m.group(0), text)
+
+
+def bad_percent(text: str, english: str | None = None) -> bool:
+    """True if fix_percent would change the text."""
+    return fix_percent(text, english) != text
 
 log = logging.getLogger("lt")
 
@@ -764,7 +784,8 @@ class Engine:
                 changed = changed | exact_changed
                 if old["protect"] < PROTECT_VERSION and self.cache:
                     # translated with older protection rules: translate these lines again
-                    redo = [s for s in self.cache if self.outdated(s, old["protect"])]
+                    redo = [s for s, t in self.cache.items() if self.outdated(s, old["protect"])
+                            or (old["protect"] < 4 and bad_percent(t, s))]
                     for s in redo:
                         purge.add(self.cache.pop(s))
                     dropped += len(redo)
@@ -900,7 +921,7 @@ class Engine:
                 continue
             for ph, original in restore.items():
                 out = out.replace(ph, original)
-            results[line] = out
+            results[line] = fix_percent(out, line)
         return results
 
 
@@ -946,6 +967,8 @@ def export_review(map_path: Path, patch_path: Path, out: Path) -> int:
 
 def _write_patch(patch: Patch, path: Path) -> None:
     data = patch.to_dict()
+    for section in ("strings", "auto"):  # last check on the whole patch: lone "%" -> "%%"
+        data[section] = {k: fix_percent(v) for k, v in data[section].items()}
     Patch.parse(data)  # never write an invalid file
     Patch.parse_glossary(data)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -1059,7 +1082,7 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
 
     def result(line: str) -> str:
         fixed = g.lookup(line)
-        return fixed if fixed is not None else translations.get(line, line)
+        return fixed if fixed is not None else fix_percent(translations.get(line, line), line)
 
     auto = {k: v for k, v in patch.auto.items() if k not in english and k not in patch.strings}
     skipped = 0
