@@ -15,7 +15,7 @@ Glossary, OPUS-MT engine and map come from lt_server.py, imported as a library; 
 Data lives in IT\\ next to this exe (model, glossary, patch_it.db, cache_it.jsonl, map_it.db).
 
 Developer commands (strumenti.bat options 4, 5 and 14): --export-review, --import-review and
---show-keys text|all|off ("show keys" mode: with the file IT\\mostra_key.txt the texts in the game
+--show-keys text|all|off ("show keys" mode: with the file IT\\show_keys.txt the texts in the game
 start with their string ID, "44547 - Bambini"; the file holds "text" or "all", see patch_db).
 """
 from __future__ import annotations
@@ -49,7 +49,7 @@ MAX_MESSAGE = 0x10_0000
 KIND_TEXT, KIND_CANCEL = 0, 1
 
 STATS_EVERY = 300  # default seconds between two "stats" lines in the log (--stats-every)
-SHOW_KEYS_FILE = "mostra_key.txt"  # in IT\: "show keys" mode (see patch_db.sync_key_tags)
+SHOW_KEYS_FILE = "show_keys.txt"  # in IT\: "show keys" mode (see patch_db.sync_key_tags)
 
 
 def show_keys_mode(lang_dir: Path) -> str | None:

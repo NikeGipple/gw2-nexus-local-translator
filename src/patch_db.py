@@ -70,7 +70,7 @@ UPSERT = ("INSERT INTO main.translations (id, cache_key, version, timestamp, tex
           "VALUES (?, ?, ?, ?, ?) ON CONFLICT(cache_key, id) DO UPDATE SET "
           "text = excluded.text, version = excluded.version, timestamp = excluded.timestamp")
 
-# "Show keys" mode (developers and helpers, file IT\mostra_key.txt): texts in cache.db and
+# "Show keys" mode (developers and helpers, file IT\show_keys.txt): texts in cache.db and
 # answers start with their string ID, "44547 - Bambini", to find the key of a text seen in the
 # game. Two modes:
 #   "text" only texts with words: templates such as "[m]%str1%", "[null]" or "%str1% %str2%",
