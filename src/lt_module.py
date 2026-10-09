@@ -2,7 +2,8 @@
 
 Local Translator is meant for any language the game can be translated into from English; each
 language is built as its own module (local_translator_<lang>). Italian is the first one, and for
-now the language is set in the code (CACHE_KEY, IT\\ folder, *_it files, the GitHub URLs).
+now the language is set in the code (CACHE_KEY, IT\\ folder, *_it files, the GitHub URLs, and the
+plural rules lt_server.PLURAL_RULES from plurale_it.py).
 
 Protocol: https://github.com/ideka/modulep (version 1). The addon starts this exe itself
 (module.toml), sends every game text with its string ID on stdin and reads the translations

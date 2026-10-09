@@ -25,7 +25,7 @@ import zipfile
 from collections import deque
 from pathlib import Path
 
-from plurale_it import make_plural  # Italian plural markers for names (same folder)
+import plurale_it  # Italian plural markers for names (same folder)
 
 GLOSSARY_URL = (
     "https://raw.githubusercontent.com/NikeGipple/"
@@ -64,7 +64,12 @@ PROTECT_VERSION = 5
 # 2026-10-09: 'Gamberetto[pl:"Gamberetti"]' shows "Gamberetto" for 1 item, "Gamberetti" for more,
 # and two markers in one string work), but "[s]" would add an English "s" ("Funghi commestibilis").
 PLURAL_RE = re.compile(r'(?<=\w)\[s\]|[\w\'’-]+\[pl:"([^"\[\]\n]*)"\]')
-# Italian plural markers written by plurale_it in a translation
+# Plural rules of the module language (Italian: plurale_it.make_plural). The language is set in
+# lt_module (CACHE_KEY "it", IT\ folder, *_it files). Another language needs its own rules, a
+# plurale_<lang>.py with the same make_plural(singular, english, plural_or_None) -> (text, outcome,
+# changes), or None: then names are translated in the plural form as before, without markers.
+PLURAL_RULES = plurale_it.make_plural
+# Plural markers written by the rules in a translation
 IT_PL_RE = re.compile(r'\[pl:"[^"\[\]\n]*"\]')
 NUM_RE = re.compile(r"%num\d*%")
 
@@ -85,7 +90,8 @@ def plural_name(line: str) -> bool:
     """A name with English plural markers ("Medaglia" items, "Chicken[s]"): translated in the
     singular + Italian plural markers. Sentences with %num% stay in the plural form: the English
     singular ("Win %num2% rated arena game") confuses the models."""
-    return PLURAL_RE.search(line) is not None and NUM_RE.search(line) is None
+    return (PLURAL_RULES is not None and PLURAL_RE.search(line) is not None
+            and NUM_RE.search(line) is None)
 
 
 def italian_plural(line: str, singular_en: str, out: str, plural_out: str | None = None) -> str:
@@ -96,7 +102,7 @@ def italian_plural(line: str, singular_en: str, out: str, plural_out: str | None
     core = out.strip()
     if core == singular_en.strip() or core == resolve_plural(line).strip():
         return line
-    res, esito, _ = make_plural(core, singular_en + " " + resolve_plural(line), plural_out)
+    res, esito, _ = PLURAL_RULES(core, singular_en + " " + resolve_plural(line), plural_out)
     if esito.startswith("dubbio") or IT_PL_RE.sub("", res) != core:
         return out
     lead = out[:len(out) - len(out.lstrip())]
