@@ -1,5 +1,5 @@
 {
-"version":54,
+"version":55,
 "strings":{
 "44105":"Rana",
 "44110":"Corvo",
@@ -25,6 +25,7 @@
 "44313":"Moa verde",
 "44383":"Lucciola",
 "44389":"Barracuda",
+"44504":"Lavoratore",
 "44547":"Bambino",
 "44584":"bambino",
 "44585":"bambino",
@@ -4386,7 +4387,6 @@
 "44500":"Collana reale di Orrian",
 "44501":"Ricercatore",
 "44503":"Lavoratore[pl:\"Lavoratori\"]",
-"44504":"Lavoratori",
 "44506":"Echi del Passato",
 "44507":"Ash Legion Esploratore",
 "44511":"Capitano della Blood Legion",
