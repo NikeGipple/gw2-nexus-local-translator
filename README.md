@@ -117,6 +117,7 @@ The source code of the module is in [`src/`](src):
 
 - `lt_module.py`: the Text Translator module (module protocol, patch and cache handling, local map);
 - `lt_server.py`: glossary, patch, local map and the OPUS-MT engine, used by the module as a library;
+- `plurale_it.py`: Italian plural rules, so item names get both forms (`Medaglia[pl:"Medaglie"]`, the game picks the right one);
 - `text_translator/`: the `module.toml` and the initial `settings.toml` shipped in the zip.
 
 To build the module yourself on Windows with Python 3.12:

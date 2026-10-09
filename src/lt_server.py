@@ -25,6 +25,8 @@ import zipfile
 from collections import deque
 from pathlib import Path
 
+from plurale_it import make_plural  # Italian plural markers for names (same folder)
+
 GLOSSARY_URL = (
     "https://raw.githubusercontent.com/NikeGipple/"
     "gw2-nexus-local-translator/main/glossary/glossary_it.json"
@@ -54,16 +56,51 @@ TOKEN_RE = re.compile(r'%[A-Za-z]+\d*%|</?[A-Za-z][^<>\n]*>|\[[^\[\]\n]*\]')
 #       Mushrooms"): kept in the Italian text, the game added an English "s" ("Funghi commestibilis")
 #   4 = a single "%" in the translation becomes "%%" (fix_percent): GW2 formats texts like printf
 #       and a lone "%" cuts the text after it
-PROTECT_VERSION = 4
+#   5 = names with plural markers (no %num%) are translated in the SINGULAR and get Italian plural
+#       markers: 'Medaglia[pl:"Medaglie"] precisa[pl:"precise"]' (see plural_name)
+PROTECT_VERSION = 5
 # Plural markers of the raw game strings: "Piece[s]" adds "s", "Box[pl:\"Boxes\"]" replaces the
-# word before it. They only work for English, so the text is translated in its plural form.
+# word before it. The game applies [pl:"..."] to the translated text too (checked in game on
+# 2026-10-09: 'Gamberetto[pl:"Gamberetti"]' shows "Gamberetto" for 1 item, "Gamberetti" for more,
+# and two markers in one string work), but "[s]" would add an English "s" ("Funghi commestibilis").
 PLURAL_RE = re.compile(r'(?<=\w)\[s\]|[\w\'’-]+\[pl:"([^"\[\]\n]*)"\]')
+# Italian plural markers written by plurale_it in a translation
+IT_PL_RE = re.compile(r'\[pl:"[^"\[\]\n]*"\]')
+NUM_RE = re.compile(r"%num\d*%")
 
 
 def resolve_plural(line: str) -> str:
     """English plural form of a raw game string: "Piece[s] of Gear" -> "Pieces of Gear",
     "Recovered Tool Box[pl:\"Boxes\"]" -> "Recovered Tool Boxes"."""
     return PLURAL_RE.sub(lambda m: "s" if m.group(1) is None else m.group(1), line)
+
+
+def english_singular(line: str) -> str:
+    """English singular form: "Piece[s] of Gear" -> "Piece of Gear",
+    "Recovered Tool Box[pl:\"Boxes\"]" -> "Recovered Tool Box"."""
+    return PLURAL_RE.sub(lambda m: "" if m.group(1) is None else m.group(0).split("[pl:")[0], line)
+
+
+def plural_name(line: str) -> bool:
+    """A name with English plural markers ("Medaglia" items, "Chicken[s]"): translated in the
+    singular + Italian plural markers. Sentences with %num% stay in the plural form: the English
+    singular ("Win %num2% rated arena game") confuses the models."""
+    return PLURAL_RE.search(line) is not None and NUM_RE.search(line) is None
+
+
+def italian_plural(line: str, singular_en: str, out: str, plural_out: str | None = None) -> str:
+    """Translation of a plural_name line, made from its singular translation `out`.
+    Returns the raw English line if the name stayed in English (materials kept in English by the
+    glossary: the game shows the right form with the original markers), the singular with Italian
+    plural markers when the rules are sure, otherwise the singular as it is."""
+    core = out.strip()
+    if core == singular_en.strip() or core == resolve_plural(line).strip():
+        return line
+    res, esito, _ = make_plural(core, singular_en + " " + resolve_plural(line), plural_out)
+    if esito.startswith("dubbio") or IT_PL_RE.sub("", res) != core:
+        return out
+    lead = out[:len(out) - len(out.lstrip())]
+    return lead + res + out[len(out.rstrip()):]
 # Control characters: a string that contains them is undecoded game data, not text
 # (e.g. key 508192 arrived as "\x8e6]2T\x93..."); it is never translated nor published.
 GARBLED_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
@@ -726,7 +763,8 @@ class Engine:
 
     def outdated(self, line: str, version: int) -> bool:
         """True if a translation made with protection rules `version` must be redone."""
-        return ((version < 3 and PLURAL_RE.search(line) is not None)
+        return ((version < 5 and plural_name(line))
+                or (version < 3 and PLURAL_RE.search(line) is not None)
                 or (version < 2 and self._glued_term(line)))
 
     def _glued_term(self, line: str) -> bool:
@@ -902,7 +940,10 @@ class Engine:
     def _translate_lines(self, lines: list[str]) -> dict[str, str]:
         results: dict[str, str] = {}
         t0 = time.perf_counter()
-        prepared = [self._protect(resolve_plural(line)) for line in lines]
+        # names with plural markers: singular (plural markers added below); the rest: plural form
+        srcs = [english_singular(line) if plural_name(line) else resolve_plural(line)
+                for line in lines]
+        prepared = [self._protect(src) for src in srcs]
         # lines made only of markup and glossary terms ("Large Bone[s]") need no model
         model_idx = [i for i, (p, _) in enumerate(prepared)
                      if re.search(r"[A-Za-z]", re.sub(r"QZ\d+QZ", "", p))]
@@ -915,13 +956,14 @@ class Engine:
         outs = [p for p, _ in prepared]
         for i, out in zip(model_idx, model_outs):
             outs[i] = out
-        for line, (_, restore), out in zip(lines, prepared, outs):
+        for line, src, (_, restore), out in zip(lines, srcs, prepared, outs):
             if not out.strip() or not all(ph in out for ph in restore):
                 results[line] = line  # a placeholder got lost: keep the English text, never break markup
                 continue
             for ph, original in restore.items():
                 out = out.replace(ph, original)
-            results[line] = fix_percent(out, line)
+            out = fix_percent(out, line)
+            results[line] = italian_plural(line, src, out) if plural_name(line) else out
         return results
 
 
