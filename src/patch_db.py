@@ -41,6 +41,7 @@ KIND_REVIEWED, KIND_AUTO, KIND_DROP = 0, 1, 2
 CHUNK = 2000          # cache.db rows written per transaction (short locks: the addon writes too)
 SQL_VARS = 500        # keys per "IN (...)" list
 STALE_LOG_LIMIT = 20  # keys with a changed English text logged one by one per session
+WAL_LIMIT = 1_000_000  # bytes patch_it.db-wal may keep after a checkpoint
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS patch (
@@ -114,13 +115,25 @@ class CachePatch:
         self.writer.executescript(SCHEMA)
         self.reader = self._connect()
         self._load_meta()
+        self._shrink_wal()
 
     def _connect(self) -> sqlite3.Connection:
         con = sqlite3.connect(str(self.path), timeout=30, isolation_level=None,
                               check_same_thread=False)
         con.execute("PRAGMA journal_mode=WAL")
         con.execute("PRAGMA synchronous=NORMAL")
+        con.execute(f"PRAGMA journal_size_limit={WAL_LIMIT}")
         return con
+
+    def _shrink_wal(self) -> None:
+        """Move what patch_it.db-wal holds into patch_it.db and empty it. SQLite writes every
+        change to the -wal file first; after a big write (first download, import, full apply) it
+        would stay as big as that write (9 MB for 60k entries). Done at start too: the addon ends
+        the module without closing the archive. If a reader is busy the file just stays as is."""
+        try:
+            self.writer.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        except sqlite3.Error as exc:
+            log.debug("patch_it.db-wal not emptied: %s", exc)
 
     def close(self) -> None:
         with self.lock, self.rlock:
@@ -412,6 +425,8 @@ class CachePatch:
                     self.skip_version = None
             finally:
                 con.close()
+            if keys is None:  # the registry of all the automatic texts was rewritten
+                self._shrink_wal()
             took = time.perf_counter() - t0
             if written:
                 log.info("patch v%d: %d translations updated in cache.db (visible at next game "
@@ -488,6 +503,7 @@ class CachePatch:
                 con.execute("ROLLBACK")
                 raise
             self._load_meta()
+            self._shrink_wal()
 
     def import_file(self, path: Path, source: str) -> bool:
         try:
@@ -575,6 +591,7 @@ class CachePatch:
                 con.execute("ROLLBACK")
                 raise
             self._load_meta()
+            self._shrink_wal()
         c = self.counts()
         log.info("patch archive created from the v0.4 files in %.2f s: v%d, %d reviewed, "
                  "%d automatic, %d drop", time.perf_counter() - t0, self.version,
@@ -630,6 +647,7 @@ class CachePatch:
                 con.execute("ROLLBACK")
                 raise
             self._load_meta()
+            self._shrink_wal()
             with self._stale_lock:  # entries changed: a stale key may be valid again
                 self._stale_seen = {k: h for k, h in self._stale_seen.items()
                                     if k not in old and k not in new}
