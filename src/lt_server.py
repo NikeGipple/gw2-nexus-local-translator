@@ -339,7 +339,8 @@ class GlossaryUpdater(threading.Thread):
     def apply(self, data: dict) -> None:
         self.glossary.load_dict(data)
         self.on_change()
-        log.info("glossary updated (%d exact, %d terms)", len(self.glossary.exact), len(self.glossary.terms))
+        log.info("glossary updated: %s (%d exact, %d terms)", self.glossary.fingerprint,
+                 len(self.glossary.exact), len(self.glossary.terms))
 
     RAW_RE = re.compile(r"https://raw\.githubusercontent\.com/([^/]+)/([^/]+)/([^/]+)/(.+)")
 

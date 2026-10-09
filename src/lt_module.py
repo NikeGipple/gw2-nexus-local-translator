@@ -36,6 +36,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))  # lt_server.py sits ne
 import lt_server as lt  # noqa: E402
 from patch_db import CachePatch, PieceUpdater, has_table  # noqa: E402
 
+VERSION = "0.5.0"        # version of the release: raise it at every new zip (shown in the log)
 PROTOCOL = 1
 SOURCE_LANG = 0          # English: the game must be set to English
 RESULT_VERSION = 1       # raise it to make the addon ask again for every cached text
@@ -537,7 +538,8 @@ def main() -> int:
         h.setFormatter(logging.Formatter("%(message)s"))
         handlers.append(h)
     logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO, handlers=handlers)
-    log.info("Local Translator IT module started (protocol %d, result version %d)", PROTOCOL, RESULT_VERSION)
+    log.info("Local Translator IT v%s started (protocol %d, result version %d)", VERSION, PROTOCOL,
+             RESULT_VERSION)
     lower_priority()
     if unknown:
         log.warning("ignored unknown arguments: %s", " ".join(unknown))
@@ -577,8 +579,14 @@ def main() -> int:
     threading.Thread(target=reader, daemon=True, name="stdin-reader").start()
 
     glossary = lt.Glossary()
-    if not glossary.load_file(args.lang_dir / "glossary_it.json"):
+    if glossary.load_file(args.lang_dir / "glossary_it.json"):
+        where = "glossary_it.json"
+    else:
         glossary.load_file(lt.bundled_dir() / "glossary_it.default.json")
+        where = "built-in default"
+    # the glossary has no version number: its fingerprint identifies the content
+    log.info("glossary %s (%s): %d exact, %d terms, %d patterns", glossary.fingerprint or "-", where,
+             len(glossary.exact), len(glossary.terms), len(glossary.patterns))
     fake = args.fake or (args.lang_dir / "fake.txt").is_file()
     t0 = time.perf_counter()
     patch = CachePatch(args.lang_dir / "patch_it.db", CACHE_KEY, RESULT_VERSION)
@@ -591,8 +599,10 @@ def main() -> int:
         if patch.import_file(args.patch_file, "patch-file"):
             log.info("test patch loaded: %s", args.patch_file)
     c = patch.counts()
-    log.info("patch v%d: %d reviewed, %d automatic, %d drop, %d with English fingerprint "
-             "(ready in %.2f s)", patch.version, c["reviewed"], c["auto"], c["drop"], c["h"],
+    log.info("patch v%d: %d reviewed, %d automatic, %d drop, %d with English fingerprint; "
+             "made with glossary %s (%s) (ready in %.2f s)", patch.version, c["reviewed"],
+             c["auto"], c["drop"], c["h"], patch.glossary_fp or "-",
+             "same as yours" if patch.auto_current() else "different from yours",
              time.perf_counter() - t0)
     engine = ModuleEngine(lt.FakeTranslator() if fake else None, glossary,
                           args.lang_dir / "cache_it.jsonl", args.cache_db, patch=patch)
