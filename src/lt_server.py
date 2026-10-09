@@ -22,20 +22,26 @@ import time
 import urllib.error
 import urllib.request
 import zipfile
+import zlib
 from collections import deque
 from pathlib import Path
 
 import plurale_it  # Italian plural markers for names (same folder)
 
-GLOSSARY_URL = (
-    "https://raw.githubusercontent.com/NikeGipple/"
-    "gw2-nexus-local-translator/main/glossary/glossary_it.json"
-)
-# Curated translations by string ID (key -> translation), applied by the module.
-PATCH_URL = (
-    "https://raw.githubusercontent.com/NikeGipple/"
-    "gw2-nexus-local-translator/main/patch/patch_it.json"
-)
+GITHUB_REPO = "NikeGipple/gw2-nexus-local-translator"
+DEFAULT_BRANCH = "main"  # the module can read another branch with --branch (tests)
+
+
+def raw_url(path: str, branch: str = DEFAULT_BRANCH) -> str:
+    """URL of a file of the repository on raw.githubusercontent.com."""
+    return f"https://raw.githubusercontent.com/{GITHUB_REPO}/{branch}/{path}"
+
+
+GLOSSARY_URL = raw_url("glossary/glossary_it.json")
+# Curated translations by string ID (key -> translation), applied by the module. Since v0.5 the
+# module reads the patch split in pieces (patch/<lang>/index.json + pNNNN.json, see split_patch);
+# this single file is still published for the modules up to v0.4.
+PATCH_URL = raw_url("patch/patch_it.json")
 # The model is published once as a GitHub Release (fixed tag, e.g. model-it-v1) and downloaded on first run.
 MODEL_URL = (
     "https://github.com/NikeGipple/gw2-nexus-local-translator/"
@@ -264,6 +270,48 @@ class Glossary:
             return False
 
 
+def latest_commit(repo: str, branch: str, what: str = "download") -> str | None:
+    """SHA of the latest commit of a branch (GitHub API), or None (rate limit, offline...)."""
+    try:
+        req = urllib.request.Request(
+            f"https://api.github.com/repos/{repo}/commits/{branch}",
+            headers={"User-Agent": "gw2-local-translator", "Accept": "application/vnd.github.sha"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            sha = resp.read(100).decode().strip()
+        if re.fullmatch(r"[0-9a-f]{40}", sha):
+            return sha
+    except Exception as exc:  # noqa: BLE001 - rate limit, offline...: the caller uses the branch
+        log.debug("%s: latest commit of %s unknown (%s)", what, branch, exc)
+    return None
+
+
+def http_get(url: str, limit: int = MAX_DOWNLOAD, timeout: int = 30) -> bytes:
+    """Download a file (gzip-compressed on the wire when the server allows it, ~3x smaller for
+    the patch). Raises urllib.error.HTTPError (e.g. 404) and ValueError for files larger than
+    `limit` or cut short."""
+    req = urllib.request.Request(url, headers={"User-Agent": "gw2-local-translator",
+                                               "Accept-Encoding": "gzip"})
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        raw = resp.read(limit + 1)
+        length = resp.headers.get("Content-Length")
+        encoding = (resp.headers.get("Content-Encoding") or "").strip().lower()
+    if len(raw) > limit:
+        raise ValueError(f"file larger than {limit} bytes")
+    if length and length.strip().isdigit() and int(length) != len(raw):
+        raise ValueError(f"download incomplete ({len(raw)} of {int(length)} bytes)")
+    if encoding == "gzip":
+        d = zlib.decompressobj(16 + zlib.MAX_WBITS)
+        body = d.decompress(raw, limit + 1)
+        if len(body) > limit or d.unconsumed_tail:
+            raise ValueError(f"file larger than {limit} bytes")
+        if not d.eof:
+            raise ValueError("download incomplete (gzip data cut short)")
+        return body
+    if encoding not in ("", "identity"):
+        raise ValueError(f"unexpected Content-Encoding {encoding!r}")
+    return raw
+
+
 class GlossaryUpdater(threading.Thread):
     """Downloads a JSON file from GitHub when it changes (ETag), validates it and applies it."""
 
@@ -303,16 +351,9 @@ class GlossaryUpdater(threading.Thread):
         if not m:
             return self.url
         owner, repo, branch, path = m.groups()
-        try:
-            req = urllib.request.Request(
-                f"https://api.github.com/repos/{owner}/{repo}/commits/{branch}",
-                headers={"User-Agent": "gw2-local-translator", "Accept": "application/vnd.github.sha"})
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                sha = resp.read(100).decode().strip()
-            if re.fullmatch(r"[0-9a-f]{40}", sha):
-                return f"https://raw.githubusercontent.com/{owner}/{repo}/{sha}/{path}"
-        except Exception as exc:  # noqa: BLE001 - rate limit, offline...: use the branch URL
-            log.debug("%s: latest commit unknown (%s), using %s", self.what, exc, self.url)
+        sha = latest_commit(f"{owner}/{repo}", branch, self.what)
+        if sha:
+            return f"https://raw.githubusercontent.com/{owner}/{repo}/{sha}/{path}"
         return self.url
 
     def check(self) -> None:
@@ -348,7 +389,7 @@ class GlossaryUpdater(threading.Thread):
 # --------------------------------------------------------------------------- #
 # key = the game's internal string ID (same for every player). The patch only contains
 # key -> translation: no English game text. Text Translator keeps the translations it receives in
-# cache.db; the patch is applied to it by lt_module.CachePatch.
+# cache.db; the patch is applied to it by patch_db.CachePatch.
 class Patch:
     """Two sections, both key -> translation:
 
@@ -507,7 +548,7 @@ class Patch:
             return set()
 
     def apply(self, db: Path | None) -> int:
-        """Apply the patch to the addon's database; implemented by lt_module.CachePatch."""
+        """Apply the patch to the addon's database; implemented by patch_db.CachePatch."""
         raise NotImplementedError
 
 
@@ -533,6 +574,149 @@ class PatchUpdater(GlossaryUpdater):
             self.patch.apply(self.db)
         except Exception as exc:  # noqa: BLE001
             log.warning("cannot apply the patch to %s: %s", self.db, exc)
+
+
+# --------------------------------------------------------------------------- #
+# Patch split in pieces (published by tools/pubblica_pezzi.py, read by the module)
+# --------------------------------------------------------------------------- #
+# patch/<lang>/index.json   {"format": 1, "version": n, "glossary": "<fingerprint>", "width": 20000,
+#                            "pieces": {"p0000.json": {"sha256": ..., "entries": n, "size": bytes}}}
+# patch/<lang>/pNNNN.json   the keys from NNNN*width to (NNNN+1)*width-1:
+#                           {"strings": {...}, "auto": {...}, "drop": [...], "h": {key: "1a2b3c4d"}}
+# A key always stays in the same piece, so a new version only changes the pieces of the keys that
+# changed. Version and glossary fingerprint are only in the index: otherwise every piece would
+# change at every version. Empty sections are left out.
+# "h" = raw_hash() of the raw English text (as Text Translator sends it) the translation was made
+# from: the module does not use a translation whose English text changed. It is a fingerprint, not
+# the text: no English game text is published.
+PATCH_FORMAT = 1
+PIECE_WIDTH = 20_000              # default width of a piece (keys); the index says the real one
+PIECE_MAX_BYTES = 5_000_000       # option 8 warns above this: make the width smaller
+PIECE_RE = re.compile(r"p(\d{4,7})\.json")
+HASH_RE = re.compile(r"[0-9a-f]{8}")
+
+
+def raw_hash(english: str) -> str:
+    """Fingerprint of an English text: first 8 hex digits of the SHA-256 of its UTF-8 bytes."""
+    return hashlib.sha256(english.encode("utf-8")).hexdigest()[:8]
+
+
+def piece_name(number: int) -> str:
+    return f"p{number:04d}.json"
+
+
+def piece_number(name: str) -> int | None:
+    m = PIECE_RE.fullmatch(name)
+    return int(m.group(1)) if m else None
+
+
+def _ordered(section: dict[int, str]) -> dict[str, str]:
+    return {str(k): section[k] for k in sorted(section)}
+
+
+def piece_bytes(strings: dict[int, str], auto: dict[int, str], drop: set[int],
+                hashes: dict[int, str]) -> bytes:
+    """Content of one piece: always the same bytes for the same entries (sorted, compact)."""
+    data: dict = {}
+    if strings:
+        data["strings"] = _ordered(strings)
+    if auto:
+        data["auto"] = _ordered(auto)
+    if drop:
+        data["drop"] = sorted(drop)
+    if hashes:
+        data["h"] = _ordered(hashes)
+    return (json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n").encode("utf-8")
+
+
+def split_patch(strings: dict[int, str], auto: dict[int, str], drop: set[int],
+                hashes: dict[int, str], width: int) -> dict[str, bytes]:
+    """Piece file name -> content. `hashes` may hold keys that are not published (ignored)."""
+    if width <= 0:
+        raise ValueError("width must be positive")
+    groups: dict[int, tuple[dict, dict, set, dict]] = {}
+
+    def group(k: int) -> tuple[dict, dict, set, dict]:
+        return groups.setdefault(k // width, ({}, {}, set(), {}))
+
+    for k, v in strings.items():
+        group(k)[0][k] = v
+    for k, v in auto.items():
+        if k not in strings:
+            group(k)[1][k] = v
+    for k in drop:
+        if k not in strings and k not in auto:
+            group(k)[2].add(k)
+    for k, h in hashes.items():
+        if (k in strings or k in auto) and h:
+            group(k)[3][k] = h
+    return {piece_name(n): piece_bytes(*groups[n]) for n in sorted(groups)}
+
+
+def index_bytes(version: int, glossary: str, width: int, pieces: dict[str, bytes]) -> bytes:
+    info = {}
+    for name in sorted(pieces):
+        body = pieces[name]
+        data = json.loads(body)
+        entries = sum(len(data.get(s, ())) for s in ("strings", "auto", "drop"))
+        info[name] = {"sha256": hashlib.sha256(body).hexdigest(), "entries": entries,
+                      "size": len(body)}
+    data = {"format": PATCH_FORMAT, "version": version, "glossary": glossary, "width": width,
+            "pieces": info}
+    return (json.dumps(data, ensure_ascii=False, indent=1) + "\n").encode("utf-8")
+
+
+def parse_index(data: dict) -> dict:
+    """Checks an index.json; returns it with "pieces" as {name: (number, sha256, size)}."""
+    if not isinstance(data, dict) or data.get("format") != PATCH_FORMAT:
+        raise ValueError("patch index: unknown format")
+    version, width = data.get("version"), data.get("width")
+    if not isinstance(version, int) or version < 0:
+        raise ValueError("patch index: bad version")
+    if not isinstance(width, int) or width <= 0:
+        raise ValueError("patch index: bad width")
+    fp = data.get("glossary", "")
+    if not isinstance(fp, str):
+        raise ValueError("patch index: 'glossary' must be a string")
+    pieces = data.get("pieces")
+    if not isinstance(pieces, dict):
+        raise ValueError("patch index: 'pieces' must be an object")
+    out = {}
+    for name, info in pieces.items():
+        number = piece_number(str(name))
+        if number is None or not isinstance(info, dict):
+            raise ValueError(f"patch index: bad piece {name!r}")
+        sha, size = info.get("sha256"), info.get("size")
+        if not isinstance(sha, str) or not re.fullmatch(r"[0-9a-f]{64}", sha):
+            raise ValueError(f"patch index: bad sha256 for {name}")
+        if not isinstance(size, int) or not 0 < size <= MAX_DOWNLOAD:
+            raise ValueError(f"patch index: bad size for {name}")
+        out[name] = (number, sha, size)
+    return {"version": version, "glossary": fp, "width": width, "pieces": out}
+
+
+def parse_piece(data: dict, number: int, width: int
+                ) -> tuple[dict[int, str], dict[int, str], set[int], dict[int, str]]:
+    """Checks a piece with the same rules as Patch.load_dict; every key must belong to it."""
+    if not isinstance(data, dict):
+        raise ValueError("patch piece: not an object")
+    strings = Patch._section(data, "strings", False)
+    auto = {k: v for k, v in Patch._section(data, "auto", False).items() if k not in strings}
+    drop = Patch.parse_drop(data) - set(strings) - set(auto)
+    raw = data.get("h", {})
+    if not isinstance(raw, dict):
+        raise ValueError("patch piece: 'h' must be an object")
+    hashes = {}
+    for k, h in raw.items():
+        if not str(k).isdigit() or not isinstance(h, str) or not HASH_RE.fullmatch(h):
+            raise ValueError(f"patch piece: bad 'h' entry {k!r}")
+        if int(k) in strings or int(k) in auto:
+            hashes[int(k)] = h
+    low, high = number * width, (number + 1) * width
+    for k in (*strings, *auto, *drop):
+        if not low <= k < high:
+            raise ValueError(f"patch piece {piece_name(number)}: key {k} outside {low}-{high - 1}")
+    return strings, auto, drop, hashes
 
 
 # --------------------------------------------------------------------------- #
@@ -1013,6 +1197,12 @@ def export_review(map_path: Path, patch_path: Path, out: Path) -> int:
     return len(keys)
 
 
+def dump_patch(data: dict) -> str:
+    """Text of patch_it.json: compact (no spaces) but one entry per line, so it stays small for
+    the modules up to v0.4 that download it whole, and git diffs stay readable."""
+    return json.dumps(data, ensure_ascii=False, indent=0, separators=(",", ":")) + "\n"
+
+
 def _write_patch(patch: Patch, path: Path) -> None:
     data = patch.to_dict()
     for section in ("strings", "auto"):  # last check on the whole patch: lone "%" -> "%%"
@@ -1021,7 +1211,7 @@ def _write_patch(patch: Patch, path: Path) -> None:
     Patch.parse_glossary(data)
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
-    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+    tmp.write_text(dump_patch(data), encoding="utf-8")
     os.replace(tmp, path)
 
 

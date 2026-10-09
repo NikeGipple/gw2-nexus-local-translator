@@ -10,15 +10,15 @@ Protocol: https://github.com/ideka/modulep (version 1). The addon starts this ex
 on stdout; stderr goes to the Nexus log. The addon keeps the translations in cache.db next to
 this exe (table translations: id, cache_key, version, timestamp, text).
 
-Glossary, patch, OPUS-MT engine and map come from lt_server.py, imported as a library.
-Data lives in IT\\ next to this exe (model, glossary, patch, cache_it.jsonl, map_it.db).
+Glossary, OPUS-MT engine and map come from lt_server.py, imported as a library; the patch archive
+(IT\\patch_it.db, updated from GitHub piece by piece) from patch_db.py.
+Data lives in IT\\ next to this exe (model, glossary, patch_it.db, cache_it.jsonl, map_it.db).
 
 Developer commands (strumenti.bat options 4 and 5): --export-review and --import-review.
 """
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import os
 import queue
@@ -34,11 +34,13 @@ from pathlib import Path
 # PyInstaller bundles lt_server.py too (--paths).
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # lt_server.py sits next to this file
 import lt_server as lt  # noqa: E402
+from patch_db import CachePatch, PieceUpdater, has_table  # noqa: E402
 
 PROTOCOL = 1
 SOURCE_LANG = 0          # English: the game must be set to English
 RESULT_VERSION = 1       # raise it to make the addon ask again for every cached text
 CACHE_KEY = "it"
+PATCH_LANG = "it"        # patch/<lang>/ on GitHub
 MAX_MESSAGE = 0x10_0000
 KIND_TEXT, KIND_CANCEL = 0, 1
 
@@ -171,172 +173,8 @@ class StderrHandler(logging.Handler):
 
 
 # --------------------------------------------------------------------------- #
-# Patch and glossary cleanup on the addon's cache.db
+# Glossary cleanup on the addon's cache.db (the patch itself: patch_db.CachePatch)
 # --------------------------------------------------------------------------- #
-def has_table(db: Path) -> bool:
-    if not db or not db.is_file():
-        return False
-    con = sqlite3.connect(f"file:{db}?mode=ro", uri=True, timeout=10)
-    try:
-        return con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='translations'"
-                           ).fetchone() is not None
-    finally:
-        con.close()
-
-
-class CachePatch(lt.Patch):
-    """Same rules as lt_server.Patch, applied to Text Translator's cache.db.
-
-    The whole patch is written into cache.db in advance (since 2026-10-07): the addon reads
-    cache.db when the game starts, so from the next start every patch text is Italian the first
-    time it appears, also with "Pause Refreshes" on (no refresh needed). Priority: reviewed >
-    automatic > local server; automatic rows purged by a glossary change (skip file) are not
-    written. Texts that left the patch ('drop' and rows written earlier by us) are removed.
-
-    If the string IDs check fails (IdCheck), the patch rows are removed from cache.db and the
-    patch stays off (marker file patch_it.ids_failed.json) until a later check passes.
-    """
-
-    def apply(self, db: Path | None) -> int:
-        with self.lock:
-            reviewed = list(self.strings.items())
-            auto = list(self.auto.items())
-            drop = set(self.drop)
-        if not (reviewed or auto or drop) or not has_table(db):
-            return 0
-        if self.ids_failed():
-            log.warning("patch not applied: the string IDs did not match the map (%s)",
-                        self._ids_failed_path().name)
-            return 0
-        con = sqlite3.connect(str(db), timeout=10)
-        try:
-            current = dict(con.execute("SELECT id, text FROM translations WHERE cache_key = ?",
-                                       (CACHE_KEY,)))
-            skipped = self._skipped() if auto else set()
-            applied = self._read_applied()
-            write = [(k, v) for k, v in reviewed if current.get(k) != v]
-            for k, v in auto:
-                if current.get(k) == v or k in skipped:
-                    continue
-                write.append((k, v))  # new, or a valid automatic text beats the local server's one
-            published = {k for k, _ in reviewed} | {k for k, _ in auto}
-            remove = {k for k, t in applied.items()
-                      if k not in published and current.get(k) == t} if auto else set()
-            dropped_before = self._read_dropped()
-            remove |= {k for k in drop - dropped_before
-                       if k not in published and current.get(k) is not None}
-            now = int(time.time())
-            with con:
-                con.executemany(
-                    "INSERT INTO translations (id, cache_key, version, timestamp, text) "
-                    "VALUES (?, ?, ?, ?, ?) ON CONFLICT(cache_key, id) DO UPDATE SET "
-                    "text = excluded.text, version = excluded.version, timestamp = excluded.timestamp",
-                    [(k, CACHE_KEY, RESULT_VERSION, now, v) for k, v in write])
-                con.executemany("DELETE FROM translations WHERE cache_key = ? AND id = ?",
-                                [(CACHE_KEY, k) for k in remove])
-        finally:
-            con.close()
-        if self.auto_current() and self.skip_path and self.skip_path.exists():
-            try:  # patch made with the player's glossary: the old blocks are no longer needed
-                self.skip_path.unlink()
-            except OSError as exc:
-                log.warning("cannot remove %s: %s", self.skip_path, exc)
-        for k in remove:
-            current.pop(k, None)
-        dpath = self._dropped_path()
-        if dpath and drop - dropped_before:
-            try:
-                dpath.write_text(json.dumps(sorted(drop)), encoding="utf-8")
-            except OSError as exc:
-                log.warning("cannot save %s: %s", dpath, exc)
-        self.remember_applied(current, write)
-        if write:
-            log.info("patch v%d: %d translations updated in cache.db (visible at next game start)",
-                     self.version, len(write))
-        if remove:
-            log.info("patch v%d: %d old translations removed from cache.db", self.version, len(remove))
-        return len(write) + len(remove)
-
-    def remember_applied(self, current: dict[int, str], write: list[tuple[int, str]]) -> None:
-        """Registry of the automatic texts now held by the addon, to update them in a new version."""
-        path = self._applied_path()
-        if not path:
-            return
-        with self.lock:
-            auto = dict(self.auto)
-        final = dict(current)
-        final.update(write)
-        try:
-            tmp = path.with_suffix(".tmp")
-            tmp.write_text(json.dumps({str(k): v for k, v in auto.items() if final.get(k) == v},
-                                      ensure_ascii=False), encoding="utf-8")
-            os.replace(tmp, path)
-        except OSError as exc:
-            log.warning("cannot save %s: %s", path, exc)
-
-    # -- string IDs check failed: patch off -----------------------------------------------
-    def _ids_failed_path(self) -> Path | None:
-        return self.skip_path.with_name("patch_it.ids_failed.json") if self.skip_path else None
-
-    def ids_failed(self) -> bool:
-        path = self._ids_failed_path()
-        return bool(path and path.exists())
-
-    def withdraw(self, db: Path | None, reason: str) -> int:
-        """The string IDs do not match: remove from cache.db every row that holds a patch text
-        (the addon asks for them again) and keep the patch off until a check passes."""
-        path = self._ids_failed_path()
-        if path:
-            try:
-                path.write_text(json.dumps({"patch_version": self.version, "reason": reason,
-                                            "time": int(time.time())}), encoding="utf-8")
-            except OSError as exc:
-                log.warning("cannot save %s: %s", path, exc)
-        if not has_table(db):
-            return 0
-        with self.lock:
-            texts = dict(self.auto)
-            texts.update(self.strings)
-        con = sqlite3.connect(str(db), timeout=10)
-        try:
-            current = dict(con.execute("SELECT id, text FROM translations WHERE cache_key = ?",
-                                       (CACHE_KEY,)))
-            remove = [k for k, t in current.items() if texts.get(k) == t]
-            with con:
-                con.executemany("DELETE FROM translations WHERE cache_key = ? AND id = ?",
-                                [(CACHE_KEY, k) for k in remove])
-        finally:
-            con.close()
-        applied = self._applied_path()
-        if applied and applied.exists():
-            try:
-                applied.unlink()
-            except OSError as exc:
-                log.warning("cannot remove %s: %s", applied, exc)
-        log.error("patch: %d patch texts removed from cache.db (string IDs do not match)", len(remove))
-        return len(remove)
-
-    def ids_ok(self, db: Path | None) -> None:
-        """A check passed: if the patch was off because of an earlier failed check, turn it on."""
-        path = self._ids_failed_path()
-        if path and path.exists():
-            try:
-                path.unlink()
-            except OSError as exc:
-                log.warning("cannot remove %s: %s", path, exc)
-                return
-            log.info("string IDs match again: patch turned back on")
-            self.apply(db)
-
-    def answer(self, key: int, skipped: set[int]) -> str | None:
-        with self.lock:
-            if key in self.strings:
-                return self.strings[key]
-            if key in self.auto and key not in skipped:
-                return self.auto[key]
-        return None
-
-
 class ModuleEngine(lt.Engine):
     """lt_server.Engine whose glossary cleanup works on cache.db (rows found by their translated text)."""
 
@@ -345,7 +183,6 @@ class ModuleEngine(lt.Engine):
         texts = {t for t in texts if len(t.strip()) >= 3}
         if not texts or not has_table(db):
             return
-        keep = self.patch.keys() if self.patch else set()
         try:
             con = sqlite3.connect(str(db), timeout=10)
             try:
@@ -355,7 +192,8 @@ class ModuleEngine(lt.Engine):
                         doomed.update(k for (k,) in con.execute(
                             "SELECT id FROM translations WHERE cache_key = ? AND instr(text, ?) > 0",
                             (CACHE_KEY, t)))
-                    doomed -= keep
+                    if self.patch:  # reviewed rows, and automatic ones made with this glossary
+                        doomed -= self.patch.protected(doomed)
                     if self.patch:
                         self.patch.suppress(doomed)
                     con.executemany("DELETE FROM translations WHERE cache_key = ? AND id = ?",
@@ -431,6 +269,7 @@ class Stats:
         self.cpu_since = time.process_time()
         self.base = self._totals()
         self.counts = {"patch": 0, "cache": 0, "model": 0, "empty": 0}
+        self.stale = 0  # patch entries not used because their English text changed
         self.waits: list[float] = []
         self.queue_max = 0
         self.sends = 0  # groups of answers sent to the addon (each one can cause an addon refresh)
@@ -452,7 +291,7 @@ class Stats:
         done, prep, model, gave_up = (a - b for a, b in zip(self._totals(), self.base))
         total = sum(self.counts.values())
         text = None
-        if total or done or cpu >= 1:
+        if total or done or cpu >= 1 or self.stale:
             parts = ", ".join(f"{k} {v * 100 / total:.0f}%" for k, v in self.counts.items()) if total else ""
             text = (f"stats {period}: cpu {cpu:.0f}% of one core ({os.cpu_count() or '?'} cores); "
                     f"{total} requests" + (f" ({parts})" if parts else ""))
@@ -471,11 +310,14 @@ class Stats:
                      f"model {model:.1f} s)")
             if gave_up:
                 text += f"; given up {gave_up} lines"
+            if self.stale:
+                text += f"; patch outdated (English changed) {self.stale} texts"
         self.since, self.cpu_since, self.base = now, cpu_now, self._totals()
         self.counts = dict.fromkeys(self.counts, 0)
         self.waits = []
         self.queue_max = 0
         self.sends = 0
+        self.stale = 0
         return text
 
 
@@ -497,8 +339,6 @@ class Dispatcher:
         self.waiting: dict[str, set[int]] = {}   # line -> keys waiting for it
         self.ids = IdCheck(keymap, on_fail=lambda why: patch.withdraw(cache_db, why),
                            on_pass=lambda: patch.ids_ok(cache_db))
-        self.skipped: set[int] = set()
-        self.skipped_version: tuple = ()
         self.answered = 0
         self.arrived: dict[int, float] = {}      # key -> when it started waiting for the model
         self.stats = Stats(engine, stats_every)
@@ -568,9 +408,6 @@ class Dispatcher:
             with e.cv:
                 if self.inbox.empty() and not e.finished:
                     e.cv.wait(0.5)
-                state = self.patch.skipped_state()  # patch or glossary changed: check again
-                if state != self.skipped_version:
-                    self.skipped, self.skipped_version = self.patch._skipped(), state
                 queued = False
                 while True:  # new requests
                     try:
@@ -583,8 +420,10 @@ class Dispatcher:
                         self.stats.counts["empty"] += 1
                         out.append((key, text, text))
                         continue
-                    fixed = (None if self.ids.failed or self.patch.ids_failed()
-                             else self.patch.answer(key, self.skipped))
+                    fixed, stale = ((None, False) if self.ids.failed or self.patch.ids_failed()
+                                    else self.patch.lookup(key, text))
+                    if stale:  # English changed after the translation: translated locally
+                        self.stats.stale += 1
                     if fixed is not None:
                         self.stats.counts["patch"] += 1
                         out.append((key, text, fixed))
@@ -652,6 +491,8 @@ def main() -> int:
     ap.add_argument("--cache-db", type=Path, default=module_dir / "cache.db")
     ap.add_argument("--patch-file", type=Path, default=None, help="local patch (developers)")
     ap.add_argument("--no-update", action="store_true")
+    ap.add_argument("--branch", default=lt.DEFAULT_BRANCH,
+                    help="GitHub branch for glossary and patch (developers' tests; default main)")
     ap.add_argument("--debug", action="store_true")
     ap.add_argument("--threads", type=int, default=None,
                     help="CPU threads for the model (default: a quarter of the CPUs, at most 2)")
@@ -739,9 +580,20 @@ def main() -> int:
     if not glossary.load_file(args.lang_dir / "glossary_it.json"):
         glossary.load_file(lt.bundled_dir() / "glossary_it.default.json")
     fake = args.fake or (args.lang_dir / "fake.txt").is_file()
-    patch = CachePatch(skip_path=args.lang_dir / "patch_it.skip.json")
-    patch.load_file(args.patch_file or args.lang_dir / "patch_it.json")
+    t0 = time.perf_counter()
+    patch = CachePatch(args.lang_dir / "patch_it.db", CACHE_KEY, RESULT_VERSION)
     patch.glossary = glossary  # to know whether 'auto' was made with this glossary
+    try:
+        patch.migrate(args.lang_dir)  # v0.4 files, or IT\\patch_it.json copied by option 7
+    except Exception:  # noqa: BLE001 - the archive is still usable
+        log.exception("cannot import the local patch files")
+    if args.patch_file:  # developers: test patch, no updates from GitHub in this session
+        if patch.import_file(args.patch_file, "patch-file"):
+            log.info("test patch loaded: %s", args.patch_file)
+    c = patch.counts()
+    log.info("patch v%d: %d reviewed, %d automatic, %d drop, %d with English fingerprint "
+             "(ready in %.2f s)", patch.version, c["reviewed"], c["auto"], c["drop"], c["h"],
+             time.perf_counter() - t0)
     engine = ModuleEngine(lt.FakeTranslator() if fake else None, glossary,
                           args.lang_dir / "cache_it.jsonl", args.cache_db, patch=patch)
     keymap = None
@@ -790,9 +642,10 @@ def main() -> int:
             except Exception as exc:  # noqa: BLE001
                 log.warning("cannot apply the patch to %s: %s", args.cache_db, exc)
 
-        lt.GlossaryUpdater(glossary, args.lang_dir, glossary_changed, lt.GLOSSARY_URL).start()
+        lt.GlossaryUpdater(glossary, args.lang_dir, glossary_changed,
+                           lt.raw_url("glossary/glossary_it.json", args.branch)).start()
         if not args.patch_file:
-            lt.PatchUpdater(patch, args.lang_dir, args.cache_db, lt.PATCH_URL).start()
+            PieceUpdater(patch, PATCH_LANG, args.cache_db, args.branch).start()
 
     while True:  # everything runs in threads; the reader exits the process when stdin closes
         time.sleep(3600)

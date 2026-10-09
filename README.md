@@ -32,6 +32,8 @@ This module brings the game into **Italian**; other languages are planned.
 
 On the very first start the model is downloaded and loaded, which takes a little while. Until then text stays in English. Later starts are immediate.
 
+> **Installed v0.2.x or older?** Those versions can no longer download patch updates (the patch has grown past the size they can read) and keep using an old copy without any warning. Download the newest release and extract it over the old one, as in the installation. Updating is also recommended from v0.3 and v0.4, which download the whole patch at every update.
+
 The texts of the curated patch are written in advance into the addon's `cache.db`: from your next game start they appear translated right away, even the ones you have never seen before.
 
 ### Smooth play: *Pause Refreshes*
@@ -56,7 +58,7 @@ addons\
       IT\                             Italian files (one folder per language)
         model\                        translation model (downloaded automatically)
         glossary_it.json              glossary (updated automatically)
-        patch_it.json                 curated translations (updated automatically)
+        patch_it.db                   curated translations (updated automatically)
         cache_it.jsonl                local translation cache
         map_it.db                     local map of the texts seen in game
       local_translator_it.log         module log
@@ -76,13 +78,17 @@ The only network connections made by the module are to this repository on GitHub
 
 ## Translation patch
 
-[`patch/patch_it.json`](patch/patch_it.json) contains curated Italian translations identified by the game's internal string ID:
+The curated Italian translations, identified by the game's internal string ID, are in [`patch/it/`](patch/it), split in pieces by ID range so that an update only downloads the pieces that changed. `index.json` lists the pieces with their SHA-256, which the module checks before using them:
 
 ```json
-{ "version": 1, "strings": { "272657": "Raffina per ottenere Bloodstone Brick." } }
+{ "strings": { "272657": "Raffina per ottenere Bloodstone Brick." }, "h": { "272657": "1a2b3c4d" } }
 ```
 
-It contains no English game text. To report a wrong translation, open an issue with the Italian text you see in game and where you saw it.
+`h` is a short fingerprint (the first 8 hex digits of the SHA-256) of the English text the translation was made from: if the game sends a different English text for that ID, for example after a game update, the module translates the new text instead of showing the old translation. The patch contains no English game text.
+
+[`patch/patch_it.json`](patch/patch_it.json) holds the same translations in a single file, for modules up to v0.4.
+
+To report a wrong translation, open an issue with the Italian text you see in game and where you saw it.
 
 ## Your local files
 
@@ -100,7 +106,7 @@ Suggestions and corrections are welcome through issues or pull requests.
 
 ## Other languages
 
-Each language is a separate module (`local_translator_<language>`) with its own OPUS-MT model, glossary (`glossary_<language>.json`) and patch (`patch_<language>.json`). If you would like to maintain one, open an issue.
+Each language is a separate module (`local_translator_<language>`) with its own OPUS-MT model, glossary (`glossary_<language>.json`) and patch (`patch/<language>/`). If you would like to maintain one, open an issue.
 
 ## Troubleshooting
 
@@ -115,8 +121,9 @@ Each language is a separate module (`local_translator_<language>`) with its own 
 
 The source code of the module is in [`src/`](src):
 
-- `lt_module.py`: the Text Translator module (module protocol, patch and cache handling, local map);
-- `lt_server.py`: glossary, patch, local map and the OPUS-MT engine, used by the module as a library;
+- `lt_module.py`: the Text Translator module (module protocol, requests, glossary cleanup of the cache, local map);
+- `patch_db.py`: the local patch archive (`patch_it.db`), its download piece by piece and its application to `cache.db`;
+- `lt_server.py`: glossary, patch format, local map and the OPUS-MT engine, used by the module as a library;
 - `plurale_it.py`: Italian plural rules, so item names get both forms (`Medaglia[pl:"Medaglie"]`, the game picks the right one);
 - `text_translator/`: the `module.toml` and the initial `settings.toml` shipped in the zip.
 
