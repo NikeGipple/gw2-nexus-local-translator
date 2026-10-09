@@ -756,33 +756,6 @@ class KeyMap:
         except sqlite3.Error as exc:
             log.debug("map: checkpoint at start failed: %s", exc)
         self.lock = threading.Lock()
-        # Since close() does not run when the game closes, the rows of the current session would
-        # stay in the -wal until the next start. A background thread merges them into
-        # map_<lang>.db every CHECKPOINT_EVERY seconds, so map_<lang>.db alone is at most that
-        # far behind, also after a crash. (The thread ends with the module.)
-        self.dirty = False
-        self.stop = threading.Event()
-        threading.Thread(target=self._checkpoint_loop, daemon=True, name="map-checkpoint").start()
-
-    CHECKPOINT_EVERY = 120  # seconds
-
-    def _checkpoint_loop(self) -> None:
-        while not self.stop.wait(self.CHECKPOINT_EVERY):
-            with self.lock:
-                if self.closed:
-                    return
-                if not self.dirty:
-                    continue
-                try:
-                    # PASSIVE: never waits for other readers (e.g. the management page), so a save
-                    # is never blocked; what it cannot copy now is copied at the next round.
-                    _, wal, done = self.con.execute("PRAGMA wal_checkpoint(PASSIVE)").fetchone()
-                    if wal == done:
-                        self.dirty = False
-                    else:
-                        log.debug("map: checkpoint partial (%s of %s pages, file in use)", done, wal)
-                except sqlite3.Error as exc:
-                    log.debug("map: checkpoint failed: %s", exc)
 
     def save(self, rows: list[tuple[int, str, str, str]]) -> int:
         """rows: (key, en, it, how). A 'live' row always wins over an older kind."""
@@ -800,10 +773,7 @@ class KeyMap:
                     "how = excluded.how, seen = excluded.seen "
                     "WHERE excluded.how = 'live' OR texts.how = 'backfill'",
                     [(k, en, it, how, now) for k, en, it, how in rows])
-                changed = self.con.total_changes - before
-            if changed:
-                self.dirty = True
-            return changed
+                return self.con.total_changes - before
 
     def count(self) -> int:
         with self.lock:
@@ -817,7 +787,6 @@ class KeyMap:
             if self.closed:
                 return
             self.closed = True
-            self.stop.set()
             try:
                 self.con.execute("PRAGMA wal_checkpoint(TRUNCATE)")
                 try:
