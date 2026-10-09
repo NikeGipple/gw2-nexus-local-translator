@@ -26,6 +26,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import re
 import shutil
 import sqlite3
 import threading
@@ -69,6 +70,72 @@ UPSERT = ("INSERT INTO main.translations (id, cache_key, version, timestamp, tex
           "VALUES (?, ?, ?, ?, ?) ON CONFLICT(cache_key, id) DO UPDATE SET "
           "text = excluded.text, version = excluded.version, timestamp = excluded.timestamp")
 
+# "Show keys" mode (developers and helpers, file IT\mostra_key.txt): texts in cache.db and
+# answers start with their string ID, "44547 - Bambini", to find the key of a text seen in the
+# game. Two modes:
+#   "text" only texts with words: templates such as "[m]%str1%", "[null]" or "%str1% %str2%",
+#          which the game uses to build names and dialogues out of several strings, stay as they are;
+#   "all"  every non-empty text, templates included, to see how a text is built.
+TAG_SKIP_RE = re.compile(r"%[A-Za-z]+\d*%|\[[^\]]*\]|<[^>]*>")
+WORD_RE = re.compile(r"[^\W\d_]")
+
+
+SHOW_MODES = ("text", "all")
+
+
+def key_tag(key: int, text: str, mode: str | None) -> str:
+    """The "<key> - " prefix for this text in this mode (None: mode off), or ""."""
+    if mode == "all":
+        return f"{key} - " if text.strip() else ""
+    if mode == "text":
+        return f"{key} - " if WORD_RE.search(TAG_SKIP_RE.sub("", text)) else ""
+    return ""
+
+
+def shown_text(key: int, text: str | None, mode: str | None) -> str | None:
+    """The text with its key prefix, as it is in cache.db in this mode."""
+    return text if text is None else key_tag(key, text, mode) + text
+
+
+def untagged(key: int, text: str) -> str:
+    tag = f"{key} - "
+    return text[len(tag):] if text.startswith(tag) else text
+
+
+def sync_key_tags(db: Path | None, cache_key: str, mode: str | None) -> int:
+    """Put the texts of cache.db in the given mode ("text", "all" or None = no prefixes), CHUNK
+    rows per transaction. Returns the rows changed. Done at every start, so cache.db always follows the
+    mode: with the game closed (strumenti.bat) the change is visible at the very next start."""
+    if not has_table(db):
+        return 0
+    con = sqlite3.connect(str(db), timeout=10, isolation_level=None)
+    done, last = 0, -1
+    try:
+        while True:
+            rows = con.execute("SELECT id, text FROM translations WHERE cache_key = ? AND id > ? "
+                               f"ORDER BY id LIMIT {CHUNK}", (cache_key, last)).fetchall()
+            if not rows:
+                return done
+            last = rows[-1][0]
+            changes = []
+            for key, text in rows:
+                base = untagged(key, text)
+                want = shown_text(key, base, mode)
+                if want != text:
+                    changes.append((want, cache_key, key))
+            if changes:
+                con.execute("BEGIN")
+                try:
+                    con.executemany("UPDATE translations SET text = ? WHERE cache_key = ? AND id = ?",
+                                    changes)
+                    con.execute("COMMIT")
+                except BaseException:
+                    con.execute("ROLLBACK")
+                    raise
+                done += len(changes)
+    finally:
+        con.close()
+
 
 def has_table(db: Path | None) -> bool:
     """True if the addon's cache.db exists and has its translations table."""
@@ -104,6 +171,7 @@ class CachePatch:
         self.path = path
         self.cache_key, self.result_version = cache_key, result_version
         self.glossary: lt.Glossary | None = None  # the player's glossary (set by the module)
+        self.show_keys: str | None = None  # "show keys" mode ("text", "all") or None
         self.lock = threading.RLock()             # one writer at a time: update, apply, withdraw
         self.rlock = threading.Lock()             # the reading connection (answers)
         self._stale_lock = threading.Lock()
@@ -315,8 +383,14 @@ class CachePatch:
         self._ids_failed = value
 
     # -- cache.db ---------------------------------------------------------------------------
+    def _shown(self, row: str) -> str:
+        """SQL for the text of a patch (or applied) row as it is in cache.db."""
+        return f"lt_shown({row}.key, {row}.text)" if self.show_keys else f"{row}.text"
+
     def _open_cache(self, db: Path) -> sqlite3.Connection:
         con = sqlite3.connect(str(db), timeout=10, isolation_level=None)
+        mode = self.show_keys
+        con.create_function("lt_shown", 2, lambda k, t: shown_text(k, t, mode), deterministic=True)
         con.execute("ATTACH DATABASE ? AS p", (str(self.path),))
         return con
 
@@ -371,10 +445,11 @@ class CachePatch:
                     restrict = " AND {0}.key IN (SELECT key FROM temp.k)"
                 skip_on = 1 if has_auto and self._skip_active() else 0
                 con.execute("CREATE TEMP TABLE w (key INTEGER PRIMARY KEY, text TEXT)")
+                shown = self._shown("pt")
                 con.execute(
-                    "INSERT INTO temp.w SELECT pt.key, pt.text FROM p.patch pt "
+                    f"INSERT INTO temp.w SELECT pt.key, {shown} FROM p.patch pt "
                     "LEFT JOIN main.translations t ON t.cache_key = ? AND t.id = pt.key "
-                    f"WHERE pt.kind IN ({KIND_REVIEWED}, {KIND_AUTO}) AND t.text IS NOT pt.text "
+                    f"WHERE pt.kind IN ({KIND_REVIEWED}, {KIND_AUTO}) AND t.text IS NOT {shown} "
                     f"AND NOT (pt.kind = {KIND_AUTO} AND ? AND pt.key IN (SELECT key FROM p.skip)) "
                     "AND NOT EXISTS (SELECT 1 FROM p.stale s WHERE s.key = pt.key AND s.h = pt.h)"
                     + restrict.format("pt"), (ck, skip_on))
@@ -383,7 +458,7 @@ class CachePatch:
                     con.execute(
                         "INSERT OR IGNORE INTO temp.r SELECT a.key FROM p.applied a "
                         "JOIN main.translations t ON t.cache_key = ? AND t.id = a.key "
-                        "WHERE t.text = a.text AND NOT EXISTS (SELECT 1 FROM p.patch pt "
+                        f"WHERE t.text = {self._shown('a')} AND NOT EXISTS (SELECT 1 FROM p.patch pt "
                         f"WHERE pt.key = a.key AND pt.kind IN ({KIND_REVIEWED}, {KIND_AUTO}))"
                         + restrict.format("a"), (ck,))
                 new_drop = con.execute(
@@ -415,7 +490,7 @@ class CachePatch:
                     con.execute(
                         "INSERT INTO p.applied SELECT pt.key, pt.text FROM p.patch pt "
                         "JOIN main.translations t ON t.cache_key = ? AND t.id = pt.key "
-                        f"WHERE pt.kind = {KIND_AUTO} AND t.text = pt.text"
+                        f"WHERE pt.kind = {KIND_AUTO} AND t.text = {shown}"
                         + restrict.format("pt"), (ck,))
                     con.execute("COMMIT")
                 except BaseException:
@@ -452,7 +527,7 @@ class CachePatch:
                     "INSERT OR IGNORE INTO temp.r SELECT t.id FROM main.translations t "
                     "JOIN p.patch pt ON pt.key = t.id "
                     f"WHERE t.cache_key = ? AND pt.kind IN ({KIND_REVIEWED}, {KIND_AUTO}) "
-                    "AND t.text = pt.text", (self.cache_key,))
+                    f"AND t.text = {self._shown('pt')}", (self.cache_key,))
                 removed = self._write_rows(con, "r", upsert=False)
                 con.execute("DELETE FROM p.applied")
             finally:

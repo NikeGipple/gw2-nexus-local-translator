@@ -14,7 +14,9 @@ Glossary, OPUS-MT engine and map come from lt_server.py, imported as a library; 
 (IT\\patch_it.db, updated from GitHub piece by piece) from patch_db.py.
 Data lives in IT\\ next to this exe (model, glossary, patch_it.db, cache_it.jsonl, map_it.db).
 
-Developer commands (strumenti.bat options 4 and 5): --export-review and --import-review.
+Developer commands (strumenti.bat options 4, 5 and 14): --export-review, --import-review and
+--show-keys text|all|off ("show keys" mode: with the file IT\\mostra_key.txt the texts in the game
+start with their string ID, "44547 - Bambini"; the file holds "text" or "all", see patch_db).
 """
 from __future__ import annotations
 
@@ -34,9 +36,10 @@ from pathlib import Path
 # PyInstaller bundles lt_server.py too (--paths).
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # lt_server.py sits next to this file
 import lt_server as lt  # noqa: E402
-from patch_db import CachePatch, PieceUpdater, has_table  # noqa: E402
+from patch_db import (CachePatch, PieceUpdater, SHOW_MODES, has_table, key_tag,  # noqa: E402
+                      sync_key_tags)
 
-VERSION = "0.5.0"        # version of the release: raise it at every new zip (shown in the log)
+VERSION = "0.5.1"        # version of the release: raise it at every new zip (shown in the log)
 PROTOCOL = 1
 SOURCE_LANG = 0          # English: the game must be set to English
 RESULT_VERSION = 1       # raise it to make the addon ask again for every cached text
@@ -46,6 +49,17 @@ MAX_MESSAGE = 0x10_0000
 KIND_TEXT, KIND_CANCEL = 0, 1
 
 STATS_EVERY = 300  # default seconds between two "stats" lines in the log (--stats-every)
+SHOW_KEYS_FILE = "mostra_key.txt"  # in IT\: "show keys" mode (see patch_db.sync_key_tags)
+
+
+def show_keys_mode(lang_dir: Path) -> str | None:
+    """Mode of the "show keys" file: "all" if it says so (also "tutte"), otherwise "text";
+    None without the file. An empty file (made by hand by a helper) means "text"."""
+    try:
+        words = (lang_dir / SHOW_KEYS_FILE).read_text(encoding="utf-8", errors="replace").split()
+    except OSError:
+        return None
+    return "all" if words and words[0].lower() in ("all", "tutte", "tutti") else "text"
 
 TRIVIAL_RE = re.compile(r"\(\(\d+\)\)|\(new string\)")
 
@@ -341,6 +355,7 @@ class Dispatcher:
         self.ids = IdCheck(keymap, on_fail=lambda why: patch.withdraw(cache_db, why),
                            on_pass=lambda: patch.ids_ok(cache_db))
         self.answered = 0
+        self.show_keys = patch.show_keys         # answers start with "<key> - "
         self.arrived: dict[int, float] = {}      # key -> when it started waiting for the model
         self.stats = Stats(engine, stats_every)
         with engine.cv:
@@ -452,9 +467,9 @@ class Dispatcher:
         msgs = []
         for key, en, it in out:
             try:
-                msgs.append(Channel.text(key, it))
+                msgs.append(Channel.text(key, key_tag(key, it, self.show_keys) + it))
             except ValueError:  # translation longer than the game allows: keep the original
-                msgs.append(Channel.text(key, en))
+                msgs.append(Channel.text(key, key_tag(key, en, self.show_keys) + en))
         self.channel.send(msgs)
         self.stats.sends += 1
         before = self.answered
@@ -471,10 +486,15 @@ class Dispatcher:
 
 
 def cache_db_watcher(patch: CachePatch, cache_db: Path) -> None:
-    """Apply the patch to cache.db as soon as the addon has created it (once per start)."""
+    """Apply the patch to cache.db as soon as the addon has created it (once per start), after
+    adding or removing the key prefixes of the "show keys" mode."""
     for _ in range(720):  # up to one hour
         try:
             if has_table(cache_db):
+                n = sync_key_tags(cache_db, CACHE_KEY, patch.show_keys)
+                if n:
+                    log.info("cache.db: key prefixes set to mode %s on %d texts (visible at next "
+                             "game start)", patch.show_keys or "off", n)
                 patch.apply(cache_db)
                 return
         except Exception as exc:  # noqa: BLE001
@@ -504,6 +524,10 @@ def main() -> int:
     ap.add_argument("--import-review", type=Path, metavar="CSV",
                     help="developers: merge the 'nuova_traduzione' column of a reviewed CSV into "
                          "--patch-file, then exit")
+    ap.add_argument("--show-keys", choices=(*SHOW_MODES, "off"),
+                    help=f"developers (game closed): 'show keys' mode: text (only real texts), "
+                         f"all (templates too) or off ({SHOW_KEYS_FILE} in --lang-dir + prefixes "
+                         f"in --cache-db), then exit")
     # Unknown arguments (e.g. a newer module.toml with an older exe) must not stop the module:
     # argparse would exit before the log exists, and the game would stay untranslated.
     args, unknown = ap.parse_known_args()
@@ -519,6 +543,19 @@ def main() -> int:
             return 1
         changed, removed = lt.import_review(args.import_review, args.patch_file)
         print(f"patch {args.patch_file}: {changed} added/changed, {removed} removed")
+        return 0
+    if args.show_keys:
+        flag = args.lang_dir / SHOW_KEYS_FILE
+        mode = None if args.show_keys == "off" else args.show_keys
+        if mode:
+            flag.write_text(f"{mode}\n\nLocal Translator: the texts in the game start with their "
+                            "string ID.\n'text' = only real texts; 'all' = templates too.\n"
+                            "Delete this file to turn it off (visible after two game starts).\n",
+                            encoding="utf-8")
+        else:
+            flag.unlink(missing_ok=True)
+        n = sync_key_tags(args.cache_db, CACHE_KEY, mode)
+        print(f"show keys {args.show_keys}: {n} texts changed in {args.cache_db}")
         return 0
 
     rx, tx, err = binary_streams()
@@ -591,6 +628,10 @@ def main() -> int:
     t0 = time.perf_counter()
     patch = CachePatch(args.lang_dir / "patch_it.db", CACHE_KEY, RESULT_VERSION)
     patch.glossary = glossary  # to know whether 'auto' was made with this glossary
+    patch.show_keys = show_keys_mode(args.lang_dir)
+    if patch.show_keys:
+        log.info("SHOW KEYS mode '%s' (%s): texts start with their string ID", patch.show_keys,
+                 SHOW_KEYS_FILE)
     try:
         patch.migrate(args.lang_dir)  # v0.4 files, or IT\\patch_it.json copied by option 7
     except Exception:  # noqa: BLE001 - the archive is still usable
