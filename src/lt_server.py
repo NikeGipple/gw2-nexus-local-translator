@@ -131,6 +131,19 @@ def fix_percent(text: str, english: str | None = None) -> str:
     return PERCENT_RE.sub(lambda m: "%%" if m.group(0) == "%" else m.group(0), text)
 
 
+# Double masculine/feminine forms written by the models ("Ladro/a", "pronto/a", "il/la"):
+# the translation keeps the masculine only. "Attiva/Disattiva", "%num1%/%num2%" are not touched.
+GENDER_RE = re.compile(r"(?<![\w/])([^\W\d_]*o)/a(?![\w/])"
+                       r"|(?<![\w/])(il|lo|un|uno)/(?:la|una)(?![\w/])", re.IGNORECASE)
+
+
+def masculine(text: str) -> str:
+    """Keep only the masculine of the "o/a" forms: "Ladro/a" -> "Ladro", "il/la" -> "il"."""
+    if not text or "/" not in text:
+        return text
+    return GENDER_RE.sub(lambda m: m.group(1) or m.group(2), text)
+
+
 def bad_percent(text: str, english: str | None = None) -> bool:
     """True if fix_percent would change the text."""
     return fix_percent(text, english) != text
@@ -1153,7 +1166,7 @@ class Engine:
                 continue
             for ph, original in restore.items():
                 out = out.replace(ph, original)
-            out = fix_percent(out, line)
+            out = masculine(fix_percent(out, line))
             results[line] = italian_plural(line, src, out) if plural_name(line) else out
         return results
 
@@ -1321,7 +1334,7 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
 
     def result(line: str) -> str:
         fixed = g.lookup(line)
-        return fixed if fixed is not None else fix_percent(translations.get(line, line), line)
+        return fixed if fixed is not None else masculine(fix_percent(translations.get(line, line), line))
 
     auto = {k: v for k, v in patch.auto.items() if k not in english and k not in patch.strings}
     skipped = 0
