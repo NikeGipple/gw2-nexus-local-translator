@@ -1,5 +1,5 @@
 {
-"version":55,
+"version":58,
 "strings":{
 "44105":"Rana",
 "44110":"Corvo",
@@ -40,6 +40,9 @@
 "331277":"Gatto",
 "331279":"Cucciolo",
 "379204":"Immune a Knockdown, respinta, trascinamento, lancio, Stun, Daze, fluttuazione, affondamento, Fear e Taunt.",
+"425604":"Lucciola",
+"479078":"Lucciola",
+"500808":"Lucciola",
 "567733":"Fai doppio clic per evocare questo mini, che ti seguirà. Puoi usare un solo mini alla volta.<br>Combina 3 di questo mini con un Pile of Crystalline Dust, un Obsidian Shard e un Amber Quantic Dipole (rilasciato dalle creature nei Fractals di livello 1–20) nella Mystic Forge per creare un Mini Mister Mittens.",
 "628408":"Applica Protection a te e ai tuoi alleati, poi aumenta la durata di tutti i benefici attualmente attivi su di te e sui tuoi alleati. Ottieni un'aura magnetica.",
 "759194":"Pollo[pl:\"Polli\"] nano[pl:\"nani\"]",
