@@ -188,6 +188,44 @@ def feminine(text: str, roles: dict[str, str] | None) -> str:
     return pre + " ".join(out) + post
 
 
+# Names: an article the model put in front of a name ("L'Insignia...", "Una Pietra...") goes
+# away when the English name has none (item and NPC names have no article in the game).
+IT_ARTICLE_RE = re.compile(r"(?:(?:il|lo|la|i|gli|le|un|uno|una) |(?:l|un)['’])", re.IGNORECASE)
+EN_ARTICLE_RE = re.compile(r"(?:the|a|an)\b", re.IGNORECASE)
+
+
+def drop_article(text: str, english: str) -> str:
+    """Name without the Italian article at the start, if the English name has none."""
+    if not text or "\n" in text:
+        return text
+    pre, core, post = Glossary.WRAP_RE.fullmatch(text).groups()
+    ecore = Glossary.WRAP_RE.fullmatch(english).group(2)
+    m = IT_ARTICLE_RE.match(core)
+    if not m or EN_ARTICLE_RE.match(ecore.lstrip()):
+        return text
+    rest = core[m.end():]
+    if not rest.strip():
+        return text
+    return pre + rest[:1].upper() + rest[1:] + post
+
+
+# "Recipe: X" / "Recipe[s]: X": the item name is translated on its own (the same translation as
+# the item itself, glossary patterns included) and gets the Italian prefix.
+RECIPE_RE = re.compile(r"(Recipe(?:\[s\]|s)?): (\S.*)")
+RECIPE_IT = {"Recipe": "Ricetta: ", "Recipes": "Ricette: ", "Recipe[s]": 'Ricetta[pl:"Ricette"]: '}
+
+
+def recipe_split(line: str) -> tuple[str, str, str] | None:
+    """(Italian head with the markup before, English item name, markup after) or None."""
+    if "Recipe" not in line or "\n" in line:
+        return None
+    pre, core, post = Glossary.WRAP_RE.fullmatch(line).groups()
+    m = RECIPE_RE.fullmatch(core)
+    if not m:
+        return None
+    return pre + RECIPE_IT[m.group(1)], m.group(2), post
+
+
 def _cased(word: str, like: str) -> str:
     """`word` with the capitalization of `like` (first letter)."""
     return word[:1].upper() + word[1:] if like[:1].isupper() else word[:1].lower() + word[1:]
@@ -1197,7 +1235,24 @@ class Engine:
         return protected, restore
 
     def _translate_lines(self, lines: list[str]) -> dict[str, str]:
+        """Translations of these lines; recipes ("Recipe[s]: X") are made from the item name."""
+        recipes = {line: r for line in lines if (r := recipe_split(line))}
+        if not recipes:
+            return self._translate_plain(lines)
+        g = self.glossary
+        names = [n for n in dict.fromkeys(r[1] for r in recipes.values())
+                 if g.lookup(n) is None and n not in self.cache]
+        results = self._translate_plain([x for x in lines if x not in recipes] + names)
+        for line, (head, name, tail) in recipes.items():
+            fixed = g.lookup(name)
+            it = fixed if fixed is not None else results.get(name, self.cache.get(name, name))
+            results[line] = head + drop_article(it, name) + tail
+        return results
+
+    def _translate_plain(self, lines: list[str]) -> dict[str, str]:
         results: dict[str, str] = {}
+        if not lines:
+            return results
         t0 = time.perf_counter()
         # names with plural markers: singular (plural markers added below); the rest: plural form
         srcs = [english_singular(line) if plural_name(line) else resolve_plural(line)
@@ -1222,7 +1277,8 @@ class Engine:
             for ph, original in restore.items():
                 out = out.replace(ph, original)
             out = masculine(fix_percent(out, line))
-            out = italian_plural(line, src, out) if plural_name(line) else out
+            if plural_name(line):
+                out = italian_plural(line, src, drop_article(out, src))
             results[line] = feminine(out, self.glossary.feminine)
         return results
 
@@ -1369,7 +1425,12 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
     finally:
         m.close()
     g = glossary
-    needed = sorted({line for en in english.values() for line in en.split("\n")
+
+    def item(line: str) -> str:  # recipes are made from the item name (recipe_split)
+        r = recipe_split(line)
+        return r[1] if r else line
+
+    needed = sorted({line for en in english.values() for line in map(item, en.split("\n"))
                      if line not in translations and g.lookup(line) is None
                      and Engine._needs_translation(line)})
     log.info("build-auto: %d strings, %d lines to translate", len(english), len(needed))
@@ -1389,6 +1450,9 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
             log.info("build-auto: %d of %d lines translated", done, len(needed))
 
     def result(line: str) -> str:
+        r = recipe_split(line)
+        if r:
+            return r[0] + drop_article(result(r[1]), r[1]) + r[2]
         fixed = g.lookup(line)
         return fixed if fixed is not None else feminine(
             masculine(fix_percent(translations.get(line, line), line)), g.feminine)
