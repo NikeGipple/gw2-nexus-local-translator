@@ -1,5 +1,5 @@
 {
-  "_comment": "exact = whole-string overrides; terms = names protected/translated inside sentences (whole words; single words are case-sensitive, terms of two or more words also match all lower case or with only the first letter capitalized). Policy: GW2 proper names, boons, conditions and crafting materials stay in English; only names with an established Italian form are translated. patterns = whole-line rules for item names, {X} = the prefix words (e.g. \"{X} Longbow\": \"Arco lungo {X}\").",
+  "_comment": "exact = whole-string overrides; terms = names protected/translated inside sentences (whole words; single words are case-sensitive, terms of two or more words also match all lower case or with only the first letter capitalized). Policy: GW2 proper names, boons, conditions and crafting materials stay in English; only names with an established Italian form are translated. patterns = whole-line rules for item names, {X} = the prefix words (e.g. \"{X} Longbow\": \"Arco lungo {X}\"). feminine = role names (Italian masculine) and their feminine: a name alone such as \"Cittadino\" becomes Cittadino[f:\"Cittadina\"] and the game shows the feminine on women NPCs.",
   "exact": {
     "Waypoint": "Waypoint",
     "Account Bound": "Legato all'Account",
@@ -3684,5 +3684,41 @@
     "villagers": "abitanti del villaggio",
     "Renown Heart": "Renown Heart",
     "Renown Hearts": "Renown Hearts"
+  },
+  "feminine": {
+    "Allievo": "Allieva",
+    "Anziano": "Anziana",
+    "Artigiano": "Artigiana",
+    "Bambino": "Bambina",
+    "Bandito": "Bandita",
+    "Cacciatore": "Cacciatrice",
+    "Cittadino": "Cittadina",
+    "Contadino": "Contadina",
+    "Cuoco": "Cuoca",
+    "Dio": "Dea",
+    "Esploratore": "Esploratrice",
+    "Ferito": "Ferita",
+    "Guardiano": "Guardiana",
+    "Guaritore": "Guaritrice",
+    "Istruttore": "Istruttrice",
+    "Ladro": "Ladra",
+    "Lavoratore": "Lavoratrice",
+    "Mercenario": "Mercenaria",
+    "Operaio": "Operaia",
+    "Pellegrino": "Pellegrina",
+    "Pescatore": "Pescatrice",
+    "Prigioniero": "Prigioniera",
+    "Profugo": "Profuga",
+    "Ragazzo": "Ragazza",
+    "Ricercatore": "Ricercatrice",
+    "Rifugiato": "Rifugiata",
+    "Sacerdote": "Sacerdotessa",
+    "Semidio": "Semidea",
+    "Servo": "Serva",
+    "Sopravvissuto": "Sopravvissuta",
+    "Studente": "Studentessa",
+    "Studioso": "Studiosa",
+    "Venditore": "Venditrice",
+    "Viaggiatore": "Viaggiatrice"
   }
 }

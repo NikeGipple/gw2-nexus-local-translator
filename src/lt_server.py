@@ -144,6 +144,55 @@ def masculine(text: str) -> str:
     return GENDER_RE.sub(lambda m: m.group(1) or m.group(2), text)
 
 
+# Feminine of the role names (glossary section "feminine", e.g. {"Cittadino": "Cittadina"}).
+# The game marks the gender of an NPC with templates such as "[f]%str1%": a name written as
+# Cittadino[f:"Cittadina"] shows "Cittadina" on a woman and "Cittadino" on a man (tested
+# 2026-10-10, also after a plural marker: Cittadino[pl:"Cittadini"][f:"Cittadina"]).
+# English feminine markers copied by the models ([f:"Goddess"]) are always removed.
+EN_FEM_RE = re.compile(r'\[f:"[^"]*"\]')
+NAME_STOP = {"di", "del", "dello", "della", "dell", "dei", "degli", "delle", "da", "dal", "dalla",
+             "dai", "in", "nel", "nella", "a", "al", "alla", "ai", "con", "su", "per", "tra", "fra",
+             "e", "o"}
+NAME_WORD_RE = re.compile(r"([^\W\d_][\w'’-]*)((?:\[pl:\"[^\"]*\"\])?)")
+
+
+def feminine(text: str, roles: dict[str, str] | None) -> str:
+    """Role names alone (at most 4 words, no sentence) whose first word is in `roles` get the
+    feminine marker, and so do the adjectives in -o right after it, up to a preposition:
+    "Cittadino pettegolo" -> 'Cittadino[f:"Cittadina"] pettegolo[f:"pettegola"]'.
+    Sentences and other texts are returned as they are (English [f:"..."] markers removed)."""
+    if not text:
+        return text
+    if "[f:" in text:
+        text = EN_FEM_RE.sub("", text)
+    if not roles or "\n" in text:
+        return text
+    pre, core, post = Glossary.WRAP_RE.fullmatch(text).groups()
+    words = core.split(" ")
+    if not 1 <= len(words) <= 4 or re.search(r"[.,;:!?%<>()\"]", IT_PL_RE.sub("", core)):
+        return text
+    first = NAME_WORD_RE.fullmatch(words[0])
+    fem = roles.get(first.group(1).lower()) if first else None
+    if not fem:
+        return text
+    out = [first.group(1) + first.group(2) + f'[f:"{_cased(fem, first.group(1))}"]']
+    adjectives = True
+    for w in words[1:]:
+        m = NAME_WORD_RE.fullmatch(w)
+        if adjectives and m and m.group(1).lower() not in NAME_STOP and m.group(1).endswith("o") \
+                and m.group(1)[:1].islower():
+            out.append(w + f'[f:"{m.group(1)[:-1]}a"]')
+            continue
+        adjectives = False
+        out.append(w)
+    return pre + " ".join(out) + post
+
+
+def _cased(word: str, like: str) -> str:
+    """`word` with the capitalization of `like` (first letter)."""
+    return word[:1].upper() + word[1:] if like[:1].isupper() else word[:1].lower() + word[1:]
+
+
 def bad_percent(text: str, english: str | None = None) -> bool:
     """True if fix_percent would change the text."""
     return fix_percent(text, english) != text
@@ -168,6 +217,8 @@ def bundled_dir() -> Path:
 # --------------------------------------------------------------------------- #
 class Glossary:
     """exact:  whole-string overrides  {"Waypoint": "Waypoint"}
+    feminine: role names and their feminine {"Cittadino": "Cittadina"} (see feminine(); not part
+              of the fingerprint: older modules ignore it and the patch stays valid for them)
     terms:  words kept/translated as given inside sentences {"Lion's Arch": "Arco del Leone"}
     patterns: whole-line rules, {X} = one or more capitalized words (item prefixes)
               {"{X} Longbow": "Arco lungo {X}"}  ->  "Pact Longbow" = "Arco lungo Pact"
@@ -185,6 +236,7 @@ class Glossary:
         self.patterns: list[tuple[re.Pattern, str]] = []
         self.version = 0
         self.fingerprint = ""  # identifies the glossary content (see fingerprint_of)
+        self.feminine: dict[str, str] = {}  # role name -> feminine, lower case keys (see feminine())
         self._term_rx: dict[str, re.Pattern] = {}  # compiled term regexes, built once per term
 
     def term_regex(self, src: str) -> re.Pattern:
@@ -210,8 +262,9 @@ class Glossary:
         exact = data.get("exact", {})
         terms = data.get("terms", {})
         patterns = data.get("patterns", {})
-        if not all(isinstance(x, dict) for x in (exact, terms, patterns)):
-            raise ValueError("glossary: 'exact', 'terms' and 'patterns' must be objects")
+        fem = data.get("feminine", {})
+        if not all(isinstance(x, dict) for x in (exact, terms, patterns, fem)):
+            raise ValueError("glossary: 'exact', 'terms', 'patterns' and 'feminine' must be objects")
         compiled = []
         for k, v in patterns.items():
             k, v = str(k), str(v)
@@ -225,6 +278,8 @@ class Glossary:
         # longest first, so "Lion's Arch Keep" wins over "Lion's Arch"
         self.terms = sorted(terms.items(), key=lambda kv: -len(kv[0]))
         self.patterns = sorted(compiled, key=lambda p: -len(p[0].pattern))
+        self.feminine = {str(k).strip().lower(): str(v).strip() for k, v in fem.items()
+                         if str(k).strip() and str(v).strip()}
         self.fingerprint = self.fingerprint_of(data)
         self.version += 1
 
@@ -1167,7 +1222,8 @@ class Engine:
             for ph, original in restore.items():
                 out = out.replace(ph, original)
             out = masculine(fix_percent(out, line))
-            results[line] = italian_plural(line, src, out) if plural_name(line) else out
+            out = italian_plural(line, src, out) if plural_name(line) else out
+            results[line] = feminine(out, self.glossary.feminine)
         return results
 
 
@@ -1334,7 +1390,8 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
 
     def result(line: str) -> str:
         fixed = g.lookup(line)
-        return fixed if fixed is not None else masculine(fix_percent(translations.get(line, line), line))
+        return fixed if fixed is not None else feminine(
+            masculine(fix_percent(translations.get(line, line), line)), g.feminine)
 
     auto = {k: v for k, v in patch.auto.items() if k not in english and k not in patch.strings}
     skipped = 0
