@@ -385,11 +385,11 @@ function card(r, note) {
   const badges = [];
   badges.push(el("span", { class: "badge b-" + (r.kind || "none") }, r.kind ? KIND[r.kind] : "non nella patch"));
   if (r.user) badges.push(el("span", { class: "badge b-user" }, "user input"));
-  self.append(
+  self.append(...[
     el("div", { class: "head" }, el("span", { class: "key" }, "#" + r.key), ...badges),
     r.en ? el("p", { class: "en" }, r.en) : null,
     ta,
-    el("div", { class: "actions" }, btn, undo, status));
+    el("div", { class: "actions" }, btn, undo, status)].filter((c) => c != null));
   return self;
 }
 
