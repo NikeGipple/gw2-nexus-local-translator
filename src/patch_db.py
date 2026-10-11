@@ -674,6 +674,35 @@ class CachePatch:
             with self._stale_lock:
                 self._stale_seen.discard(key)
 
+    def full_entry(self, key: int) -> tuple[int, str | None, int | None, int | None] | None:
+        """(kind, text, src_hash, piece) of a key in the patch, or None."""
+        with self.rlock:
+            return self.reader.execute("SELECT kind, text, src_hash, piece FROM patch WHERE key = ?",
+                                       (key,)).fetchone()
+
+    def restore_entry(self, key: int, row: tuple[int, str | None, int | None, int | None] | None
+                      ) -> None:
+        """Put back a patch row taken with full_entry() (None: the key had no row)."""
+        with self.lock:
+            con = self.writer
+            con.execute("BEGIN IMMEDIATE")
+            try:
+                if row is None:
+                    con.execute("DELETE FROM patch WHERE key = ?", (key,))
+                else:
+                    con.execute("INSERT OR REPLACE INTO patch (key, kind, text, src_hash, piece) "
+                                "VALUES (?, ?, ?, ?, ?)", (key, *row))
+                con.execute("COMMIT")
+            except BaseException:
+                con.execute("ROLLBACK")
+                raise
+            with self._stale_lock:
+                self._stale_seen.discard(key)
+
+    def send_text(self, key: int, src_hash: int, text: str) -> int:
+        """Send one text to the game as it is (not from the patch); returns the texts sent."""
+        return self._push([(key, src_hash, text)]) if self.sender else 0
+
     def entry(self, key: int) -> tuple[int, str | None] | None:
         """(kind, text) of a key in the patch, or None."""
         with self.rlock:

@@ -924,6 +924,28 @@ class KeyMap:
                     "seen = excluded.seen", (key, it, USER_INPUT, int(time.time())))
             return self.con.execute("SELECT en FROM texts WHERE key = ?", (key,)).fetchone()[0]
 
+    def get(self, key: int) -> tuple[str, str | None, str | None] | None:
+        """(en, it, how) of a key, or None."""
+        with self.lock:
+            return self.con.execute("SELECT en, it, how FROM texts WHERE key = ?", (key,)).fetchone()
+
+    def restore(self, key: int, row: tuple[str, str | None, str | None] | None) -> None:
+        """Put back a row taken with get() (None: the key had no row). The English text known now
+        is kept when the old row had none."""
+        with self.lock:
+            if self.closed:
+                raise RuntimeError("map closed")
+            with self.con:
+                if row is None:
+                    self.con.execute("DELETE FROM texts WHERE key = ?", (key,))
+                    return
+                en, it, how = row
+                self.con.execute(
+                    "INSERT INTO texts (key, en, it, how, seen) VALUES (?, ?, ?, ?, ?) "
+                    "ON CONFLICT(key) DO UPDATE SET en = CASE WHEN excluded.en = '' THEN texts.en "
+                    "ELSE excluded.en END, it = excluded.it, how = excluded.how, seen = excluded.seen",
+                    (key, en, it, how, int(time.time())))
+
     def user_rows(self) -> dict[int, tuple[str, str]]:
         """The translations written by hand: key -> (it, en)."""
         with self.lock:

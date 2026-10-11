@@ -7,6 +7,10 @@ change it and save: the translation is written into
 - map_it.db, with how = 'user input', so the translations written by hand can be told apart
   (the map is what helpers send to the author); they are written again over every patch update.
 
+Before every save, the state of the key (map row, patch row, text shown in game) goes into
+history_it.db, next to patch_it.db: "Annulla" puts back the last one, so a wrong save can be undone
+step by step, back to the automatic or reviewed translation it replaced.
+
 The server listens on 127.0.0.1 only, accepts only requests addressed to that host (no DNS
 rebinding) and saves only same-origin JSON requests (no other site can post to it).
 """
@@ -17,6 +21,7 @@ import logging
 import re
 import sqlite3
 import threading
+import time
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -45,10 +50,27 @@ def plain(text: str) -> str:
     return text.strip()
 
 
+HISTORY_SCHEMA = """
+CREATE TABLE IF NOT EXISTS history (
+    id          INTEGER PRIMARY KEY,
+    key         INTEGER NOT NULL,
+    at          INTEGER NOT NULL,
+    map_row     TEXT,      -- JSON [en, it, how] of map_it.db before the save, NULL: no row
+    patch_row   TEXT,      -- JSON [kind, text, src_hash, piece] of patch_it.db, NULL: no row
+    shown       TEXT,      -- text of cache.db (what the game showed), NULL: none
+    shown_hash  INTEGER    -- its src_hash
+);
+CREATE INDEX IF NOT EXISTS history_key ON history(key, id);
+"""
+
+
 class Editor:
     def __init__(self, patch: CachePatch, keymap: lt.KeyMap, cache_db: Path, cache_key: str) -> None:
         self.patch, self.keymap, self.cache_db, self.cache_key = patch, keymap, cache_db, cache_key
-        self.lock = threading.Lock()  # one save at a time
+        self.lock = threading.Lock()  # one save or rollback at a time
+        self.history = sqlite3.connect(str(patch.path.with_name("history_it.db")), timeout=10,
+                                       check_same_thread=False)
+        self.history.executescript(HISTORY_SCHEMA)
 
     def _cache(self) -> sqlite3.Connection:
         return sqlite3.connect(f"file:{self.cache_db}?mode=ro", uri=True, timeout=10)
@@ -86,21 +108,28 @@ class Editor:
             keys += [k for k in self.keymap.search_english(q, RESULTS, exact) if k not in keys]
         return [self.row(k) for k in keys[:RESULTS]]
 
+    def _shown(self, key: int) -> tuple[str | None, int | None]:
+        """(text, src_hash) of the key in cache.db, as stored (with its "show keys" prefix)."""
+        if not self.cache_db.is_file():
+            return None, None
+        con = self._cache()
+        try:
+            r = con.execute("SELECT text, src_hash FROM translations WHERE cache_key = ? AND id = ?",
+                            (self.cache_key, key)).fetchone()
+        finally:
+            con.close()
+        return (r[0], r[1]) if r else (None, None)
+
     def row(self, key: int) -> dict:
-        shown = None
-        if self.cache_db.is_file():
-            con = self._cache()
-            try:
-                r = con.execute("SELECT text FROM translations WHERE cache_key = ? AND id = ?",
-                                (self.cache_key, key)).fetchone()
-            finally:
-                con.close()
-            shown = untagged(key, r[0]) if r and r[0] is not None else None
+        text, _h = self._shown(key)
+        shown = untagged(key, text) if text is not None else None
         entry = self.patch.entry(key)
-        user = self.keymap.user_rows().get(key)
-        return {"key": key, "shown": shown, "en": self.keymap.english(key),
+        map_row = self.keymap.get(key)
+        undo = self.history.execute("SELECT count(*) FROM history WHERE key = ?", (key,)).fetchone()[0]
+        return {"key": key, "shown": shown, "en": map_row[0] if map_row else "",
                 "kind": KINDS.get(entry[0]) if entry else None,
-                "patch": entry[1] if entry else None, "user": user is not None}
+                "patch": entry[1] if entry else None,
+                "user": bool(map_row) and map_row[2] == lt.USER_INPUT, "undo": undo}
 
     def recent(self) -> list[dict]:
         return [{"key": k, "en": en, "it": it, "seen": seen}
@@ -112,11 +141,42 @@ class Editor:
         if len(text.encode("utf-8")) > MAX_BYTES:
             raise ValueError("text too long")
         with self.lock:
+            shown, shown_hash = self._shown(key)
+            map_row, patch_row = self.keymap.get(key), self.patch.full_entry(key)
+            with self.history:
+                self.history.execute(
+                    "INSERT INTO history (key, at, map_row, patch_row, shown, shown_hash) "
+                    "VALUES (?, ?, ?, ?, ?, ?)",
+                    (key, int(time.time()), json.dumps(map_row) if map_row else None,
+                     json.dumps(patch_row) if patch_row else None, shown, shown_hash))
             self.keymap.save_user(key, text)
             self.patch.set_user(key, text)
             written = self.patch.apply(self.cache_db, {key})
         log.info("editor: key %d translated by hand%s", key,
                  "" if written else " (cache.db not changed: patch off, or same text)")
+        return self.row(key)
+
+    def rollback(self, key: int) -> dict:
+        """Undo the last save of the key: map row, patch row and the text in the game as before."""
+        with self.lock:
+            last = self.history.execute(
+                "SELECT id, map_row, patch_row, shown, shown_hash FROM history WHERE key = ? "
+                "ORDER BY id DESC LIMIT 1", (key,)).fetchone()
+            if last is None:
+                raise ValueError("nothing to undo")
+            hid, map_row, patch_row, shown, shown_hash = last
+            self.keymap.restore(key, tuple(json.loads(map_row)) if map_row else None)
+            self.patch.restore_entry(key, tuple(json.loads(patch_row)) if patch_row else None)
+            sent = self.patch.apply(self.cache_db, {key})
+            now, now_hash = self._shown(key)
+            if not sent and shown is not None and now != shown:
+                # the old text did not come from the patch (model translation): sent as it was
+                h = now_hash if now_hash is not None else shown_hash or 0
+                sent = self.patch.send_text(key, h, shown)
+            with self.history:
+                self.history.execute("DELETE FROM history WHERE id = ?", (hid,))
+        log.info("editor: key %d rolled back%s", key,
+                 "" if sent or shown is None else " (text in game unchanged until next start)")
         return self.row(key)
 
 
@@ -178,7 +238,8 @@ def _handler(editor: Editor, port: int) -> type[BaseHTTPRequestHandler]:
                     "Content-Type", "").startswith("application/json"):
                 self._json({"error": "forbidden"}, HTTPStatus.FORBIDDEN)
                 return
-            if urlsplit(self.path).path != "/api/save":
+            path = urlsplit(self.path).path
+            if path not in ("/api/save", "/api/rollback"):
                 self._json({"error": "not found"}, HTTPStatus.NOT_FOUND)
                 return
             try:
@@ -186,14 +247,17 @@ def _handler(editor: Editor, port: int) -> type[BaseHTTPRequestHandler]:
                 if size > 4 * MAX_BYTES:
                     raise ValueError("request too big")
                 data = json.loads(self.rfile.read(size).decode("utf-8"))
-                key, text = int(data["key"]), str(data["text"])
+                key = int(data["key"])
                 if not 0 <= key < 2 ** 32:
                     raise ValueError("bad key")
-                self._json(editor.save(key, text))
+                if path == "/api/rollback":
+                    self._json(editor.rollback(key))
+                else:
+                    self._json(editor.save(key, str(data["text"])))
             except (ValueError, KeyError, TypeError) as exc:
                 self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
             except Exception as exc:  # noqa: BLE001
-                log.warning("editor: save failed: %s", exc)
+                log.warning("editor: %s failed: %s", path, exc)
                 self._json({"error": str(exc)}, HTTPStatus.INTERNAL_SERVER_ERROR)
 
     return Handler
@@ -293,33 +357,40 @@ function el(tag, attrs, ...kids) {
   return e;
 }
 
-function card(r) {
+function card(r, note) {
   const ta = el("textarea", {});
   ta.value = r.patch ?? r.shown ?? "";
-  const status = el("span", { class: "status" });
+  const status = el("span", { class: "status" + (note ? " ok" : "") }, note || "");
   const btn = el("button", { type: "button" }, "Salva");
-  btn.onclick = async () => {
-    btn.disabled = true; status.className = "status"; status.textContent = "Salvataggio…";
+  const undo = el("button", { type: "button", class: "ghost",
+    title: r.undo ? "Torna al testo precedente (" + r.undo + " passi disponibili)" : "Nessun salvataggio da annullare" }, "Annulla");
+  undo.disabled = !r.undo;
+  const self = el("div", { class: "card" });
+  const post = async (url, body, busy, done) => {
+    btn.disabled = undo.disabled = true; status.className = "status"; status.textContent = busy;
     try {
-      const res = await fetch("/api/save", { method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: r.key, text: ta.value }) });
+      const res = await fetch(url, { method: "POST",
+        headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || res.status);
-      status.className = "status ok"; status.textContent = "Salvato, inviato al gioco";
+      self.replaceWith(card(data, done));
       loadRecent();
     } catch (e) {
       status.className = "status err"; status.textContent = "Errore: " + e.message;
-    } finally { btn.disabled = false; }
+      btn.disabled = false; undo.disabled = !r.undo;
+    }
   };
+  btn.onclick = () => post("/api/save", { key: r.key, text: ta.value }, "Salvataggio…", "Salvato, inviato al gioco");
+  undo.onclick = () => post("/api/rollback", { key: r.key }, "Annullamento…", "Ripristinato il testo precedente");
   const badges = [];
   badges.push(el("span", { class: "badge b-" + (r.kind || "none") }, r.kind ? KIND[r.kind] : "non nella patch"));
   if (r.user) badges.push(el("span", { class: "badge b-user" }, "user input"));
-  return el("div", { class: "card" },
+  self.append(
     el("div", { class: "head" }, el("span", { class: "key" }, "#" + r.key), ...badges),
     r.en ? el("p", { class: "en" }, r.en) : null,
     ta,
-    el("div", { class: "actions" }, btn, status));
+    el("div", { class: "actions" }, btn, undo, status));
+  return self;
 }
 
 async function search(q) {
@@ -329,7 +400,7 @@ async function search(q) {
     const res = await fetch("/api/search?q=" + encodeURIComponent(q) + ($("#exact").checked ? "&exact=1" : ""));
     const rows = await res.json();
     if (!res.ok) throw new Error(rows.error || res.status);
-    box.replaceChildren(...(rows.length ? rows.map(card) : [el("p", { class: "empty" }, "Nessun risultato.")]));
+    box.replaceChildren(...(rows.length ? rows.map((r) => card(r)) : [el("p", { class: "empty" }, "Nessun risultato.")]));
   } catch (e) {
     box.replaceChildren(el("p", { class: "status err" }, "Errore: " + e.message));
   }
