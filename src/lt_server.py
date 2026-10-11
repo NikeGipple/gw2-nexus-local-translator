@@ -47,7 +47,7 @@ MODEL_URL = (
     "https://github.com/NikeGipple/gw2-nexus-local-translator/"
     "releases/download/model-it-v1/opus-mt-en-it-ct2.zip"
 )  # a matching "<url>.sha256" file is downloaded and checked too
-UPDATE_INTERVAL = 6 * 3600  # seconds
+UPDATE_INTERVAL = 15 * 60  # seconds between two checks for a new glossary or patch
 # Largest glossary or patch accepted (GitHub refuses files over 100 MB). The old limit of 5 MB cut
 # bigger files: the JSON could not be read and the update failed with only "update skipped".
 MAX_DOWNLOAD = 100_000_000
@@ -429,6 +429,7 @@ class GlossaryUpdater(threading.Thread):
         self.glossary, self.on_change, self.url = glossary, on_change, url
         self.path = data_dir / self.filename
         self.etag_path = self.path.with_suffix(".etag")
+        self.checks = 0
 
     def run(self) -> None:
         time.sleep(3)  # let the game finish loading first
@@ -437,6 +438,7 @@ class GlossaryUpdater(threading.Thread):
                 self.check()
             except Exception as exc:  # noqa: BLE001 - never crash the thread
                 log.info("%s update skipped: %s", self.what, exc)
+            self.checks += 1
             time.sleep(UPDATE_INTERVAL)
 
     def validate(self, data: dict) -> None:
@@ -473,8 +475,8 @@ class GlossaryUpdater(threading.Thread):
                 etag = resp.headers.get("ETag", "")
                 length = resp.headers.get("Content-Length")
         except urllib.error.HTTPError as exc:
-            if exc.code == 304:
-                log.info("%s up to date", self.what)
+            if exc.code == 304:  # in the log once per start; later checks only with --debug
+                log.log(logging.DEBUG if self.checks else logging.INFO, "%s up to date", self.what)
                 return
             raise
         if len(body) > MAX_DOWNLOAD:

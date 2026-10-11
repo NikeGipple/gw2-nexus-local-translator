@@ -10,7 +10,9 @@ addon starts this exe itself (module.toml), sends every game text with its strin
 of its English text (XXH3-64) on stdin and reads the translations on stdout, each with the same
 hash; stderr goes to the Nexus log. The addon keeps the translations in cache.db next to this exe
 (table translations: id, cache_key, src_hash, version, timestamp, text) and asks again for a text
-whose hash changed (game update).
+whose hash changed (game update). It also takes translations it did not ask for (with the right id
+and hash), shows them at once and saves them: that is how a new patch reaches the game while it
+runs (patch_db.CachePatch.apply, checked every lt.UPDATE_INTERVAL).
 
 Glossary, OPUS-MT engine and map come from lt_server.py, imported as a library; the patch archive
 (IT\\patch_it.db, updated from GitHub piece by piece) from patch_db.py.
@@ -41,7 +43,7 @@ import lt_server as lt  # noqa: E402
 from patch_db import (CachePatch, PieceUpdater, SHOW_MODES, has_table, key_tag,  # noqa: E402
                       sync_key_tags)
 
-VERSION = "0.7.0"        # version of the release: raise it at every new zip (shown in the log)
+VERSION = "0.8.0"        # version of the release: raise it at every new zip (shown in the log)
 PROTOCOL = 2              # Text Translator v0.2.0 (texts carry the hash of the English)
 SOURCE_LANG = 0          # English: the game must be set to English
 RESULT_VERSION = 1       # raise it to make the addon ask again for every cached text
@@ -283,6 +285,7 @@ class Stats:
               or nothing to translate), model (had to wait for the translation), empty (no text)
     wait      seconds from arrival to answer of the "model" requests: average, 95th percentile, max
     queue     longest queue of lines waiting for the model
+    live      patch texts sent without a request (new patch, glossary or start)
     model     lines translated, how long the worker was busy (glossary protection + model)
     cpu       CPU used by the whole module (all threads), in % of one core: 100% = one core busy
     The line is written only if something happened (requests, translations or CPU >= 1%).
@@ -299,6 +302,7 @@ class Stats:
         self.waits: list[float] = []
         self.queue_max = 0
         self.sends = 0  # groups of answers sent to the addon (each one can cause an addon refresh)
+        self.live = 0   # patch texts sent without a request
 
     def _totals(self) -> tuple[int, float, float, int]:
         e = self.engine
@@ -317,7 +321,7 @@ class Stats:
         done, prep, model, gave_up = (a - b for a, b in zip(self._totals(), self.base))
         total = sum(self.counts.values())
         text = None
-        if total or done or cpu >= 1 or self.stale:
+        if total or done or cpu >= 1 or self.stale or self.live:
             parts = ", ".join(f"{k} {v * 100 / total:.0f}%" for k, v in self.counts.items()) if total else ""
             text = (f"stats {period}: cpu {cpu:.0f}% of one core ({os.cpu_count() or '?'} cores); "
                     f"{total} requests" + (f" ({parts})" if parts else ""))
@@ -338,12 +342,15 @@ class Stats:
                 text += f"; given up {gave_up} lines"
             if self.stale:
                 text += f"; patch outdated (English changed) {self.stale} texts"
+            if self.live:
+                text += f"; patch sent to the game {self.live} texts"
         self.since, self.cpu_since, self.base = now, cpu_now, self._totals()
         self.counts = dict.fromkeys(self.counts, 0)
         self.waits = []
         self.queue_max = 0
         self.sends = 0
         self.stale = 0
+        self.live = 0
         return text
 
 
@@ -475,6 +482,26 @@ class Dispatcher:
                 log.info("%s", report)
             if out:
                 self._send(out)
+
+    def push(self, rows: list[tuple[int, int, str]]) -> int:
+        """Send patch texts the addon did not ask for: (key, u64 hash, text as cache.db shows it).
+        The addon shows them at once and saves them in cache.db. A key still waiting for the model
+        is answered by this text: its request is dropped, so the model answer does not replace it.
+        Returns the texts sent."""
+        msgs = []
+        for key, h, text in rows:
+            try:
+                msgs.append(Channel.text(key, h, text))
+            except ValueError:
+                log.warning("patch text of key %d too long: not sent", key)
+        if not msgs:
+            return 0
+        with self.engine.cv:
+            for key, _h, _t in rows:
+                self._forget(key)
+            self.stats.live += len(msgs)
+        self.channel.send(msgs)
+        return len(msgs)
 
     def _send(self, out: list[tuple[int, int, str, str]]) -> None:
         msgs = []
@@ -670,6 +697,7 @@ def main() -> int:
     dispatcher = Dispatcher(engine, patch, keymap, channel, max(10, args.stats_every),
                             args.cache_db)
     holder["d"] = dispatcher
+    patch.sender = dispatcher.push  # patch texts the game must change are sent at once
     ready.set()
     for req in early:
         dispatcher.submit(*req)
