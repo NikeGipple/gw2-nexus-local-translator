@@ -689,23 +689,36 @@ class PatchUpdater(GlossaryUpdater):
 # patch/<lang>/index.json   {"format": 1, "version": n, "glossary": "<fingerprint>", "width": 20000,
 #                            "pieces": {"p0000.json": {"sha256": ..., "entries": n, "size": bytes}}}
 # patch/<lang>/pNNNN.json   the keys from NNNN*width to (NNNN+1)*width-1:
-#                           {"strings": {...}, "auto": {...}, "drop": [...], "h": {key: "1a2b3c4d"}}
+#                           {"strings": {...}, "auto": {...}, "drop": [...],
+#                            "src_hash": {key: "0123456789abcdef"}}
 # A key always stays in the same piece, so a new version only changes the pieces of the keys that
 # changed. Version and glossary fingerprint are only in the index: otherwise every piece would
 # change at every version. Empty sections are left out.
-# "h" = raw_hash() of the raw English text (as Text Translator sends it) the translation was made
-# from: the module does not use a translation whose English text changed. It is a fingerprint, not
-# the text: no English game text is published.
+# "src_hash" = english_hash() of the raw English text the translation was made from: the same hash
+# Text Translator (v0.2.0) sends with every text and keeps in cache.db (column src_hash, same name).
+# The module does not use a translation whose English text changed, and writes the patch into
+# cache.db with this hash. "0000000000000000" = the English changed and the translation was not
+# redone: never used. It is a hash, not the text: no English game text is published.
 PATCH_FORMAT = 1
 PIECE_WIDTH = 20_000              # default width of a piece (keys); the index says the real one
 PIECE_MAX_BYTES = 5_000_000       # option 8 warns above this: make the width smaller
 PIECE_RE = re.compile(r"p(\d{4,7})\.json")
-HASH_RE = re.compile(r"[0-9a-f]{8}")
+HASH_RE = re.compile(r"[0-9a-f]{16}")
+OUTDATED_HASH = "0" * 16  # see above
 
 
-def raw_hash(english: str) -> str:
-    """Fingerprint of an English text: first 8 hex digits of the SHA-256 of its UTF-8 bytes."""
-    return hashlib.sha256(english.encode("utf-8")).hexdigest()[:8]
+def english_hash(english: str) -> str:
+    """Hash of an English text as Text Translator computes it: XXH3-64 of its UTF-8 bytes, default
+    seed, as 16 hex digits. Developer tools only (xxhash package): the module never hashes, it
+    compares with the hash the addon sends."""
+    import xxhash
+    return f"{xxhash.xxh3_64_intdigest(english.encode('utf-8')):016x}"
+
+
+def hash_int(hex16: str) -> int:
+    """A src_hash as Text Translator keeps it in cache.db: the u64 as a signed SQLite integer."""
+    u = int(hex16, 16)
+    return u - (1 << 64) if u >= 1 << 63 else u
 
 
 def piece_name(number: int) -> str:
@@ -732,7 +745,7 @@ def piece_bytes(strings: dict[int, str], auto: dict[int, str], drop: set[int],
     if drop:
         data["drop"] = sorted(drop)
     if hashes:
-        data["h"] = _ordered(hashes)
+        data["src_hash"] = _ordered(hashes)
     return (json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n").encode("utf-8")
 
 
@@ -810,13 +823,13 @@ def parse_piece(data: dict, number: int, width: int
     strings = Patch._section(data, "strings", False)
     auto = {k: v for k, v in Patch._section(data, "auto", False).items() if k not in strings}
     drop = Patch.parse_drop(data) - set(strings) - set(auto)
-    raw = data.get("h", {})
+    raw = data.get("src_hash", {})
     if not isinstance(raw, dict):
-        raise ValueError("patch piece: 'h' must be an object")
+        raise ValueError("patch piece: 'src_hash' must be an object")
     hashes = {}
     for k, h in raw.items():
         if not str(k).isdigit() or not isinstance(h, str) or not HASH_RE.fullmatch(h):
-            raise ValueError(f"patch piece: bad 'h' entry {k!r}")
+            raise ValueError(f"patch piece: bad 'src_hash' entry {k!r}")
         if int(k) in strings or int(k) in auto:
             hashes[int(k)] = h
     low, high = number * width, (number + 1) * width
