@@ -833,6 +833,9 @@ def norm(text: str) -> str:
     return html.unescape(text).strip()
 
 
+USER_INPUT = "user input"  # map "how" of a translation written by hand (editor page)
+
+
 class KeyMap:
     """Map string ID -> English -> translation (map_<lang>.db), filled by the module with every text it
     answers. It stays on this PC: it contains English game text."""
@@ -849,7 +852,8 @@ class KeyMap:
             key INTEGER PRIMARY KEY NOT NULL,
             en TEXT NOT NULL,
             it TEXT,
-            how TEXT,          -- 'live' (seen while playing), 'contrib...' (merged from a contributor)
+            how TEXT,          -- 'live' (seen while playing), 'contrib...' (merged from a contributor),
+                               -- 'user input' (written by hand in the editor page; en may be '')
             seen INTEGER)""")
         self.con.commit()
         # The addon ends the module without closing the connection, so close() does not run when
@@ -864,7 +868,9 @@ class KeyMap:
         self.lock = threading.Lock()
 
     def save(self, rows: list[tuple[int, str, str, str]]) -> int:
-        """rows: (key, en, it, how). A 'live' row always wins over an older kind."""
+        """rows: (key, en, it, how). A 'live' row always wins over an older kind, except over a
+        'user input' one made for the same English text (or for an unknown one, en = ''): there
+        it only fills in the English text."""
         if not rows:
             return 0
         now = int(time.time())
@@ -875,11 +881,56 @@ class KeyMap:
                 before = self.con.total_changes
                 self.con.executemany(
                     "INSERT INTO texts (key, en, it, how, seen) VALUES (?, ?, ?, ?, ?) "
-                    "ON CONFLICT(key) DO UPDATE SET en = excluded.en, it = excluded.it, "
-                    "how = excluded.how, seen = excluded.seen "
+                    f"ON CONFLICT(key) DO UPDATE SET en = excluded.en, "
+                    f"it = CASE WHEN {self._KEEP} THEN texts.it ELSE excluded.it END, "
+                    f"how = CASE WHEN {self._KEEP} THEN texts.how ELSE excluded.how END, "
+                    "seen = excluded.seen "
                     "WHERE excluded.how = 'live' OR texts.how = 'backfill'",
                     [(k, en, it, how, now) for k, en, it, how in rows])
                 return self.con.total_changes - before
+
+    _KEEP = f"(texts.how = '{USER_INPUT}' AND texts.en IN ('', excluded.en))"
+
+    def english(self, key: int) -> str:
+        """The English text of a key, '' if the module never received it."""
+        with self.lock:
+            row = self.con.execute("SELECT en FROM texts WHERE key = ?", (key,)).fetchone()
+        return row[0] if row else ""
+
+    def save_user(self, key: int, it: str) -> str:
+        """Store a translation written by hand (how = 'user input'); returns its English text."""
+        with self.lock:
+            if self.closed:
+                raise RuntimeError("map closed")
+            with self.con:
+                self.con.execute(
+                    "INSERT INTO texts (key, en, it, how, seen) VALUES (?, '', ?, ?, ?) "
+                    "ON CONFLICT(key) DO UPDATE SET it = excluded.it, how = excluded.how, "
+                    "seen = excluded.seen", (key, it, USER_INPUT, int(time.time())))
+            return self.con.execute("SELECT en FROM texts WHERE key = ?", (key,)).fetchone()[0]
+
+    def user_rows(self) -> dict[int, tuple[str, str]]:
+        """The translations written by hand: key -> (it, en)."""
+        with self.lock:
+            if self.closed:
+                return {}
+            return {k: (it, en) for k, it, en in self.con.execute(
+                "SELECT key, it, en FROM texts WHERE how = ? AND it IS NOT NULL AND it != ''",
+                (USER_INPUT,))}
+
+    def recent_user(self, limit: int = 50) -> list[tuple[int, str, str, int]]:
+        """Last translations written by hand: (key, en, it, seen)."""
+        with self.lock:
+            return self.con.execute("SELECT key, en, it, seen FROM texts WHERE how = ? "
+                                    "ORDER BY seen DESC LIMIT ?", (USER_INPUT, limit)).fetchall()
+
+    def search_english(self, words: str, limit: int, exact: bool = False) -> list[int]:
+        """Keys whose English text contains `words` (case-insensitive for ASCII); with `exact`,
+        whose English text is `words` and nothing else."""
+        sql, arg = ("en = ?", words) if exact else ("en LIKE ? ESCAPE '\\'", like_pattern(words))
+        with self.lock:
+            return [k for (k,) in self.con.execute(
+                f"SELECT key FROM texts WHERE {sql} LIMIT ?", (arg, limit))]
 
     def count(self) -> int:
         with self.lock:
@@ -901,6 +952,11 @@ class KeyMap:
                     pass  # another tool has the file open: it stays in WAL mode, no harm
             finally:
                 self.con.close()
+
+
+def like_pattern(words: str) -> str:
+    """SQL LIKE pattern matching `words` anywhere (escape character: backslash)."""
+    return "%" + re.sub(r"([\\%_])", r"\\\1", words) + "%"
 
 
 # --------------------------------------------------------------------------- #

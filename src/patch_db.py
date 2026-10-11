@@ -45,6 +45,11 @@ SQL_VARS = 500        # keys per "IN (...)" list
 STALE_LOG_LIMIT = 20  # keys with a changed English text logged one by one per session
 WAL_LIMIT = 1_000_000  # bytes patch_it.db-wal may keep after a checkpoint
 
+# a translation written by hand: a reviewed row, checked against the English text when it is known
+USER_UPSERT = (f"INSERT INTO patch (key, kind, text, h, piece) VALUES (?, {KIND_REVIEWED}, ?, ?, NULL) "
+               f"ON CONFLICT(key) DO UPDATE SET kind = {KIND_REVIEWED}, text = excluded.text, "
+               "h = excluded.h")
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS patch (
     key   INTEGER PRIMARY KEY NOT NULL,
@@ -174,6 +179,7 @@ class CachePatch:
         self.glossary: lt.Glossary | None = None  # the player's glossary (set by the module)
         self.show_keys: str | None = None  # "show keys" mode ("text", "all") or None
         self.live = None  # function(rows): sends to the game the rows written into cache.db
+        self.user = None  # function -> {key: (text, English or '')}: translations by hand (map)
         self.lock = threading.RLock()             # one writer at a time: update, apply, withdraw
         self.rlock = threading.Lock()             # the reading connection (answers)
         self._stale_lock = threading.Lock()
@@ -600,8 +606,56 @@ class CachePatch:
         con.executemany("INSERT INTO patch (key, kind, text, h, piece) VALUES (?, ?, ?, ?, ?)",
                         self._rows_of(strings, auto, drop, {}, None))
         con.execute("DELETE FROM stale")
+        self._keep_user(con)
         self._set_meta(con, version=version, glossary=fp, width=None, commit=commit or None,
                        source=source)
+
+    # -- translations by hand ---------------------------------------------------------------
+    def _keep_user(self, con: sqlite3.Connection) -> int:
+        """Write the translations by hand over the patch rows, in the open transaction: a patch
+        update must not undo them (they live in map_it.db, how = 'user input')."""
+        rows = self.user() if self.user else {}
+        con.executemany(USER_UPSERT, [(k, t, lt.raw_hash(en) if en else None)
+                                      for k, (t, en) in rows.items()])
+        return len(rows)
+
+    def restore_user(self) -> int:
+        """At start: the translations by hand back into patch_it.db (in case it was replaced)."""
+        if not self.user:
+            return 0
+        with self.lock:
+            con = self.writer
+            con.execute("BEGIN IMMEDIATE")
+            try:
+                n = self._keep_user(con)
+                con.execute("COMMIT")
+            except BaseException:
+                con.execute("ROLLBACK")
+                raise
+        return n
+
+    def set_user(self, key: int, text: str, english: str) -> None:
+        """Store a translation written by hand as a reviewed row. With the English text unknown
+        ('') it has no fingerprint, so it is used whatever English text the game sends."""
+        with self.lock:
+            con = self.writer
+            con.execute("BEGIN IMMEDIATE")
+            try:
+                con.execute(USER_UPSERT, (key, text, lt.raw_hash(english) if english else None))
+                con.execute("DELETE FROM stale WHERE key = ?", (key,))
+                con.execute("COMMIT")
+            except BaseException:
+                con.execute("ROLLBACK")
+                raise
+            with self._stale_lock:
+                self._stale_seen.pop(key, None)
+                self._stale_pending.pop(key, None)
+
+    def entry(self, key: int) -> tuple[int, str | None] | None:
+        """(kind, text) of a key in the patch, or None."""
+        with self.rlock:
+            return self.reader.execute("SELECT kind, text FROM patch WHERE key = ?",
+                                       (key,)).fetchone()
 
     def import_data(self, data: dict, source: str, commit: str = "") -> None:
         """Replace the whole patch with a single-file patch (validated first)."""
@@ -750,6 +804,7 @@ class CachePatch:
                                 (name, sha, len(rows), size))
                     if not full:
                         new.update((r[0], (r[1], r[2], r[3])) for r in rows)
+                self._keep_user(con)
                 con.execute("DELETE FROM stale WHERE NOT EXISTS (SELECT 1 FROM patch "
                             "WHERE patch.key = stale.key AND patch.h = stale.h)")
                 self._set_meta(con, version=index["version"], glossary=index["glossary"],

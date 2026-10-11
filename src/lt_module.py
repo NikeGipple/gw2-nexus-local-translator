@@ -38,6 +38,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))  # lt_server.py sits ne
 import lt_server as lt  # noqa: E402
 from patch_db import (CachePatch, PieceUpdater, SHOW_MODES, has_table, key_tag,  # noqa: E402
                       sync_key_tags)
+import editor  # noqa: E402
 
 VERSION = "0.6.0"        # version of the release: raise it at every new zip (shown in the log)
 PROTOCOL = 1
@@ -558,6 +559,8 @@ def main() -> int:
     ap.add_argument("--branch", default=lt.DEFAULT_BRANCH,
                     help="GitHub branch for glossary and patch (developers' tests; default main)")
     ap.add_argument("--debug", action="store_true")
+    ap.add_argument("--editor-port", type=int, default=editor.EDITOR_PORT, metavar="PORT",
+                    help="port of the correction page on 127.0.0.1 (0 = off)")
     ap.add_argument("--threads", type=int, default=None,
                     help="CPU threads for the model (default: a quarter of the CPUs, at most 2)")
     ap.add_argument("--stats-every", type=int, default=STATS_EVERY, metavar="SECONDS",
@@ -702,6 +705,16 @@ def main() -> int:
                             args.cache_db)
     holder["d"] = dispatcher
     patch.live = dispatcher.push  # patch rows written into cache.db are shown at once
+    if keymap:
+        patch.user = keymap.user_rows  # translations by hand survive every patch update
+        try:
+            n = patch.restore_user()
+            if n:
+                log.info("map: %d translations by hand", n)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("translations by hand not restored: %s", exc)
+        if args.editor_port:
+            editor.start(editor.Editor(patch, keymap, args.cache_db, CACHE_KEY), args.editor_port)
     ready.set()
     for key, text in early:
         dispatcher.submit(key, text)
