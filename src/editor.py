@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import sqlite3
 import threading
 from http import HTTPStatus
@@ -30,6 +31,18 @@ EDITOR_PORT = 8770
 RESULTS = 50          # rows per search
 MAX_BYTES = 65535     # longest text the addon accepts (UTF-8 bytes)
 KINDS = {KIND_REVIEWED: "reviewed", KIND_AUTO: "automatic", KIND_DROP: "drop"}
+
+# markup the game does not show: plural/feminine forms, colors, line breaks, escaped brackets
+MARKUP = [(re.compile(r'\[(?:pl|f):"[^"]*"\]'), ""), (re.compile(r"</?c(?:=[^>]*)?/?>"), ""),
+          (re.compile(r"<br>"), " "), (re.compile(r"\[lbracket\]"), "["),
+          (re.compile(r"\[rbracket\]"), "]"), (re.compile(r"\s+"), " ")]
+
+
+def plain(text: str) -> str:
+    """A text as the game shows it, more or less: for searching."""
+    for pattern, repl in MARKUP:
+        text = pattern.sub(repl, text)
+    return text.strip()
 
 
 class Editor:
@@ -51,17 +64,23 @@ class Editor:
             keys = [int(q)]
         else:
             if self.cache_db.is_file():
+                # compared as the game shows them: without markup and "show keys" prefix
+                if exact:
+                    def match(t: str) -> bool:
+                        return t == q
+                else:
+                    folded = q.casefold()
+
+                    def match(t: str) -> bool:
+                        return folded in t.casefold()
                 con = self._cache()
                 try:
-                    if exact:  # also with the "<key> - " prefix of the "show keys" mode
-                        sql = "(text = ? OR text = id || ' - ' || ?)"
-                        args = (q, q)
-                    else:
-                        sql = "text LIKE ? ESCAPE '\\'"
-                        args = (lt.like_pattern(q),)
-                    keys = [k for (k,) in con.execute(
-                        f"SELECT id FROM translations WHERE cache_key = ? AND {sql} LIMIT ?",
-                        (self.cache_key, *args, RESULTS))]
+                    for k, t in con.execute("SELECT id, text FROM translations WHERE cache_key = ? "
+                                            "AND text IS NOT NULL", (self.cache_key,)):
+                        if match(plain(untagged(k, t))):
+                            keys.append(k)
+                            if len(keys) >= RESULTS:
+                                break
                 finally:
                     con.close()
             keys += [k for k in self.keymap.search_english(q, RESULTS, exact) if k not in keys]
