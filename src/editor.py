@@ -126,10 +126,21 @@ class Editor:
         entry = self.patch.entry(key)
         map_row = self.keymap.get(key)
         undo = self.history.execute("SELECT count(*) FROM history WHERE key = ?", (key,)).fetchone()[0]
+        prev = None
+        if undo:  # what "Annulla" puts back: text and labels before the last save
+            p_map, p_patch, p_shown = self.history.execute(
+                "SELECT map_row, patch_row, shown FROM history WHERE key = ? ORDER BY id DESC "
+                "LIMIT 1", (key,)).fetchone()
+            p_map = json.loads(p_map) if p_map else None
+            p_patch = json.loads(p_patch) if p_patch else None
+            prev = {"text": p_patch[1] if p_patch and p_patch[1] is not None
+                    else untagged(key, p_shown) if p_shown is not None else None,
+                    "kind": KINDS.get(p_patch[0]) if p_patch else None,
+                    "user": bool(p_map) and p_map[2] == lt.USER_INPUT}
         return {"key": key, "shown": shown, "en": map_row[0] if map_row else "",
                 "kind": KINDS.get(entry[0]) if entry else None,
                 "patch": entry[1] if entry else None,
-                "user": bool(map_row) and map_row[2] == lt.USER_INPUT, "undo": undo}
+                "user": bool(map_row) and map_row[2] == lt.USER_INPUT, "undo": undo, "prev": prev}
 
     def recent(self) -> list[dict]:
         return [{"key": k, "en": en, "it": it, "seen": seen}
@@ -320,6 +331,8 @@ button:disabled { opacity: .5; cursor: default; }
 .b-reviewed { background: var(--badge-rev); } .b-automatic, .b-none { background: var(--badge-auto); }
 .b-user { background: var(--badge-user); }
 .en { color: var(--muted); font-size: 13px; margin: 0 0 6px; white-space: pre-wrap; }
+.prev { font-size: 13px; margin: 6px 0 0; white-space: pre-wrap; }
+.prev-label { color: var(--muted); }
 textarea { width: 100%; min-height: 64px; padding: 8px 10px; font: inherit; color: var(--text);
   background: var(--bg); border: 1px solid var(--line); border-radius: 8px; resize: vertical; }
 .actions { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
@@ -389,6 +402,10 @@ function card(r, note) {
     el("div", { class: "head" }, el("span", { class: "key" }, "#" + r.key), ...badges),
     r.en ? el("p", { class: "en" }, r.en) : null,
     ta,
+    r.prev ? el("p", { class: "prev" },
+      el("span", { class: "prev-label" }, "Precedente (" + (r.prev.kind ? KIND[r.prev.kind] : "non nella patch")
+        + (r.prev.user ? ", user input" : "") + "), torna con Annulla: "),
+      r.prev.text ?? "(nessun testo)") : null,
     el("div", { class: "actions" }, btn, undo, status)].filter((c) => c != null));
   return self;
 }
