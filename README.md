@@ -21,6 +21,7 @@ This module brings the game into **Italian**; other languages are planned.
 
 - Guild Wars 2 on Windows (64-bit), **game language set to English**
 - [Nexus](https://raidcore.gg/Nexus) addon loader
+- Text Translator **v0.2.0 or newer** (included in the zip). Module v0.7 and later do not work with Text Translator v0.1.x, and module v0.6 and older do not work with Text Translator v0.2.0
 - About **500 MB of free RAM** while playing, on top of what the game uses. The translator runs on the CPU (2 threads by default, at below-normal priority so the game always comes first) only while new texts are being translated.
 - About **250 MB of free disk space**
 
@@ -31,6 +32,8 @@ This module brings the game into **Italian**; other languages are planned.
 3. Start the game. If needed, enable **Text Translator** from the Nexus addon list: the *Italiano (Local Translator)* module starts by itself.
 
 On the very first start the model is downloaded and loaded, which takes a little while. Until then text stays in English. Later starts are immediate.
+
+> **Installed v0.6 or older?** Text Translator v0.2.0 changed the module protocol: older modules stop working with it (Nexus updates Text Translator by itself). Download the newest release and extract it over the old one, as in the installation. After the update the texts translated on the fly before are checked once more, the first time you see them: nothing to do on your side.
 
 > **Installed v0.2.x or older?** Those versions can no longer download patch updates (the patch has grown past the size they can read) and keep using an old copy without any warning. Download the newest release and extract it over the old one, as in the installation. Updating is also recommended from v0.3 and v0.4, which download the whole patch at every update.
 
@@ -67,10 +70,10 @@ addons\
 ## How it works
 
 1. Text Translator starts the module when the game loads and stops it when the game closes.
-2. It sends the module every game text with its internal string ID.
+2. It sends the module every game text with its internal string ID and a hash of the English text.
 3. The module answers from the curated patch if the text is there; otherwise it translates it locally with OPUS-MT, applying the glossary.
-4. Text Translator saves the translations in `cache.db` and shows them in game.
-5. At every start, and whenever a new patch is published, the module also writes the whole patch into `cache.db`, so Text Translator already has those translations at the next start.
+4. Text Translator saves the translations in `cache.db`, with that hash, and shows them in game. When a game update changes an English text, the hash no longer matches and Text Translator asks the module again.
+5. At every start, and whenever a new patch is published, the module also writes the whole patch into `cache.db`, with the hash of the English text each translation was made from, so Text Translator already has those translations at the next start. If a game update changes one of those texts, the hash no longer matches and Text Translator asks the module, which translates the new text instead of using the old translation.
 
 Before using the patch, the module checks that the string IDs sent by Text Translator still match the texts it knows. If they do not (for example after a change in the addon), the patch translations are removed from `cache.db` and the patch stays off until the IDs match again.
 
@@ -81,10 +84,11 @@ The only network connections made by the module are to this repository on GitHub
 The curated Italian translations, identified by the game's internal string ID, are in [`patch/it/`](patch/it), split in pieces by ID range so that an update only downloads the pieces that changed. `index.json` lists the pieces with their SHA-256, which the module checks before using them:
 
 ```json
-{ "strings": { "272657": "Raffina per ottenere Bloodstone Brick." }, "h": { "272657": "1a2b3c4d" } }
+{ "strings": { "272657": "Raffina per ottenere Bloodstone Brick." },
+  "src_hash": { "272657": "0123456789abcdef" } }
 ```
 
-`h` is a short fingerprint (the first 8 hex digits of the SHA-256) of the English text the translation was made from: if the game sends a different English text for that ID, for example after a game update, the module translates the new text instead of showing the old translation. The patch contains no English game text.
+`src_hash` is the hash of the English text the translation was made from, computed as Text Translator does (XXH3-64) and named like the column where Text Translator keeps it. If the game sends a different English text for that ID, for example after a game update, the module translates the new text instead of showing the old translation. `0000000000000000` marks a translation that is outdated and waiting to be redone. The patch contains no English game text.
 
 [`patch/patch_it.json`](patch/patch_it.json) holds the same translations in a single file, for modules up to v0.4.
 

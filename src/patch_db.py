@@ -5,15 +5,34 @@ Up to v0.4 the module kept the whole patch in Python dictionaries (patch_it.json
 60k entries) and every start compared all of cache.db with all of the patch in Python, rewriting
 patch_it.applied.json (as big as "auto"). Now:
 - the patch lives in patch_it.db: an answer is a lookup by key, nothing is loaded in memory;
-- cache.db is compared with the patch in SQL (ATTACH), and only the rows that differ are written,
-  in short transactions (cache.db belongs to the addon, which writes to it while the game runs);
+- cache.db is compared with the patch in SQL (ATTACH), only reading it: the rows the addon holds
+  with another text are sent to the addon as translations it did not ask for (v0.8), so the game
+  shows them at once and the addon saves them in cache.db itself; texts the addon does not hold
+  yet are answered from the patch when it asks for them (lookup);
 - a new version downloads only the pieces whose sha256 changed (lt_server.split_patch) and
   checks only their keys against cache.db;
 - the local registries (applied, skip, dropped, ids_failed) are tables instead of JSON files;
-- every entry may carry "h", the fingerprint of the English text it was translated from: when the
-  addon sends a different English text, the patch is not used for that key (see lookup) and the
-  key is remembered in the "stale" table, so the patch text is not written into cache.db again
-  until a version with a new "h" for it is published.
+- every entry may carry src_hash, the hash of the English text it was translated from, the same
+  Text Translator (v0.2.0) sends with every text and keeps in cache.db (column src_hash): see below.
+
+Text Translator shows a row of cache.db whose src_hash does not match the text the game shows, but
+asks the module for it again. So:
+- the patch is sent with its src_hash: the addon keeps it as it is, and asks for it by itself if
+  ArenaNet changes the English text;
+- asked for a key whose src_hash differs from the one received, the module does not use the patch
+  (lookup) and translates the new text; the addon saves that translation with the new hash, and from
+  then on apply leaves the row alone (the addon's hash differs from the patch's), until a version of
+  the patch made from the new text is published;
+- entries without src_hash (English never known for certain) are sent with the hash the addon has
+  in cache.db for that key (0 if none: the addon asks for them once and the module answers with
+  them, without a check);
+- rows of cache.db with the patch text but src_hash 0 (written by v0.7, or moved to the v0.2.0
+  layout by the addon) are not sent: the addon asks for them once and gets the patch with its hash;
+- src_hash 0000000000000000 (lt_server.OUTDATED_HASH, stored as 0) marks a translation whose English
+  changed and was not redone: never used, never sent.
+
+The module writes into cache.db only to remove rows ('drop' keys, automatic texts that left the
+patch, a failed string IDs check): the game shows that change at the next start.
 
 Rules (unchanged from v0.4): reviewed > automatic (valid when made with the player's glossary)
 > local translation; automatic rows purged by a glossary change are skipped until a patch made
@@ -39,23 +58,27 @@ import lt_server as lt
 log = logging.getLogger("lt")
 
 KIND_REVIEWED, KIND_AUTO, KIND_DROP = 0, 1, 2
-LIVE_MAX = 5000       # rows written to cache.db also sent to the game at once (more: next start)
-CHUNK = 2000          # cache.db rows written per transaction (short locks: the addon writes too)
+CHUNK = 2000          # cache.db rows removed per transaction (short locks: the addon writes too)
+PUSH_BLOCK = 2000     # patch texts sent to the addon in one go
+PUSH_PAUSE = 0.2      # seconds between two blocks: below the addon's refresh_debounce (0.5 s), so
+                      # the blocks of one update make a single refresh of the game texts
 SQL_VARS = 500        # keys per "IN (...)" list
 STALE_LOG_LIMIT = 20  # keys with a changed English text logged one by one per session
 WAL_LIMIT = 1_000_000  # bytes patch_it.db-wal may keep after a checkpoint
 
-# a translation written by hand: a reviewed row, checked against the English text when it is known
-USER_UPSERT = (f"INSERT INTO patch (key, kind, text, h, piece) VALUES (?, {KIND_REVIEWED}, ?, ?, NULL) "
+# a translation written by hand: a reviewed row without src_hash (the module cannot hash the
+# English), so it is used whatever English text the game sends and is sent with the addon's hash
+USER_UPSERT = (f"INSERT INTO patch (key, kind, text, src_hash, piece) "
+               f"VALUES (?, {KIND_REVIEWED}, ?, NULL, NULL) "
                f"ON CONFLICT(key) DO UPDATE SET kind = {KIND_REVIEWED}, text = excluded.text, "
-               "h = excluded.h")
+               "src_hash = NULL")
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS patch (
     key   INTEGER PRIMARY KEY NOT NULL,
     kind  INTEGER NOT NULL,      -- 0 reviewed (strings), 1 automatic (auto), 2 drop
     text  TEXT,                  -- NULL for drop
-    h     TEXT,                  -- fingerprint of the English text (lt_server.raw_hash) or NULL
+    src_hash INTEGER,            -- hash of the English text (lt_server.hash_int), 0 = outdated, or NULL
     piece INTEGER                -- piece number (key // width), NULL when loaded from a single file
 );
 CREATE INDEX IF NOT EXISTS patch_piece ON patch(piece);
@@ -68,13 +91,7 @@ CREATE TABLE IF NOT EXISTS applied (key INTEGER PRIMARY KEY NOT NULL, text TEXT 
 CREATE TABLE IF NOT EXISTS skip (key INTEGER PRIMARY KEY NOT NULL);
 -- 'drop' keys already removed from cache.db once
 CREATE TABLE IF NOT EXISTS dropped (key INTEGER PRIMARY KEY NOT NULL);
--- patch entries whose English text changed for this player: key -> the "h" found outdated
-CREATE TABLE IF NOT EXISTS stale (key INTEGER PRIMARY KEY NOT NULL, h TEXT NOT NULL);
 """
-
-UPSERT = ("INSERT INTO main.translations (id, cache_key, version, timestamp, text) "
-          "VALUES (?, ?, ?, ?, ?) ON CONFLICT(cache_key, id) DO UPDATE SET "
-          "text = excluded.text, version = excluded.version, timestamp = excluded.timestamp")
 
 # "Show keys" mode (developers and helpers, file IT\show_keys.txt): texts in cache.db and
 # answers start with their string ID, "44547 - Bambini", to find the key of a text seen in the
@@ -143,16 +160,18 @@ def sync_key_tags(db: Path | None, cache_key: str, mode: str | None) -> int:
         con.close()
 
 
-def has_table(db: Path | None) -> bool:
-    """True if the addon's cache.db exists and has its translations table."""
+def has_table(db: Path | None, need_hash: bool = False) -> bool:
+    """True if the addon's cache.db exists and has its translations table; with need_hash, only
+    in the layout of Text Translator v0.2.0 (src_hash column), the one the patch is written in. A
+    cache.db of v0.1.x is moved to that layout by the addon itself when it loads the module."""
     if not db or not db.is_file():
         return False
     con = sqlite3.connect(f"file:{db}?mode=ro", uri=True, timeout=10)
     try:
-        return con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='translations'"
-                           ).fetchone() is not None
+        cols = {r[1] for r in con.execute("PRAGMA table_info(translations)")}
     finally:
         con.close()
+    return bool(cols) and (not need_hash or "src_hash" in cols)
 
 
 def _chunks(items: list, size: int = SQL_VARS):
@@ -178,16 +197,21 @@ class CachePatch:
         self.cache_key, self.result_version = cache_key, result_version
         self.glossary: lt.Glossary | None = None  # the player's glossary (set by the module)
         self.show_keys: str | None = None  # "show keys" mode ("text", "all") or None
-        self.live = None  # function(rows): sends to the game the rows written into cache.db
         self.user = None  # function -> {key: (text, English or '')}: translations by hand (map)
+        # function(rows) that sends (key, u64 hash, text as shown) to the addon (set by the module);
+        # None: nothing is sent (tools, tests)
+        self.sender = None
+        # texts sent in this session (key -> text): the addon saves them in cache.db a moment
+        # later, so an apply that runs before (start, glossary and patch checks close together)
+        # would send them again
+        self._sent: dict[int, str] = {}
         self.lock = threading.RLock()             # one writer at a time: update, apply, withdraw
         self.rlock = threading.Lock()             # the reading connection (answers)
         self._stale_lock = threading.Lock()
-        self._stale_pending: dict[int, str | None] = {}  # key -> h (None = no longer stale)
-        self._stale_seen: dict[int, str] = {}
-        self.stale_logged = 0
+        self._stale_seen: set[int] = set()  # keys found outdated in this session (log only)
         path.parent.mkdir(parents=True, exist_ok=True)
         self.writer = self._connect()
+        self._upgrade()
         self.writer.executescript(SCHEMA)
         self.reader = self._connect()
         self._load_meta()
@@ -200,6 +224,26 @@ class CachePatch:
         con.execute("PRAGMA synchronous=NORMAL")
         con.execute(f"PRAGMA journal_size_limit={WAL_LIMIT}")
         return con
+
+    def _upgrade(self) -> None:
+        """Archive of v0.5-v0.6 (column h, SHA-256 fingerprints, table stale): src_hash instead of
+        h, and the pieces forgotten, so the next check downloads them all again."""
+        con = self.writer
+        cols = {r[1] for r in con.execute("PRAGMA table_info(patch)")}
+        if "h" not in cols:
+            return
+        con.execute("BEGIN IMMEDIATE")
+        try:
+            con.execute("ALTER TABLE patch DROP COLUMN h")
+            con.execute("ALTER TABLE patch ADD COLUMN src_hash INTEGER")
+            con.execute("DROP TABLE IF EXISTS stale")
+            con.execute("DELETE FROM pieces")
+            con.execute("DELETE FROM meta WHERE k = 'commit'")  # else "same commit": no download
+            con.execute("COMMIT")
+        except BaseException:
+            con.execute("ROLLBACK")
+            raise
+        log.info("patch archive moved to src_hash (all pieces downloaded again)")
 
     def _shrink_wal(self) -> None:
         """Move what patch_it.db-wal holds into patch_it.db and empty it. SQLite writes every
@@ -244,11 +288,11 @@ class CachePatch:
     def counts(self) -> dict[str, int]:
         with self.rlock:
             rows = self.reader.execute(
-                "SELECT kind, count(*), count(h) FROM patch GROUP BY kind").fetchall()
-        out = {"reviewed": 0, "auto": 0, "drop": 0, "h": 0}
+                "SELECT kind, count(*), count(src_hash) FROM patch GROUP BY kind").fetchall()
+        out = {"reviewed": 0, "auto": 0, "drop": 0, "hash": 0}
         for kind, n, h in rows:
             out[("reviewed", "auto", "drop")[kind]] = n
-            out["h"] += h
+            out["hash"] += h
         return out
 
     def pieces(self) -> dict[str, str]:
@@ -307,14 +351,14 @@ class CachePatch:
             self.skip_version = self.version
 
     # -- answers ----------------------------------------------------------------------------
-    def lookup(self, key: int, english: str) -> tuple[str | None, bool]:
+    def lookup(self, key: int, src_hash: int) -> tuple[str | None, bool]:
         """(translation from the patch or None, True if the patch entry is outdated).
 
-        An entry with "h" is used only if the English text received has the same fingerprint:
-        otherwise ArenaNet changed the text after the translation was made, and the module
-        translates it locally (the key is remembered as stale, see apply)."""
+        An entry with src_hash is used only if it is the hash the addon sent with the English text
+        (src_hash, the u64 of the protocol): otherwise ArenaNet changed the text after the
+        translation was made, and the module translates it locally (see apply)."""
         with self.rlock:
-            row = self.reader.execute("SELECT kind, text, h FROM patch WHERE key = ?",
+            row = self.reader.execute("SELECT kind, text, src_hash FROM patch WHERE key = ?",
                                       (key,)).fetchone()
             if row is None or row[0] == KIND_DROP:
                 return None, False
@@ -322,58 +366,18 @@ class CachePatch:
             if kind == KIND_AUTO and self._skip_active() and self.reader.execute(
                     "SELECT 1 FROM skip WHERE key = ?", (key,)).fetchone():
                 return None, False
-        if h and lt.raw_hash(english) != h:
-            self._mark_stale(key, h)
-            return None, True
-        if h and key in self._stale_seen:
-            self._mark_stale(key, None)  # the English text is the expected one again
-        return text, False
-
-    def _mark_stale(self, key: int, h: str | None) -> None:
+        if h is None or h == lt.hash_int(f"{src_hash:016x}"):
+            return text, False
         with self._stale_lock:
-            if h is None:
-                self._stale_seen.pop(key, None)
-            elif self._stale_seen.get(key) == h:
-                return
-            else:
-                self._stale_seen[key] = h
-                if self.stale_logged < STALE_LOG_LIMIT:
-                    log.info("patch: the English text of key %d changed after its translation "
-                             "(h %s): translated locally", key, h)
-                elif self.stale_logged == STALE_LOG_LIMIT:
-                    log.info("patch: more keys with a changed English text, see the stats lines")
-                self.stale_logged += 1
-            self._stale_pending[key] = h
-        if self.lock.acquire(blocking=False):  # saved now if nobody is writing, else later
-            try:
-                self._flush_stale()
-            finally:
-                self.lock.release()
-
-    def _flush_stale(self) -> None:
-        """Save the stale keys found by lookup (called with self.lock held)."""
-        with self._stale_lock:
-            pending, self._stale_pending = self._stale_pending, {}
-        if not pending:
-            return
-        con = self.writer
-        try:
-            con.execute("BEGIN IMMEDIATE")
-            for key, h in pending.items():
-                if h is None:
-                    con.execute("DELETE FROM stale WHERE key = ?", (key,))
-                else:
-                    con.execute("INSERT OR REPLACE INTO stale (key, h) VALUES (?, ?)", (key, h))
-            con.execute("COMMIT")
-        except sqlite3.Error as exc:
-            try:
-                con.execute("ROLLBACK")
-            except sqlite3.Error:
-                pass
-            with self._stale_lock:  # try again at the next write
-                for key, h in pending.items():
-                    self._stale_pending.setdefault(key, h)
-            log.warning("cannot save the outdated patch keys: %s", exc)
+            new = key not in self._stale_seen
+            self._stale_seen.add(key)
+            n = len(self._stale_seen)
+        if new and n <= STALE_LOG_LIMIT:
+            log.info("patch: the English text of key %d is not the one it was translated from: "
+                     "translated locally", key)
+        elif new and n == STALE_LOG_LIMIT + 1:
+            log.info("patch: more keys with a changed English text, see the stats lines")
+        return None, True
 
     # -- string IDs check -------------------------------------------------------------------
     def ids_failed(self) -> bool:
@@ -402,25 +406,19 @@ class CachePatch:
         con.execute("ATTACH DATABASE ? AS p", (str(self.path),))
         return con
 
-    def _write_rows(self, con: sqlite3.Connection, table: str, upsert: bool) -> int:
-        """Write (upsert) or delete the keys of a temp table into cache.db, CHUNK rows per
-        transaction, so the addon never waits long for cache.db."""
+    def _delete_rows(self, con: sqlite3.Connection, table: str) -> int:
+        """Delete the keys of a temp table from cache.db, CHUNK rows per transaction, so the addon
+        never waits long for cache.db."""
         done, last = 0, -1
-        now = int(time.time())
-        cols = "key, text" if upsert else "key"
         while True:
-            rows = con.execute(f"SELECT {cols} FROM temp.{table} WHERE key > ? ORDER BY key "
+            rows = con.execute(f"SELECT key FROM temp.{table} WHERE key > ? ORDER BY key "
                                f"LIMIT {CHUNK}", (last,)).fetchall()
             if not rows:
                 return done
             con.execute("BEGIN")
             try:
-                if upsert:
-                    con.executemany(UPSERT, [(k, self.cache_key, self.result_version, now, v)
-                                             for k, v in rows])
-                else:
-                    con.executemany("DELETE FROM main.translations WHERE cache_key = ? AND id = ?",
-                                    [(self.cache_key, r[0]) for r in rows])
+                con.executemany("DELETE FROM main.translations WHERE cache_key = ? AND id = ?",
+                                [(self.cache_key, r[0]) for r in rows])
                 con.execute("COMMIT")
             except BaseException:
                 con.execute("ROLLBACK")
@@ -428,21 +426,27 @@ class CachePatch:
             done += len(rows)
             last = rows[-1][0]
 
-    def _to_write_sql(self) -> str:
-        """SELECT of the patch rows (key, text as shown) that cache.db does not hold yet;
-        parameters: cache_key, skip active (0/1). The patch is attached as "p"."""
+    def _to_send_sql(self) -> str:
+        """SELECT of the patch rows the addon holds with another text: (key, text as shown, hash
+        to send, kind); parameters: cache_key, skip active (0/1). The patch is attached as "p".
+        Never outdated entries (0), nor rows the addon holds for another English text (its hash is
+        not 0 and not ours: the patch entry was made from an older text). Hash sent: the patch's,
+        or the addon's for entries without one."""
         shown = self._shown("pt")
-        return (f"SELECT pt.key, {shown} FROM p.patch pt "
-                "LEFT JOIN main.translations t ON t.cache_key = ? AND t.id = pt.key "
+        return (f"SELECT pt.key, {shown}, coalesce(pt.src_hash, t.src_hash, 0), pt.kind "
+                "FROM p.patch pt "
+                "JOIN main.translations t ON t.cache_key = ? AND t.id = pt.key "
                 f"WHERE pt.kind IN ({KIND_REVIEWED}, {KIND_AUTO}) AND t.text IS NOT {shown} "
-                f"AND NOT (pt.kind = {KIND_AUTO} AND ? AND pt.key IN (SELECT key FROM p.skip)) "
-                "AND NOT EXISTS (SELECT 1 FROM p.stale s WHERE s.key = pt.key AND s.h = pt.h)")
+                "AND pt.src_hash IS NOT 0 "
+                "AND NOT (pt.src_hash IS NOT NULL "
+                "AND coalesce(t.src_hash, 0) NOT IN (0, pt.src_hash)) "
+                f"AND NOT (pt.kind = {KIND_AUTO} AND ? AND pt.key IN (SELECT key FROM p.skip))")
 
     def apply_changes(self, db: Path | None) -> int:
         """Apply only the patch rows that differ from cache.db: used when patch_it.db was changed
-        by another program (a translation edited by hand). Returns the rows written + removed."""
+        by another program (a translation edited by hand). Returns the texts sent + removed."""
         with self.lock:
-            if not has_table(db) or self.ids_failed():
+            if not has_table(db, need_hash=True) or self.ids_failed():
                 return 0
             with self.rlock:
                 has_auto = self.reader.execute(
@@ -450,8 +454,9 @@ class CachePatch:
             skip_on = 1 if has_auto and self._skip_active() else 0
             con = self._open_cache(db)
             try:
-                keys = {k for k, _ in con.execute(self._to_write_sql(), (self.cache_key, skip_on))}
-                # automatic texts written by us whose row was removed from the patch
+                keys = {r[0] for r in con.execute(self._to_send_sql(), (self.cache_key, skip_on))
+                        if self._sent.get(r[0]) != r[1]}
+                # automatic texts in cache.db whose row was removed from the patch
                 keys |= {k for (k,) in con.execute(
                     "SELECT a.key FROM p.applied a WHERE NOT EXISTS (SELECT 1 FROM p.patch pt "
                     f"WHERE pt.key = a.key AND pt.kind IN ({KIND_REVIEWED}, {KIND_AUTO}))")}
@@ -459,16 +464,29 @@ class CachePatch:
                 con.close()
             return self.apply(db, keys) if keys else 0
 
+    def _push(self, rows: list[tuple[int, int, str]]) -> int:
+        """Send (key, signed src_hash, text) to the addon in blocks; returns the texts sent."""
+        sent = 0
+        for i in range(0, len(rows), PUSH_BLOCK):
+            if i:
+                time.sleep(PUSH_PAUSE)
+            block = rows[i:i + PUSH_BLOCK]
+            sent += self.sender([(k, h % (1 << 64), t) for k, h, t in block])
+            self._sent.update((k, t) for k, _h, t in block)
+        return sent
+
     def apply(self, db: Path | None, keys: set[int] | None = None) -> int:
-        """Write the patch into cache.db (all of it, or only `keys` after an update of some
-        pieces). Returns the rows written + removed."""
+        """Bring the game in line with the patch (all of it, or only `keys` after an update of
+        some pieces): the rows of cache.db with another text are sent to the addon, which shows
+        them at once and saves them; the rows to remove are deleted from cache.db.
+        Returns the texts sent + the rows removed."""
+        push: list[tuple[int, int, str]] = []
         with self.lock:
-            self._flush_stale()
             with self.rlock:
                 empty = self.reader.execute("SELECT 1 FROM patch LIMIT 1").fetchone() is None
                 has_auto = self.reader.execute(
                     f"SELECT 1 FROM patch WHERE kind = {KIND_AUTO} LIMIT 1").fetchone() is not None
-            if empty or not has_table(db):
+            if empty or not has_table(db, need_hash=True):
                 return 0
             if self.ids_failed():
                 log.warning("patch not applied: the string IDs did not match the map")
@@ -483,12 +501,13 @@ class CachePatch:
                     con.executemany("INSERT OR IGNORE INTO temp.k VALUES (?)", [(x,) for x in keys])
                     restrict = " AND {0}.key IN (SELECT key FROM temp.k)"
                 skip_on = 1 if has_auto and self._skip_active() else 0
-                con.execute("CREATE TEMP TABLE w (key INTEGER PRIMARY KEY, text TEXT)")
+                con.execute("CREATE TEMP TABLE w (key INTEGER PRIMARY KEY, text TEXT, h INTEGER, "
+                            "kind INTEGER)")
                 shown = self._shown("pt")
-                con.execute("INSERT INTO temp.w " + self._to_write_sql() + restrict.format("pt"),
+                con.execute("INSERT INTO temp.w " + self._to_send_sql() + restrict.format("pt"),
                             (ck, skip_on))
                 con.execute("CREATE TEMP TABLE r (key INTEGER PRIMARY KEY)")
-                if has_auto:  # automatic texts we wrote that are no longer published
+                if has_auto:  # automatic texts in cache.db that are no longer published
                     con.execute(
                         "INSERT OR IGNORE INTO temp.r SELECT a.key FROM p.applied a "
                         "JOIN main.translations t ON t.cache_key = ? AND t.id = a.key "
@@ -504,10 +523,10 @@ class CachePatch:
                         "JOIN main.translations t ON t.cache_key = ? AND t.id = pt.key "
                         f"WHERE pt.kind = {KIND_DROP} AND pt.key NOT IN (SELECT key FROM p.dropped)"
                         + restrict.format("pt"), (ck,))
-                live = (con.execute(f"SELECT key, text FROM temp.w LIMIT {LIVE_MAX + 1}").fetchall()
-                        if self.live else [])
-                written = self._write_rows(con, "w", upsert=True)
-                removed = self._write_rows(con, "r", upsert=False)
+                if self.sender:
+                    push = [r for r in con.execute("SELECT key, h, text FROM temp.w ORDER BY key")
+                            if self._sent.get(r[0]) != r[2]]
+                removed = self._delete_rows(con, "r")
                 # registries, in patch_it.db
                 con.execute("BEGIN")
                 try:
@@ -519,6 +538,8 @@ class CachePatch:
                         con.execute("DELETE FROM p.dropped")
                         con.execute(f"INSERT INTO p.dropped SELECT key FROM p.patch "
                                     f"WHERE kind = {KIND_DROP}")
+                    # automatic texts the game holds: already in cache.db, or sent now (the addon
+                    # saves them a moment later)
                     if keys is None:
                         con.execute("DELETE FROM p.applied")
                     else:
@@ -528,6 +549,10 @@ class CachePatch:
                         "JOIN main.translations t ON t.cache_key = ? AND t.id = pt.key "
                         f"WHERE pt.kind = {KIND_AUTO} AND t.text = {shown}"
                         + restrict.format("pt"), (ck,))
+                    if push:
+                        con.execute(
+                            "INSERT OR REPLACE INTO p.applied SELECT pt.key, pt.text FROM temp.w w "
+                            f"JOIN p.patch pt ON pt.key = w.key WHERE w.kind = {KIND_AUTO}")
                     con.execute("COMMIT")
                 except BaseException:
                     con.execute("ROLLBACK")
@@ -539,21 +564,21 @@ class CachePatch:
             if keys is None:  # the registry of all the automatic texts was rewritten
                 self._shrink_wal()
             took = time.perf_counter() - t0
-            sent = False
-            if live and len(live) <= LIVE_MAX:
-                try:
-                    self.live(live)
-                    sent = True
-                except Exception as exc:  # noqa: BLE001 - cache.db is written anyway
-                    log.warning("patch: live update not sent: %s", exc)
-            if written:
-                log.info("patch v%d: %d translations updated in cache.db (%s)", self.version,
-                         written, "sent to the game" if sent else "visible at next game start")
-            if removed:
-                log.info("patch v%d: %d old translations removed from cache.db", self.version, removed)
-            log.debug("patch applied to cache.db in %.2f s (%s)", took,
-                      "all keys" if keys is None else f"{len(keys)} keys")
-            return written + removed
+        # sent without holding the lock: answers and updates go on meanwhile
+        sent = 0
+        if push:
+            try:
+                sent = self._push(push)
+            except Exception as exc:  # noqa: BLE001 - the addon asks again at the next start
+                log.warning("patch v%d: texts not sent to the game: %s", self.version, exc)
+            if sent:
+                log.info("patch v%d: %d translations sent to the game", self.version, sent)
+        if removed:
+            log.info("patch v%d: %d old translations removed from cache.db (visible at next game "
+                     "start)", self.version, removed)
+        log.debug("patch compared with cache.db in %.2f s (%s)", took,
+                  "all keys" if keys is None else f"{len(keys)} keys")
+        return sent + removed
 
     def withdraw(self, db: Path | None, reason: str) -> int:
         """The string IDs do not match: remove from cache.db every row that holds a patch text
@@ -571,7 +596,7 @@ class CachePatch:
                     "JOIN p.patch pt ON pt.key = t.id "
                     f"WHERE t.cache_key = ? AND pt.kind IN ({KIND_REVIEWED}, {KIND_AUTO}) "
                     f"AND t.text = {self._shown('pt')}", (self.cache_key,))
-                removed = self._write_rows(con, "r", upsert=False)
+                removed = self._delete_rows(con, "r")
                 con.execute("DELETE FROM p.applied")
             finally:
                 con.close()
@@ -591,8 +616,10 @@ class CachePatch:
     @staticmethod
     def _rows_of(strings: dict[int, str], auto: dict[int, str], drop: set[int],
                  hashes: dict[int, str], piece: int | None) -> list[tuple]:
-        rows = [(k, KIND_REVIEWED, v, hashes.get(k), piece) for k, v in strings.items()]
-        rows += [(k, KIND_AUTO, v, hashes.get(k), piece) for k, v in auto.items()]
+        """(key, kind, text, src_hash, piece) rows; src_hash as Text Translator keeps it (signed)."""
+        hs = {k: lt.hash_int(v) for k, v in hashes.items()}
+        rows = [(k, KIND_REVIEWED, v, hs.get(k), piece) for k, v in strings.items()]
+        rows += [(k, KIND_AUTO, v, hs.get(k), piece) for k, v in auto.items()]
         rows += [(k, KIND_DROP, None, None, piece) for k in drop]
         return rows
 
@@ -603,9 +630,8 @@ class CachePatch:
         fp = lt.Patch.parse_glossary(data)
         con.execute("DELETE FROM patch")
         con.execute("DELETE FROM pieces")
-        con.executemany("INSERT INTO patch (key, kind, text, h, piece) VALUES (?, ?, ?, ?, ?)",
+        con.executemany("INSERT INTO patch (key, kind, text, src_hash, piece) VALUES (?, ?, ?, ?, ?)",
                         self._rows_of(strings, auto, drop, {}, None))
-        con.execute("DELETE FROM stale")
         self._keep_user(con)
         self._set_meta(con, version=version, glossary=fp, width=None, commit=commit or None,
                        source=source)
@@ -615,8 +641,7 @@ class CachePatch:
         """Write the translations by hand over the patch rows, in the open transaction: a patch
         update must not undo them (they live in map_it.db, how = 'user input')."""
         rows = self.user() if self.user else {}
-        con.executemany(USER_UPSERT, [(k, t, lt.raw_hash(en) if en else None)
-                                      for k, (t, en) in rows.items()])
+        con.executemany(USER_UPSERT, [(k, t) for k, (t, _en) in rows.items()])
         return len(rows)
 
     def restore_user(self) -> int:
@@ -634,22 +659,20 @@ class CachePatch:
                 raise
         return n
 
-    def set_user(self, key: int, text: str, english: str) -> None:
-        """Store a translation written by hand as a reviewed row. With the English text unknown
-        ('') it has no fingerprint, so it is used whatever English text the game sends."""
+    def set_user(self, key: int, text: str) -> None:
+        """Store a translation written by hand as a reviewed row without src_hash: it is used
+        whatever English text the game sends."""
         with self.lock:
             con = self.writer
             con.execute("BEGIN IMMEDIATE")
             try:
-                con.execute(USER_UPSERT, (key, text, lt.raw_hash(english) if english else None))
-                con.execute("DELETE FROM stale WHERE key = ?", (key,))
+                con.execute(USER_UPSERT, (key, text))
                 con.execute("COMMIT")
             except BaseException:
                 con.execute("ROLLBACK")
                 raise
             with self._stale_lock:
-                self._stale_seen.pop(key, None)
-                self._stale_pending.pop(key, None)
+                self._stale_seen.discard(key)
 
     def entry(self, key: int) -> tuple[int, str | None] | None:
         """(kind, text) of a key in the patch, or None."""
@@ -770,7 +793,6 @@ class CachePatch:
         or None when the whole patch must be checked against cache.db again."""
         width = index["width"]
         with self.lock:
-            self._flush_stale()
             con = self.writer
             full = self.source != "pieces" or self.width != width
             numbers = sorted({index["pieces"][n][0] for n in files}
@@ -786,7 +808,8 @@ class CachePatch:
                     for part in _chunks(numbers):
                         marks = ",".join("?" * len(part))
                         for k, kind, text, h in con.execute(
-                                f"SELECT key, kind, text, h FROM patch WHERE piece IN ({marks})", part):
+                                f"SELECT key, kind, text, src_hash FROM patch WHERE piece IN ({marks})",
+                                part):
                             old[k] = (kind, text, h)
                         con.execute(f"DELETE FROM patch WHERE piece IN ({marks})", part)
                     con.executemany("DELETE FROM pieces WHERE name = ?",
@@ -798,15 +821,13 @@ class CachePatch:
                         raise ValueError(f"piece {name} does not match the index")
                     strings, auto, drop, hashes = lt.parse_piece(json.loads(body), number, width)
                     rows = self._rows_of(strings, auto, drop, hashes, number)
-                    con.executemany("INSERT INTO patch (key, kind, text, h, piece) "
+                    con.executemany("INSERT INTO patch (key, kind, text, src_hash, piece) "
                                     "VALUES (?, ?, ?, ?, ?)", rows)
                     con.execute("INSERT INTO pieces (name, sha256, entries, size) VALUES (?, ?, ?, ?)",
                                 (name, sha, len(rows), size))
                     if not full:
                         new.update((r[0], (r[1], r[2], r[3])) for r in rows)
                 self._keep_user(con)
-                con.execute("DELETE FROM stale WHERE NOT EXISTS (SELECT 1 FROM patch "
-                            "WHERE patch.key = stale.key AND patch.h = stale.h)")
                 self._set_meta(con, version=index["version"], glossary=index["glossary"],
                                width=width, commit=commit or None, source="pieces")
                 con.execute("COMMIT")
@@ -815,9 +836,6 @@ class CachePatch:
                 raise
             self._load_meta()
             self._shrink_wal()
-            with self._stale_lock:  # entries changed: a stale key may be valid again
-                self._stale_seen = {k: h for k, h in self._stale_seen.items()
-                                    if k not in old and k not in new}
         if full:
             return None
         return {k for k in old.keys() | new.keys() if old.get(k) != new.get(k)}
@@ -837,6 +855,7 @@ class PieceUpdater(threading.Thread):
         self.branch, self.repo, self.use_api = branch, repo, use_api
         self.raw_base = (raw_base or f"https://raw.githubusercontent.com/{repo}").rstrip("/")
         self.tmp = patch.path.with_name("patch_it.download")
+        self.checks = 0
 
     def run(self) -> None:
         time.sleep(3)  # let the game finish loading first
@@ -845,6 +864,7 @@ class PieceUpdater(threading.Thread):
                 self.check()
             except Exception as exc:  # noqa: BLE001 - never crash the thread
                 log.info("patch update skipped: %s", exc)
+            self.checks += 1
             time.sleep(lt.UPDATE_INTERVAL)
 
     def _newer_ok(self, version: int) -> bool:
@@ -857,7 +877,9 @@ class PieceUpdater(threading.Thread):
         p = self.patch
         commit = lt.latest_commit(self.repo, self.branch, "patch") if self.use_api else None
         if commit and commit == p.commit and p.source in ("pieces", "github-file"):
-            log.info("patch up to date (v%d)", p.version)
+            # in the log once per start; the checks every UPDATE_INTERVAL only with --debug
+            log.log(logging.DEBUG if self.checks else logging.INFO, "patch up to date (v%d)",
+                    p.version)
             return "same commit"
         base = f"{self.raw_base}/{commit or self.branch}/patch/"
         try:
@@ -893,12 +915,13 @@ class PieceUpdater(threading.Thread):
         finally:
             shutil.rmtree(self.tmp, ignore_errors=True)
         if not want and not removed and before[1] == p.version:
-            log.info("patch up to date (v%d)", p.version)
+            log.log(logging.DEBUG if self.checks else logging.INFO, "patch up to date (v%d)",
+                    p.version)
         else:
             c = p.counts()
             log.info("patch updated: v%d, %d pieces downloaded (%d KB), %d removed; %d reviewed, "
-                     "%d automatic, %d with English fingerprint", p.version, len(want),
-                     size // 1024, len(removed), c["reviewed"], c["auto"], c["h"])
+                     "%d automatic, %d with the hash of the English", p.version, len(want),
+                     size // 1024, len(removed), c["reviewed"], c["auto"], c["hash"])
         try:
             if changed is None or before[0] != p.glossary_fp:
                 p.apply(self.db)

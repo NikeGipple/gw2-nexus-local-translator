@@ -112,8 +112,8 @@ class Editor:
         if len(text.encode("utf-8")) > MAX_BYTES:
             raise ValueError("text too long")
         with self.lock:
-            english = self.keymap.save_user(key, text)
-            self.patch.set_user(key, text, english)
+            self.keymap.save_user(key, text)
+            self.patch.set_user(key, text)
             written = self.patch.apply(self.cache_db, {key})
         log.info("editor: key %d translated by hand%s", key,
                  "" if written else " (cache.db not changed: patch off, or same text)")
