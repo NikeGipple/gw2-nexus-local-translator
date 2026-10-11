@@ -39,6 +39,7 @@ import lt_server as lt
 log = logging.getLogger("lt")
 
 KIND_REVIEWED, KIND_AUTO, KIND_DROP = 0, 1, 2
+LIVE_MAX = 5000       # rows written to cache.db also sent to the game at once (more: next start)
 CHUNK = 2000          # cache.db rows written per transaction (short locks: the addon writes too)
 SQL_VARS = 500        # keys per "IN (...)" list
 STALE_LOG_LIMIT = 20  # keys with a changed English text logged one by one per session
@@ -172,6 +173,7 @@ class CachePatch:
         self.cache_key, self.result_version = cache_key, result_version
         self.glossary: lt.Glossary | None = None  # the player's glossary (set by the module)
         self.show_keys: str | None = None  # "show keys" mode ("text", "all") or None
+        self.live = None  # function(rows): sends to the game the rows written into cache.db
         self.lock = threading.RLock()             # one writer at a time: update, apply, withdraw
         self.rlock = threading.Lock()             # the reading connection (answers)
         self._stale_lock = threading.Lock()
@@ -420,6 +422,37 @@ class CachePatch:
             done += len(rows)
             last = rows[-1][0]
 
+    def _to_write_sql(self) -> str:
+        """SELECT of the patch rows (key, text as shown) that cache.db does not hold yet;
+        parameters: cache_key, skip active (0/1). The patch is attached as "p"."""
+        shown = self._shown("pt")
+        return (f"SELECT pt.key, {shown} FROM p.patch pt "
+                "LEFT JOIN main.translations t ON t.cache_key = ? AND t.id = pt.key "
+                f"WHERE pt.kind IN ({KIND_REVIEWED}, {KIND_AUTO}) AND t.text IS NOT {shown} "
+                f"AND NOT (pt.kind = {KIND_AUTO} AND ? AND pt.key IN (SELECT key FROM p.skip)) "
+                "AND NOT EXISTS (SELECT 1 FROM p.stale s WHERE s.key = pt.key AND s.h = pt.h)")
+
+    def apply_changes(self, db: Path | None) -> int:
+        """Apply only the patch rows that differ from cache.db: used when patch_it.db was changed
+        by another program (a translation edited by hand). Returns the rows written + removed."""
+        with self.lock:
+            if not has_table(db) or self.ids_failed():
+                return 0
+            with self.rlock:
+                has_auto = self.reader.execute(
+                    f"SELECT 1 FROM patch WHERE kind = {KIND_AUTO} LIMIT 1").fetchone() is not None
+            skip_on = 1 if has_auto and self._skip_active() else 0
+            con = self._open_cache(db)
+            try:
+                keys = {k for k, _ in con.execute(self._to_write_sql(), (self.cache_key, skip_on))}
+                # automatic texts written by us whose row was removed from the patch
+                keys |= {k for (k,) in con.execute(
+                    "SELECT a.key FROM p.applied a WHERE NOT EXISTS (SELECT 1 FROM p.patch pt "
+                    f"WHERE pt.key = a.key AND pt.kind IN ({KIND_REVIEWED}, {KIND_AUTO}))")}
+            finally:
+                con.close()
+            return self.apply(db, keys) if keys else 0
+
     def apply(self, db: Path | None, keys: set[int] | None = None) -> int:
         """Write the patch into cache.db (all of it, or only `keys` after an update of some
         pieces). Returns the rows written + removed."""
@@ -446,13 +479,8 @@ class CachePatch:
                 skip_on = 1 if has_auto and self._skip_active() else 0
                 con.execute("CREATE TEMP TABLE w (key INTEGER PRIMARY KEY, text TEXT)")
                 shown = self._shown("pt")
-                con.execute(
-                    f"INSERT INTO temp.w SELECT pt.key, {shown} FROM p.patch pt "
-                    "LEFT JOIN main.translations t ON t.cache_key = ? AND t.id = pt.key "
-                    f"WHERE pt.kind IN ({KIND_REVIEWED}, {KIND_AUTO}) AND t.text IS NOT {shown} "
-                    f"AND NOT (pt.kind = {KIND_AUTO} AND ? AND pt.key IN (SELECT key FROM p.skip)) "
-                    "AND NOT EXISTS (SELECT 1 FROM p.stale s WHERE s.key = pt.key AND s.h = pt.h)"
-                    + restrict.format("pt"), (ck, skip_on))
+                con.execute("INSERT INTO temp.w " + self._to_write_sql() + restrict.format("pt"),
+                            (ck, skip_on))
                 con.execute("CREATE TEMP TABLE r (key INTEGER PRIMARY KEY)")
                 if has_auto:  # automatic texts we wrote that are no longer published
                     con.execute(
@@ -470,6 +498,8 @@ class CachePatch:
                         "JOIN main.translations t ON t.cache_key = ? AND t.id = pt.key "
                         f"WHERE pt.kind = {KIND_DROP} AND pt.key NOT IN (SELECT key FROM p.dropped)"
                         + restrict.format("pt"), (ck,))
+                live = (con.execute(f"SELECT key, text FROM temp.w LIMIT {LIVE_MAX + 1}").fetchall()
+                        if self.live else [])
                 written = self._write_rows(con, "w", upsert=True)
                 removed = self._write_rows(con, "r", upsert=False)
                 # registries, in patch_it.db
@@ -503,9 +533,16 @@ class CachePatch:
             if keys is None:  # the registry of all the automatic texts was rewritten
                 self._shrink_wal()
             took = time.perf_counter() - t0
+            sent = False
+            if live and len(live) <= LIVE_MAX:
+                try:
+                    self.live(live)
+                    sent = True
+                except Exception as exc:  # noqa: BLE001 - cache.db is written anyway
+                    log.warning("patch: live update not sent: %s", exc)
             if written:
-                log.info("patch v%d: %d translations updated in cache.db (visible at next game "
-                         "start)", self.version, written)
+                log.info("patch v%d: %d translations updated in cache.db (%s)", self.version,
+                         written, "sent to the game" if sent else "visible at next game start")
             if removed:
                 log.info("patch v%d: %d old translations removed from cache.db", self.version, removed)
             log.debug("patch applied to cache.db in %.2f s (%s)", took,

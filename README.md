@@ -90,6 +90,8 @@ The curated Italian translations, identified by the game's internal string ID, a
 
 To report a wrong translation, open an issue with the Italian text you see in game and where you saw it.
 
+While the game runs, the module watches `IT\patch_it.db`: a translation changed there (for example with [DB Browser for SQLite](https://sqlitebrowser.org/), table `patch`, column `text`, then *Write Changes*) is written into `cache.db` and shown in game within a second or two, without restarting. The same happens for patch updates downloaded from GitHub (up to 5000 texts at a time; more are shown at the next game start). A local change lasts until the next patch update rewrites that piece.
+
 ## Your local files
 
 `cache.db`, `cache_it.jsonl` and `map_it.db` are built on your PC while you play and contain game text owned by ArenaNet. They are for your own use only: please do not share or publish them.

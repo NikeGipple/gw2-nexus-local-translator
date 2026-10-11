@@ -272,6 +272,7 @@ class Stats:
               or nothing to translate), model (had to wait for the translation), empty (no text)
     wait      seconds from arrival to answer of the "model" requests: average, 95th percentile, max
     queue     longest queue of lines waiting for the model
+    live      texts sent without a request because patch_it.db changed
     model     lines translated, how long the worker was busy (glossary protection + model)
     cpu       CPU used by the whole module (all threads), in % of one core: 100% = one core busy
     The line is written only if something happened (requests, translations or CPU >= 1%).
@@ -285,6 +286,7 @@ class Stats:
         self.base = self._totals()
         self.counts = {"patch": 0, "cache": 0, "model": 0, "empty": 0}
         self.stale = 0  # patch entries not used because their English text changed
+        self.live = 0
         self.waits: list[float] = []
         self.queue_max = 0
         self.sends = 0  # groups of answers sent to the addon (each one can cause an addon refresh)
@@ -306,7 +308,7 @@ class Stats:
         done, prep, model, gave_up = (a - b for a, b in zip(self._totals(), self.base))
         total = sum(self.counts.values())
         text = None
-        if total or done or cpu >= 1 or self.stale:
+        if total or done or cpu >= 1 or self.stale or self.live:
             parts = ", ".join(f"{k} {v * 100 / total:.0f}%" for k, v in self.counts.items()) if total else ""
             text = (f"stats {period}: cpu {cpu:.0f}% of one core ({os.cpu_count() or '?'} cores); "
                     f"{total} requests" + (f" ({parts})" if parts else ""))
@@ -327,12 +329,15 @@ class Stats:
                 text += f"; given up {gave_up} lines"
             if self.stale:
                 text += f"; patch outdated (English changed) {self.stale} texts"
+            if self.live:
+                text += f"; live updates {self.live} texts"
         self.since, self.cpu_since, self.base = now, cpu_now, self._totals()
         self.counts = dict.fromkeys(self.counts, 0)
         self.waits = []
         self.queue_max = 0
         self.sends = 0
         self.stale = 0
+        self.live = 0
         return text
 
 
@@ -483,6 +488,44 @@ class Dispatcher:
                                    if en.strip() and en != it])
             except Exception as exc:  # noqa: BLE001
                 log.debug("map save failed: %s", exc)
+
+
+    def push(self, rows: list[tuple[int, str]]) -> None:
+        """Send texts the addon did not ask for (rows already as shown in cache.db): it shows
+        them at once and saves them in cache.db."""
+        msgs = []
+        for key, text in rows:
+            try:
+                msgs.append(Channel.text(key, text))
+            except ValueError:
+                log.warning("patch text of key %d too long: not sent", key)
+        if msgs:
+            self.channel.send(msgs)
+            self.stats.live += len(msgs)
+
+
+def patch_watcher(patch: CachePatch, cache_db: Path) -> None:
+    """Keeps the game in step with patch_it.db edited by hand (DB Browser for SQLite) while the
+    game runs: every second, if another connection wrote patch_it.db, the rows that differ from
+    cache.db are written there and sent to the game (patch.live), visible at once."""
+    con = sqlite3.connect(f"file:{patch.path}?mode=ro", uri=True, timeout=10,
+                          check_same_thread=False)
+    seen = None
+    while True:
+        time.sleep(1)
+        try:
+            version = con.execute("PRAGMA data_version").fetchone()[0]
+            if version == seen:
+                continue
+            if seen is not None and has_table(cache_db):
+                n = patch.apply_changes(cache_db)
+                if n:
+                    log.info("patch_it.db changed: %d texts updated", n)
+                version = con.execute("PRAGMA data_version").fetchone()[0]  # our own writes
+            seen = version
+        except Exception as exc:  # noqa: BLE001 - never stop the updates
+            log.warning("patch_it.db check failed: %s", exc)
+            time.sleep(5)
 
 
 def cache_db_watcher(patch: CachePatch, cache_db: Path) -> None:
@@ -658,6 +701,7 @@ def main() -> int:
     dispatcher = Dispatcher(engine, patch, keymap, channel, max(10, args.stats_every),
                             args.cache_db)
     holder["d"] = dispatcher
+    patch.live = dispatcher.push  # patch rows written into cache.db are shown at once
     ready.set()
     for key, text in early:
         dispatcher.submit(key, text)
@@ -683,6 +727,8 @@ def main() -> int:
 
     threading.Thread(target=cache_db_watcher, args=(patch, args.cache_db), daemon=True,
                      name="cache-db").start()
+    threading.Thread(target=patch_watcher, args=(patch, args.cache_db), daemon=True,
+                     name="patch-watcher").start()
     if not args.no_update:
         def glossary_changed() -> None:
             engine.sync_glossary()
