@@ -42,7 +42,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))  # lt_server.py sits ne
 import lt_server as lt  # noqa: E402
 from patch_db import (CachePatch, PieceUpdater, SHOW_MODES, has_table, key_tag,  # noqa: E402
                       sync_key_tags)
-import editor  # noqa: E402
 
 VERSION = "0.8.0"        # version of the release: raise it at every new zip (shown in the log)
 PROTOCOL = 2              # Text Translator v0.2.0 (texts carry the hash of the English)
@@ -286,7 +285,7 @@ class Stats:
               or nothing to translate), model (had to wait for the translation), empty (no text)
     wait      seconds from arrival to answer of the "model" requests: average, 95th percentile, max
     queue     longest queue of lines waiting for the model
-    live      patch texts sent without a request (new patch, patch_it.db edited, glossary or start)
+    live      patch texts sent without a request (new patch, glossary or start)
     model     lines translated, how long the worker was busy (glossary protection + model)
     cpu       CPU used by the whole module (all threads), in % of one core: 100% = one core busy
     The line is written only if something happened (requests, translations or CPU >= 1%).
@@ -526,30 +525,6 @@ class Dispatcher:
                 log.debug("map save failed: %s", exc)
 
 
-def patch_watcher(patch: CachePatch, cache_db: Path) -> None:
-    """Keeps the game in step with patch_it.db edited by hand (DB Browser for SQLite) while the
-    game runs: every second, if another connection wrote patch_it.db, the rows that differ from
-    cache.db are sent to the game (patch.sender), visible at once."""
-    con = sqlite3.connect(f"file:{patch.path}?mode=ro", uri=True, timeout=10,
-                          check_same_thread=False)
-    seen = None
-    while True:
-        time.sleep(1)
-        try:
-            version = con.execute("PRAGMA data_version").fetchone()[0]
-            if version == seen:
-                continue
-            if seen is not None and has_table(cache_db, need_hash=True):
-                n = patch.apply_changes(cache_db)
-                if n:
-                    log.info("patch_it.db changed: %d texts updated", n)
-                version = con.execute("PRAGMA data_version").fetchone()[0]  # our own writes
-            seen = version
-        except Exception as exc:  # noqa: BLE001 - never stop the updates
-            log.warning("patch_it.db check failed: %s", exc)
-            time.sleep(5)
-
-
 def cache_db_watcher(patch: CachePatch, cache_db: Path) -> None:
     """Apply the patch to cache.db as soon as the addon has created it, or has moved an older one
     to its current layout (once per start), after adding or removing the key prefixes of the
@@ -581,8 +556,6 @@ def main() -> int:
     ap.add_argument("--branch", default=lt.DEFAULT_BRANCH,
                     help="GitHub branch for glossary and patch (developers' tests; default main)")
     ap.add_argument("--debug", action="store_true")
-    ap.add_argument("--editor-port", type=int, default=editor.EDITOR_PORT, metavar="PORT",
-                    help="port of the correction page on 127.0.0.1 (0 = off)")
     ap.add_argument("--threads", type=int, default=None,
                     help="CPU threads for the model (default: a quarter of the CPUs, at most 2)")
     ap.add_argument("--stats-every", type=int, default=STATS_EVERY, metavar="SECONDS",
@@ -725,16 +698,6 @@ def main() -> int:
                             args.cache_db)
     holder["d"] = dispatcher
     patch.sender = dispatcher.push  # patch texts the game must change are sent at once
-    if keymap:
-        patch.user = keymap.user_rows  # translations by hand survive every patch update
-        try:
-            n = patch.restore_user()
-            if n:
-                log.info("map: %d translations by hand", n)
-        except Exception as exc:  # noqa: BLE001
-            log.warning("translations by hand not restored: %s", exc)
-        if args.editor_port:
-            editor.start(editor.Editor(patch, keymap, args.cache_db, CACHE_KEY), args.editor_port)
     ready.set()
     for req in early:
         dispatcher.submit(*req)
@@ -760,8 +723,6 @@ def main() -> int:
 
     threading.Thread(target=cache_db_watcher, args=(patch, args.cache_db), daemon=True,
                      name="cache-db").start()
-    threading.Thread(target=patch_watcher, args=(patch, args.cache_db), daemon=True,
-                     name="patch-watcher").start()
     if not args.no_update:
         def glossary_changed() -> None:
             engine.sync_glossary()

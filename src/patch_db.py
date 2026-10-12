@@ -66,13 +66,6 @@ SQL_VARS = 500        # keys per "IN (...)" list
 STALE_LOG_LIMIT = 20  # keys with a changed English text logged one by one per session
 WAL_LIMIT = 1_000_000  # bytes patch_it.db-wal may keep after a checkpoint
 
-# a translation written by hand: a reviewed row without src_hash (the module cannot hash the
-# English), so it is used whatever English text the game sends and is sent with the addon's hash
-USER_UPSERT = (f"INSERT INTO patch (key, kind, text, src_hash, piece) "
-               f"VALUES (?, {KIND_REVIEWED}, ?, NULL, NULL) "
-               f"ON CONFLICT(key) DO UPDATE SET kind = {KIND_REVIEWED}, text = excluded.text, "
-               "src_hash = NULL")
-
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS patch (
     key   INTEGER PRIMARY KEY NOT NULL,
@@ -197,7 +190,6 @@ class CachePatch:
         self.cache_key, self.result_version = cache_key, result_version
         self.glossary: lt.Glossary | None = None  # the player's glossary (set by the module)
         self.show_keys: str | None = None  # "show keys" mode ("text", "all") or None
-        self.user = None  # function -> {key: (text, English or '')}: translations by hand (map)
         # function(rows) that sends (key, u64 hash, text as shown) to the addon (set by the module);
         # None: nothing is sent (tools, tests)
         self.sender = None
@@ -426,44 +418,6 @@ class CachePatch:
             done += len(rows)
             last = rows[-1][0]
 
-    def _to_send_sql(self) -> str:
-        """SELECT of the patch rows the addon holds with another text: (key, text as shown, hash
-        to send, kind); parameters: cache_key, skip active (0/1). The patch is attached as "p".
-        Never outdated entries (0), nor rows the addon holds for another English text (its hash is
-        not 0 and not ours: the patch entry was made from an older text). Hash sent: the patch's,
-        or the addon's for entries without one."""
-        shown = self._shown("pt")
-        return (f"SELECT pt.key, {shown}, coalesce(pt.src_hash, t.src_hash, 0), pt.kind "
-                "FROM p.patch pt "
-                "JOIN main.translations t ON t.cache_key = ? AND t.id = pt.key "
-                f"WHERE pt.kind IN ({KIND_REVIEWED}, {KIND_AUTO}) AND t.text IS NOT {shown} "
-                "AND pt.src_hash IS NOT 0 "
-                "AND NOT (pt.src_hash IS NOT NULL "
-                "AND coalesce(t.src_hash, 0) NOT IN (0, pt.src_hash)) "
-                f"AND NOT (pt.kind = {KIND_AUTO} AND ? AND pt.key IN (SELECT key FROM p.skip))")
-
-    def apply_changes(self, db: Path | None) -> int:
-        """Apply only the patch rows that differ from cache.db: used when patch_it.db was changed
-        by another program (a translation edited by hand). Returns the texts sent + removed."""
-        with self.lock:
-            if not has_table(db, need_hash=True) or self.ids_failed():
-                return 0
-            with self.rlock:
-                has_auto = self.reader.execute(
-                    f"SELECT 1 FROM patch WHERE kind = {KIND_AUTO} LIMIT 1").fetchone() is not None
-            skip_on = 1 if has_auto and self._skip_active() else 0
-            con = self._open_cache(db)
-            try:
-                keys = {r[0] for r in con.execute(self._to_send_sql(), (self.cache_key, skip_on))
-                        if self._sent.get(r[0]) != r[1]}
-                # automatic texts in cache.db whose row was removed from the patch
-                keys |= {k for (k,) in con.execute(
-                    "SELECT a.key FROM p.applied a WHERE NOT EXISTS (SELECT 1 FROM p.patch pt "
-                    f"WHERE pt.key = a.key AND pt.kind IN ({KIND_REVIEWED}, {KIND_AUTO}))")}
-            finally:
-                con.close()
-            return self.apply(db, keys) if keys else 0
-
     def _push(self, rows: list[tuple[int, int, str]]) -> int:
         """Send (key, signed src_hash, text) to the addon in blocks; returns the texts sent."""
         sent = 0
@@ -504,8 +458,20 @@ class CachePatch:
                 con.execute("CREATE TEMP TABLE w (key INTEGER PRIMARY KEY, text TEXT, h INTEGER, "
                             "kind INTEGER)")
                 shown = self._shown("pt")
-                con.execute("INSERT INTO temp.w " + self._to_send_sql() + restrict.format("pt"),
-                            (ck, skip_on))
+                # rows the addon holds with another text; never outdated entries (0), nor rows
+                # the addon holds for another English text (its hash is not 0 and not ours: the
+                # patch entry was made from an older text). Hash sent: the patch's, or the addon's
+                # for entries without one.
+                con.execute(
+                    f"INSERT INTO temp.w SELECT pt.key, {shown}, coalesce(pt.src_hash, t.src_hash, 0), "
+                    "pt.kind FROM p.patch pt "
+                    "JOIN main.translations t ON t.cache_key = ? AND t.id = pt.key "
+                    f"WHERE pt.kind IN ({KIND_REVIEWED}, {KIND_AUTO}) AND t.text IS NOT {shown} "
+                    "AND pt.src_hash IS NOT 0 "
+                    "AND NOT (pt.src_hash IS NOT NULL "
+                    "AND coalesce(t.src_hash, 0) NOT IN (0, pt.src_hash)) "
+                    f"AND NOT (pt.kind = {KIND_AUTO} AND ? AND pt.key IN (SELECT key FROM p.skip))"
+                    + restrict.format("pt"), (ck, skip_on))
                 con.execute("CREATE TEMP TABLE r (key INTEGER PRIMARY KEY)")
                 if has_auto:  # automatic texts in cache.db that are no longer published
                     con.execute(
@@ -632,82 +598,8 @@ class CachePatch:
         con.execute("DELETE FROM pieces")
         con.executemany("INSERT INTO patch (key, kind, text, src_hash, piece) VALUES (?, ?, ?, ?, ?)",
                         self._rows_of(strings, auto, drop, {}, None))
-        self._keep_user(con)
         self._set_meta(con, version=version, glossary=fp, width=None, commit=commit or None,
                        source=source)
-
-    # -- translations by hand ---------------------------------------------------------------
-    def _keep_user(self, con: sqlite3.Connection) -> int:
-        """Write the translations by hand over the patch rows, in the open transaction: a patch
-        update must not undo them (they live in map_it.db, how = 'user input')."""
-        rows = self.user() if self.user else {}
-        con.executemany(USER_UPSERT, [(k, t) for k, (t, _en) in rows.items()])
-        return len(rows)
-
-    def restore_user(self) -> int:
-        """At start: the translations by hand back into patch_it.db (in case it was replaced)."""
-        if not self.user:
-            return 0
-        with self.lock:
-            con = self.writer
-            con.execute("BEGIN IMMEDIATE")
-            try:
-                n = self._keep_user(con)
-                con.execute("COMMIT")
-            except BaseException:
-                con.execute("ROLLBACK")
-                raise
-        return n
-
-    def set_user(self, key: int, text: str) -> None:
-        """Store a translation written by hand as a reviewed row without src_hash: it is used
-        whatever English text the game sends."""
-        with self.lock:
-            con = self.writer
-            con.execute("BEGIN IMMEDIATE")
-            try:
-                con.execute(USER_UPSERT, (key, text))
-                con.execute("COMMIT")
-            except BaseException:
-                con.execute("ROLLBACK")
-                raise
-            with self._stale_lock:
-                self._stale_seen.discard(key)
-
-    def full_entry(self, key: int) -> tuple[int, str | None, int | None, int | None] | None:
-        """(kind, text, src_hash, piece) of a key in the patch, or None."""
-        with self.rlock:
-            return self.reader.execute("SELECT kind, text, src_hash, piece FROM patch WHERE key = ?",
-                                       (key,)).fetchone()
-
-    def restore_entry(self, key: int, row: tuple[int, str | None, int | None, int | None] | None
-                      ) -> None:
-        """Put back a patch row taken with full_entry() (None: the key had no row)."""
-        with self.lock:
-            con = self.writer
-            con.execute("BEGIN IMMEDIATE")
-            try:
-                if row is None:
-                    con.execute("DELETE FROM patch WHERE key = ?", (key,))
-                else:
-                    con.execute("INSERT OR REPLACE INTO patch (key, kind, text, src_hash, piece) "
-                                "VALUES (?, ?, ?, ?, ?)", (key, *row))
-                con.execute("COMMIT")
-            except BaseException:
-                con.execute("ROLLBACK")
-                raise
-            with self._stale_lock:
-                self._stale_seen.discard(key)
-
-    def send_text(self, key: int, src_hash: int, text: str) -> int:
-        """Send one text to the game as it is (not from the patch); returns the texts sent."""
-        return self._push([(key, src_hash, text)]) if self.sender else 0
-
-    def entry(self, key: int) -> tuple[int, str | None] | None:
-        """(kind, text) of a key in the patch, or None."""
-        with self.rlock:
-            return self.reader.execute("SELECT kind, text FROM patch WHERE key = ?",
-                                       (key,)).fetchone()
 
     def import_data(self, data: dict, source: str, commit: str = "") -> None:
         """Replace the whole patch with a single-file patch (validated first)."""
@@ -856,7 +748,6 @@ class CachePatch:
                                 (name, sha, len(rows), size))
                     if not full:
                         new.update((r[0], (r[1], r[2], r[3])) for r in rows)
-                self._keep_user(con)
                 self._set_meta(con, version=index["version"], glossary=index["glossary"],
                                width=width, commit=commit or None, source="pieces")
                 con.execute("COMMIT")

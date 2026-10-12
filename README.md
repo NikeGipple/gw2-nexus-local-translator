@@ -94,17 +94,6 @@ The curated Italian translations, identified by the game's internal string ID, a
 
 To report a wrong translation, open an issue with the Italian text you see in game and where you saw it.
 
-While the game runs, the module watches `IT\patch_it.db`: a translation changed there (for example with [DB Browser for SQLite](https://sqlitebrowser.org/), table `patch`, column `text`, then *Write Changes*) is written into `cache.db` and shown in game within a second or two, without restarting. The same happens for patch updates downloaded from GitHub (up to 5000 texts at a time; more are shown at the next game start). A local change lasts until the next patch update rewrites that piece.
-
-### Correction page
-
-While the game runs, open <http://127.0.0.1:8770> in a browser: search a text as you see it in game (or in English, or its string ID), change it and press *Salva*. The game shows it within a second or two. Every correction is written:
-
-- into `IT\patch_it.db` as a reviewed entry, which updates the game;
-- into `IT\map_it.db` with `how` = `user input`, so the translations written by hand can be told apart when the map is sent to the author. A later answer of the module for the same English text never overwrites them, and they are written again over every patch update.
-
-When the module never received the English text of a string (texts that came from the patch), the map row has an empty `en`, filled in when the game sends that text. The page listens on this PC only; start the module with `--editor-port 0` to turn it off, or another number to change the port.
-
 ## Your local files
 
 `cache.db`, `cache_it.jsonl` and `map_it.db` are built on your PC while you play and contain game text owned by ArenaNet. They are for your own use only: please do not share or publish them.
@@ -137,7 +126,6 @@ Each language is a separate module (`local_translator_<language>`) with its own 
 The source code of the module is in [`src/`](src):
 
 - `lt_module.py`: the Text Translator module (module protocol, requests, glossary cleanup of the cache, local map);
-- `editor.py`: the correction page (http://127.0.0.1:8770), translations by hand into the patch and the map;
 - `patch_db.py`: the local patch archive (`patch_it.db`), its download piece by piece and its application to `cache.db`;
 - `lt_server.py`: glossary, patch format, local map and the OPUS-MT engine, used by the module as a library;
 - `plurale_it.py`: Italian plural rules, so item names get both forms (`Medaglia[pl:"Medaglie"]`, the game picks the right one);
