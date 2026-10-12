@@ -226,6 +226,140 @@ def recipe_split(line: str) -> tuple[str, str, str] | None:
     return pre + RECIPE_IT[m.group(1)], m.group(2), post
 
 
+# --- Lines translated in pieces --------------------------------------------------------------------
+# OPUS-MT loses text in long or composite lines: "Storyteller: Abaddon" became "Abaddon", the second
+# sentence of a dialogue disappeared, markup around a text left whole descriptions in English. So a
+# line is split on <br>, "Title: subtitle", the em dash and the end of a sentence; each piece goes
+# through the glossary and the model on its own, then the pieces are joined again. Tested on 300
+# lines of the cache (_supporto/tools/prova_it.py): lines left in English 75 -> 41, lost text 7 -> 0.
+# Lines already in the cache are not translated again (PROTECT_VERSION is not raised on purpose).
+PIECE_SEP_RE = re.compile(r"(<br\s*/?>|:\s+|\s*—\s*|(?<=[.!?…])\s+(?=[^\sa-z]))")
+_EDGE = r"(?:%[A-Za-z]+\d*%|</?[A-Za-z][^<>\n]*>)"
+PIECE_LEAD_RE = re.compile(rf"\s*(?:{_EDGE})*")
+PIECE_TAIL_RE = re.compile(rf"(?:{_EDGE})*\s*$")
+# Never split: "Guild Wars 2: <expansion>", abbreviations ("World vs. World") and glossary terms
+# that contain a separator ("Convergence: Mount Balrior", "Dragon Slash—Boost").
+NO_SPLIT_RE = re.compile(r"\bGuild Wars(?: 2)?: "
+                         r"|\b(?:vs|Mr|Mrs|Ms|Dr|St|Mt|Lt|Sgt|Capt|Gen|Jr|Sr|No|Vol)\.\s")
+PIECE_SEPS = ("—", ": ", ". ", "! ", "? ", "<br")
+END_PUNCT = tuple(".!?…")
+MASK_RE = re.compile(r"\x00(\d+)\x00")
+
+
+def _piece_edges(piece: str) -> tuple[str, str, str]:
+    """(markup before, text, markup after): markup glued to the start or the end of a piece stays
+    out of the model ("<c=@flavor>Text.</c>", "%str1%%str2%Name%str3%%str4%"), unless a space
+    separates it, as in "%str1% evades your %str3%." (there it is part of the sentence)."""
+    pre = PIECE_LEAD_RE.match(piece).group(0)
+    if pre and piece[len(pre):len(pre) + 1].isspace():
+        pre = re.match(r"\s*", piece).group(0)
+    core = piece[len(pre):]
+    post = PIECE_TAIL_RE.search(core).group(0)
+    if post and core[:len(core) - len(post)][-1:].isspace() and post.strip():
+        post = re.search(r"\s*$", core).group(0)
+    return pre, core[:len(core) - len(post)] if post else core, post
+
+
+def split_pieces(line: str, glossary: "Glossary") -> list[tuple[str, str]] | None:
+    """[("sep", text) | ("txt", text)] joined back give the line; None if splitting changes nothing
+    (one piece, no markup around it): then the line is translated whole as before."""
+    masks: list[str] = []
+
+    def mask(m: re.Match) -> str:
+        masks.append(m.group(0))
+        return f"\x00{len(masks) - 1}\x00"
+
+    for src, _ in glossary.terms:  # longest first
+        if src in line and any(sep in src for sep in PIECE_SEPS):
+            line = glossary.term_regex(src).sub(mask, line)
+    line = NO_SPLIT_RE.sub(mask, line)
+
+    def unmask(text: str) -> str:
+        while "\x00" in text:
+            text = MASK_RE.sub(lambda m: masks[int(m.group(1))], text)
+        return text
+
+    out: list[tuple[str, str]] = []
+    for i, part in enumerate(PIECE_SEP_RE.split(line)):
+        if i % 2:
+            out.append(("sep", part))
+        elif part:
+            pre, core, post = _piece_edges(part)
+            if pre:
+                out.append(("sep", pre))
+            if core:
+                # a masked glossary term has no letters left, but it is text
+                text = re.search(r"[A-Za-z]", core) or ("\x00" in core and re.search(r"[A-Za-z]", unmask(core)))
+                out.append(("txt" if text else "sep", unmask(core)))
+            if post:
+                out.append(("sep", post))
+    if sum(k == "txt" for k, _ in out) <= 1 and not any(k == "sep" and t.strip() for k, t in out):
+        return None
+    return [(k, unmask(t)) for k, t in out]
+
+
+_NUM_WORDS = {w: i for i, w in enumerate(
+    "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen "
+    "sixteen seventeen eighteen nineteen".split())}
+_NUM_WORDS.update({w: 10 * (i + 2) for i, w in enumerate(
+    "twenty thirty forty fifty sixty seventy eighty ninety".split())})
+
+
+def _english_numbers(text: str) -> set[int]:
+    """Numbers of an English text, written in digits or in words ("Twenty-Five" -> 25, 20, 5)."""
+    nums = {int(n) for n in re.findall(r"\d+", text)}
+    for m in re.finditer(r"\b([a-z]+)(?:-([a-z]+))?\b", text.lower()):
+        a, b = _NUM_WORDS.get(m.group(1)), _NUM_WORDS.get(m.group(2) or "")
+        if a is not None:
+            nums.update({a, a + (b or 0)} | ({b} if b is not None else set()))
+    if re.search(r"\b(first|second|third|I{1,3})\b", text):
+        nums.update(range(1, 4))
+    return nums
+
+
+def invented_piece(src: str, out: str) -> bool:
+    """The model added text that is not in a short piece: "Tide Turner" -> "Tide TurnerCity in New
+    Jersey USA", "Season Twenty-Five" -> "Season 22 Episode 17". Then the piece stays in English."""
+    if len(out.split()) > 2 * len(src.split()) + 1:
+        return True
+    if out.startswith(src.rstrip()) and len(out) > len(src.rstrip()) + 3:
+        return True
+    return bool({int(n) for n in re.findall(r"\d+", out)} - _english_numbers(src))
+
+
+def same_case(src: str, out: str) -> str:
+    """First letter of `out` upper or lower case as in `src` (pieces after ": " and the em dash: the
+    model capitalizes them). Untouched when one of the two starts with a number ("2a Temporada")."""
+    a = next((c for c in src if c.isalnum()), "")
+    i = next((k for k, c in enumerate(out) if c.isalnum()), None)
+    if not a.isalpha() or i is None or not out[i].isalpha():
+        return out
+    return out[:i] + (out[i].upper() if a.isupper() else out[i].lower()) + out[i + 1:]
+
+
+def join_pieces(parts: list[tuple[str, str]], done: dict[str, str], fixed: set[str]) -> str:
+    """The translated line from its pieces (`done`: piece -> translation, `fixed`: pieces given by
+    the glossary, never checked)."""
+    out, prev = [], ""
+    for kind, t in parts:
+        if kind == "sep":
+            out.append(t)
+            prev = t
+            continue
+        r = done.get(t, t)
+        if t not in fixed and r != t and invented_piece(t, r):
+            r = t
+        if r != t:
+            # final full stop added by the model to a name or title that has none in English
+            if r.endswith(".") and not r.endswith("..") and not t.rstrip().endswith(END_PUNCT):
+                r = r[:-1]
+            if prev.strip() in (":", "—"):
+                r = same_case(t, r)
+        out.append(r)
+        prev = ""
+    return "".join(out)
+
+
 def _cased(word: str, like: str) -> str:
     """`word` with the capitalization of `like` (first letter)."""
     return word[:1].upper() + word[1:] if like[:1].isupper() else word[:1].lower() + word[1:]
@@ -1250,19 +1384,34 @@ class Engine:
         return protected, restore
 
     def _translate_lines(self, lines: list[str]) -> dict[str, str]:
-        """Translations of these lines; recipes ("Recipe[s]: X") are made from the item name."""
-        recipes = {line: r for line in lines if (r := recipe_split(line))}
-        if not recipes:
-            return self._translate_plain(lines)
+        """Translations of these lines; recipes ("Recipe[s]: X") are made from the item name, and
+        composite lines are translated in pieces (see split_pieces). Names with plural markers and
+        recipes are never split."""
         g = self.glossary
+        recipes = {line: r for line in lines if (r := recipe_split(line))}
+        pieces = {line: p for line in lines if line not in recipes and not plural_name(line)
+                  and (p := split_pieces(resolve_plural(line), g)) is not None}
+        if not recipes and not pieces:
+            return self._translate_plain(lines)
         names = [n for n in dict.fromkeys(r[1] for r in recipes.values())
                  if g.lookup(n) is None and n not in self.cache]
-        results = self._translate_plain([x for x in lines if x not in recipes] + names)
+        texts = list(dict.fromkeys(t for p in pieces.values() for k, t in p if k == "txt"))
+        done = {t: f for t in texts if (f := g.lookup(t)) is not None}
+        fixed = set(done)
+        done.update({t: self.cache[t] for t in texts if t not in done and t in self.cache})
+        whole = [x for x in lines if x not in recipes and x not in pieces]
+        results = self._translate_plain(list(dict.fromkeys(
+            whole + names + [t for t in texts if t not in done])))
         for line, (head, name, tail) in recipes.items():
-            fixed = g.lookup(name)
-            it = fixed if fixed is not None else results.get(name, self.cache.get(name, name))
+            fixed_name = g.lookup(name)
+            it = fixed_name if fixed_name is not None else results.get(name, self.cache.get(name, name))
             results[line] = head + drop_article(it, name) + tail
-        return results
+        done.update({t: results[t] for t in texts if t in results})
+        for line, parts in pieces.items():
+            results[line] = join_pieces(parts, done, fixed)
+        # the pieces are not lines of the game: not returned, so not saved in the cache
+        keep = set(lines) | set(names)
+        return {k: v for k, v in results.items() if k in keep}
 
     def _translate_plain(self, lines: list[str]) -> dict[str, str]:
         results: dict[str, str] = {}
