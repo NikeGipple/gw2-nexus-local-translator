@@ -2,17 +2,22 @@
 
 A translation module for [**Text Translator**](https://github.com/ideka/text-translator-public), the [Nexus](https://raidcore.gg/Nexus) addon by [Ideka](https://github.com/ideka) that translates Guild Wars 2 in real time as you play.
 
-This module brings the game into **Italian**; other languages are planned.
+This module brings the game into languages that Guild Wars 2 does not offer:
+
+| Language | Module | Download | Status |
+|---|---|---|---|
+| Italian | Italiano (Local Translator) | `Local_Translator_IT.zip` | early testing |
+| Brazilian Portuguese | Português do Brasil (Local Translator) | `Local_Translator_PT_BR.zip` | first test: it works, translations not reviewed yet |
 
 ## What makes this module different
 
 - **Local, on-the-fly translation.** Every text is translated on your own PC, as soon as the game shows it, with [OPUS-MT](https://github.com/Helsinki-NLP/Opus-MT) and [CTranslate2](https://github.com/OpenNMT/CTranslate2). It runs on the CPU: no GPU, no accounts, no API keys, and the game text never leaves your computer.
-- **Corrected by hand.** Machine translation alone gets game names and terms wrong. Two hand-maintained files, published in this repository, fix that and update themselves at every game start:
-  - the **glossary** keeps names and terms consistent in every sentence (for example *Lion's Arch* → *Arco del Leone*, while boons and proper names stay in English);
-  - the **patch** holds curated translations of texts, identified by the game's string ID: they replace the machine translation and need no translation time.
-- **Ready for other languages.** Nothing is specific to Italian except the model, the glossary and the patch: the same module can be built for any language with an OPUS-MT model from English.
+- **Corrected by hand.** Machine translation alone gets game names and terms wrong. Two files per language, published in this repository, fix that and update themselves at every game start:
+  - the **glossary** keeps names and terms consistent in every sentence (for example *Lion's Arch* → *Arco del Leone* in Italian, while boons and proper names stay in English);
+  - the **patch** holds curated translations, prepared in advance: they replace the machine translation and appear right away.
+- **One module, many languages.** The program is the same for every language: only the model, the glossary and the patch change. Any language with an OPUS-MT model from English can be added.
 
-> **Credits:** `text_translator.dll` is Ideka's *Text Translator*, included so that one zip contains everything. 
+> **Credits:** `text_translator.dll` is Ideka's *Text Translator*, included so that one zip contains everything.
 > This project only provides the module, built on Ideka's public module protocol.
 
 > **Status:** early testing. Expect rough edges and breaking changes.
@@ -23,21 +28,24 @@ This module brings the game into **Italian**; other languages are planned.
 - [Nexus](https://raidcore.gg/Nexus) addon loader
 - Text Translator **v0.2.0 or newer** (included in the zip). Module v0.7 and later do not work with Text Translator v0.1.x, and module v0.6 and older do not work with Text Translator v0.2.0
 - About **500 MB of free RAM** while playing, on top of what the game uses. The translator runs on the CPU (2 threads by default, at below-normal priority so the game always comes first) only while new texts are being translated.
-- About **250 MB of free disk space**
+- About **250 MB of free disk space** for each language
 
 ## Installation
 
-1. Go to the [Releases](../../releases) page and download `Local_Translator_IT.zip` from the newest release.
+1. Go to the [Releases](../../releases) page and download the zip of your language from its newest release:
+   - Italian: `Local_Translator_IT.zip`, from the release marked *Latest*;
+   - Brazilian Portuguese: `Local_Translator_PT_BR.zip`, from the newest release whose tag ends in `-pt-br`.
 2. Extract it into your **Guild Wars 2** folder. The `addons` folder inside the zip merges with the one you already have; your other addons are not touched.
-3. Start the game. If needed, enable **Text Translator** from the Nexus addon list: the *Italiano (Local Translator)* module starts by itself.
+3. Start the game. If needed, enable **Text Translator** from the Nexus addon list: the module of your language starts by itself.
 
-On the very first start the model is downloaded and loaded, which takes a little while. Until then text stays in English. Later starts are immediate.
+On the very first start the model of your language is downloaded and loaded, which takes a little while. Until then text stays in English. Later starts are immediate.
 
-> **Installed v0.6 or older?** Text Translator v0.2.0 changed the module protocol: older modules stop working with it (Nexus updates Text Translator by itself). Download the newest release and extract it over the old one, as in the installation. After the update the texts translated on the fly before are checked once more, the first time you see them: nothing to do on your side.
+**Changing language.** You can install more than one language: each one is a separate module. Choose the one to use in Text Translator's options, *Modules* tab. The model of a language is downloaded only the first time that language starts.
 
-> **Installed v0.2.x or older?** Those versions can no longer download patch updates (the patch has grown past the size they can read) and keep using an old copy without any warning. Download the newest release and extract it over the old one, as in the installation. Updating is also recommended from v0.3 and v0.4, which download the whole patch at every update.
+### Updating from older versions
 
-The texts of the curated patch are written in advance into the addon's `cache.db`: from your next game start they appear translated right away, even the ones you have never seen before.
+- **v0.6 or older:** Text Translator v0.2.0 changed the module protocol and older modules stop working with it (Nexus updates Text Translator by itself). Download the newest release and extract it over the old one, as in the installation. After the update the texts translated on the fly before are checked once more, the first time you see them: nothing to do on your side.
+- **v0.2.x or older:** those versions can no longer download patch updates (the patch has grown past the size they can read) and keep using an old copy without any warning. Update as above. Updating is also recommended from v0.3 and v0.4, which download the whole patch at every update.
 
 ### Smooth play: *Pause Refreshes*
 
@@ -46,7 +54,9 @@ Every time new translations arrive, Text Translator refreshes all the text in th
 - with **Pause Refreshes on** (default): no stutters. Texts already translated are shown translated; a text seen for the first time stays in English until it appears again (for example, talking to the same NPC again), or until you press **Refresh Now**;
 - with **Pause Refreshes off**: new texts appear translated a moment after they show up, but the game stutters at each refresh. Raising *Refresh Debounce Time* makes refreshes less frequent.
 
-After installation your `addons` folder contains:
+### Installed files
+
+Each language has its own module folder, `local_translator_<language>`, where `<language>` is `it` or `pt_br`. For Italian:
 
 ```
 addons\
@@ -58,7 +68,7 @@ addons\
       Local_Translator_IT.exe         the module (Italian build)
       _internal\                      libraries used by the module
       cache.db                        translations saved by the addon
-      IT\                             Italian files (one folder per language)
+      IT\                             files of the language
         model\                        translation model (downloaded automatically)
         glossary_it.json              glossary (updated automatically)
         patch_it.db                   curated translations (updated automatically)
@@ -67,69 +77,61 @@ addons\
       local_translator_it.log         module log
 ```
 
+Brazilian Portuguese uses the same layout: `modules\local_translator_pt_br\`, `Local_Translator_PT_BR.exe`, `PT_BR\` and files ending in `_pt_br`.
+
 ## How it works
 
-1. Text Translator starts the module when the game loads and stops it when the game closes.
-2. It sends the module every game text with its internal string ID and a hash of the English text.
-3. The module answers from the curated patch if the text is there; otherwise it translates it locally with OPUS-MT, applying the glossary.
-4. Text Translator saves the translations in `cache.db`, with that hash, and shows them in game. When a game update changes an English text, the hash no longer matches and Text Translator asks the module again.
-5. At every start, and whenever a new patch is published, the module also writes the whole patch into `cache.db`, with the hash of the English text each translation was made from, so Text Translator already has those translations at the next start. If a game update changes one of those texts, the hash no longer matches and Text Translator asks the module, which translates the new text instead of using the old translation.
-
-Before using the patch, the module checks that the string IDs sent by Text Translator still match the texts it knows. If they do not (for example after a change in the addon), the patch translations are removed from `cache.db` and the patch stays off until the IDs match again.
+- Text Translator starts the module with the game and asks it to translate every text the game shows.
+- The module answers from the curated patch if the text is there; otherwise it translates it on your PC with OPUS-MT, applying the glossary. Long texts are translated piece by piece (sentences, lines, the parts around a colon), so no sentence gets lost.
+- Text Translator saves the translations and shows them in game. The patch is saved in advance too, so its texts appear translated even the first time you see them.
+- When a game update changes an English text, the old translation is no longer used and the new text is translated again.
 
 The only network connections made by the module are to this repository on GitHub: the glossary and patch checks (at start and every few hours) and the one-time model download. Text Translator itself also connects to its author's server.
 
 ## Translation patch
 
-The curated Italian translations, identified by the game's internal string ID, are in [`patch/it/`](patch/it), split in pieces by ID range so that an update only downloads the pieces that changed. `index.json` lists the pieces with their SHA-256, which the module checks before using them:
+The curated translations are in `patch/<language>/` ([`patch/it/`](patch/it) for Italian, `patch/pt_br/` for Brazilian Portuguese), split in pieces so that an update only downloads the pieces that changed. The patch contains no English game text.
 
-```json
-{ "strings": { "272657": "Raffina per ottenere Bloodstone Brick." },
-  "src_hash": { "272657": "0123456789abcdef" } }
-```
-
-`src_hash` is the hash of the English text the translation was made from, computed as Text Translator does (XXH3-64) and named like the column where Text Translator keeps it. If the game sends a different English text for that ID, for example after a game update, the module translates the new text instead of showing the old translation. `0000000000000000` marks a translation that is outdated and waiting to be redone. The patch contains no English game text.
-
-To report a wrong translation, open an issue with the Italian text you see in game and where you saw it.
-
-## Your local files
-
-`cache.db`, `cache_it.jsonl` and `map_it.db` are built on your PC while you play and contain game text owned by ArenaNet. They are for your own use only: please do not share or publish them.
+To report a wrong translation, open an issue with the text you see in game, the language and where you saw it.
 
 ## Glossary
 
-The glossary lives in [`glossary/glossary_it.json`](glossary/glossary_it.json). It has three sections:
+Each language has its glossary in `glossary/glossary_<language>.json` ([Italian](glossary/glossary_it.json), [Brazilian Portuguese](glossary/glossary_pt_br.json)). It has three sections:
 
 - `exact`: whole-text overrides, used when a text must be translated exactly in one way.
 - `terms`: names that must be translated (or kept) in a fixed way inside any sentence.
 - `patterns`: whole-text rules where `{X}` stands for one or more capitalized words, e.g. `"{X} Longbow": "Arco lungo {X}"`.
 
+The Brazilian Portuguese glossary keeps for now every name of the game in English.
+
 Suggestions and corrections are welcome through issues or pull requests.
 
-## Other languages
+## Your local files
 
-Each language is a separate module (`local_translator_<language>`) with its own OPUS-MT model, glossary (`glossary_<language>.json`) and patch (`patch/<language>/`). If you would like to maintain one, open an issue.
+`cache.db`, `cache_<language>.jsonl` and `map_<language>.db` are built on your PC while you play and contain game text owned by ArenaNet. They are for your own use only: please do not share or publish them.
 
 ## Troubleshooting
 
 - The game must be set to **English**: the module translates from English only.
-- Open the Nexus log: lines starting with `[Text Translator] [Italiano (Local Translator)]` come from the module. The same messages are in `local_translator_it.log`.
+- Open the Nexus log: lines starting with `[Text Translator] [Italiano (Local Translator)]` (or `[Português do Brasil (Local Translator)]`) come from the module. The same messages are in `local_translator_<language>.log`, in the module folder.
 - If texts stay in English right after the first launch, the model is probably still downloading.
 - If new texts stay in English, check *Pause Refreshes* in Text Translator's options (see [Smooth play](#smooth-play-pause-refreshes)): press **Refresh Now** or turn it off.
 - If the game stutters every few seconds, turn **Pause Refreshes** on.
-- Advanced: the `args` line of `module.toml` accepts `--threads N` (CPU threads used by the translator, default 2) and `--stats-every SECONDS` (writes a performance line in the log every SECONDS, default 300). Example: `args = ["--threads", "1"]`.
+- Advanced: the `args` line of `module.toml` accepts `--threads N` (CPU threads used by the translator, default 2) and `--stats-every SECONDS` (writes a performance line in the log every SECONDS, default 300). Keep the arguments already there: for example, in Brazilian Portuguese, `args = ["--lang", "pt_br", "--threads", "1"]`.
 
 ## Source code
 
 The source code of the module is in [`src/`](src):
 
 - `lt_module.py`: the Text Translator module (module protocol, requests, glossary cleanup of the cache, local map);
-- `patch_db.py`: the local patch archive (`patch_it.db`), its download piece by piece and its application to `cache.db`;
-- `lt_server.py`: glossary, patch format, local map and the OPUS-MT engine, used by the module as a library;
+- `patch_db.py`: the local patch archive (`patch_<language>.db`), its download piece by piece and its application to `cache.db`;
+- `lt_server.py`: languages, glossary, patch format, local map and the OPUS-MT engine, used by the module as a library;
 - `plurale_it.py`: Italian plural rules, so item names get both forms (`Medaglia[pl:"Medaglie"]`, the game picks the right one);
-- `text_translator/`: the `module.toml` and the initial `settings.toml` shipped in the zip.
+- `text_translator/`: the `module.toml` and the initial `settings.toml` shipped in the zip (Italian; Brazilian Portuguese in `text_translator/pt_br/`).
 
-To build the module yourself on Windows with Python 3.12:
+The language comes from `--lang` in `module.toml` or, without it, from the name of the module folder (`local_translator_<language>`).
+
+To build the module yourself on Windows with Python 3.12 (Italian):
 
 ```
 pip install -r src/requirements.txt pyinstaller
@@ -138,10 +140,12 @@ pyinstaller --noconsole --onedir --name Local_Translator_IT --paths src --collec
 
 Then copy the content of `dist\Local_Translator_IT\` and `src\text_translator\module.toml` into `addons\text_translator\modules\local_translator_it\`.
 
+For Brazilian Portuguese use `--name Local_Translator_PT_BR` without `--add-data`, then copy `dist\Local_Translator_PT_BR\` and `src\text_translator\pt_br\module.toml` into `addons\text_translator\modules\local_translator_pt_br\`.
+
 ## Credits
 
 - **Ideka**, author of [*Text Translator*](https://github.com/ideka/text-translator-public) and of its [module protocol](https://github.com/ideka/modulep).
-- **Helsinki-NLP**, for the [OPUS-MT](https://github.com/Helsinki-NLP/Opus-MT) models, released under CC BY 4.0.
+- **Helsinki-NLP**, for the [OPUS-MT](https://github.com/Helsinki-NLP/Opus-MT) and [Tatoeba-MT](https://github.com/Helsinki-NLP/Tatoeba-Challenge) models (Italian: `opus-mt-en-it`; Brazilian Portuguese: `eng-por`), released under CC BY 4.0.
 - **OpenNMT**, for [CTranslate2](https://github.com/OpenNMT/CTranslate2).
 - **Raidcore**, for Nexus.
 
