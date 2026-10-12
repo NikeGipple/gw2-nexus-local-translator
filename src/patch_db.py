@@ -34,6 +34,12 @@ asks the module for it again. So:
 The module writes into cache.db only to remove rows ('drop' keys, automatic texts that left the
 patch, a failed string IDs check): the game shows that change at the next start.
 
+Suggestions of a contributor (map_<lang>.db, see lt_server.SUGGESTIONS_SCHEMA) take the place of
+the patch while valid: apply sends them instead of the patch text and never removes their rows,
+lookup answers with them (the module checks valid_suggestion before lookup). Every entry carries
+the patch version of its last change (column version, from the pieces), to tell whether the patch
+changed after a suggestion.
+
 Rules (unchanged from v0.4): reviewed > automatic (valid when made with the player's glossary)
 > local translation; automatic rows purged by a glossary change are skipped until a patch made
 with the new glossary arrives; 'drop' keys are removed once from cache.db; texts that left the
@@ -72,7 +78,9 @@ CREATE TABLE IF NOT EXISTS patch (
     kind  INTEGER NOT NULL,      -- 0 reviewed (strings), 1 automatic (auto), 2 drop
     text  TEXT,                  -- NULL for drop
     src_hash INTEGER,            -- hash of the English text (lt_server.hash_int), 0 = outdated, or NULL
-    piece INTEGER                -- piece number (key // width), NULL when loaded from a single file
+    piece INTEGER,               -- piece number (key // width), NULL when loaded from a single file
+    version INTEGER              -- patch version of the last change of the entry (piece "version"),
+                                 -- NULL = unknown: counts as the current patch version
 );
 CREATE INDEX IF NOT EXISTS patch_piece ON patch(piece);
 CREATE TABLE IF NOT EXISTS pieces (name TEXT PRIMARY KEY NOT NULL, sha256 TEXT NOT NULL,
@@ -197,6 +205,10 @@ class CachePatch:
         # later, so an apply that runs before (start, glossary and patch checks close together)
         # would send them again
         self._sent: dict[int, str] = {}
+        # map_<lang>.db with the suggestions of a contributor (lt_server.SUGGESTIONS_SCHEMA), and
+        # function(key) -> its last suggestion; set by the module, None: no suggestions
+        self.map_path: Path | None = None
+        self.suggestion_of = None
         self.lock = threading.RLock()             # one writer at a time: update, apply, withdraw
         self.rlock = threading.Lock()             # the reading connection (answers)
         self._stale_lock = threading.Lock()
@@ -219,23 +231,37 @@ class CachePatch:
 
     def _upgrade(self) -> None:
         """Archive of v0.5-v0.6 (column h, SHA-256 fingerprints, table stale): src_hash instead of
-        h, and the pieces forgotten, so the next check downloads them all again."""
+        h, and the pieces forgotten, so the next check downloads them all again. Archive without
+        the column version (up to v0.8): added, empty (unknown) until the pieces are downloaded
+        again, so the next check downloads them all."""
         con = self.writer
         cols = {r[1] for r in con.execute("PRAGMA table_info(patch)")}
-        if "h" not in cols:
-            return
-        con.execute("BEGIN IMMEDIATE")
-        try:
-            con.execute("ALTER TABLE patch DROP COLUMN h")
-            con.execute("ALTER TABLE patch ADD COLUMN src_hash INTEGER")
-            con.execute("DROP TABLE IF EXISTS stale")
-            con.execute("DELETE FROM pieces")
-            con.execute("DELETE FROM meta WHERE k = 'commit'")  # else "same commit": no download
-            con.execute("COMMIT")
-        except BaseException:
-            con.execute("ROLLBACK")
-            raise
-        log.info("patch archive moved to src_hash (all pieces downloaded again)")
+        if not cols:
+            return  # new archive: SCHEMA creates it
+        if "h" in cols:
+            con.execute("BEGIN IMMEDIATE")
+            try:
+                con.execute("ALTER TABLE patch DROP COLUMN h")
+                con.execute("ALTER TABLE patch ADD COLUMN src_hash INTEGER")
+                con.execute("DROP TABLE IF EXISTS stale")
+                con.execute("DELETE FROM pieces")
+                con.execute("DELETE FROM meta WHERE k = 'commit'")  # else "same commit": no download
+                con.execute("COMMIT")
+            except BaseException:
+                con.execute("ROLLBACK")
+                raise
+            log.info("patch archive moved to src_hash (all pieces downloaded again)")
+        if "version" not in cols:
+            con.execute("BEGIN IMMEDIATE")
+            try:
+                con.execute("ALTER TABLE patch ADD COLUMN version INTEGER")
+                con.execute("DELETE FROM pieces")
+                con.execute("DELETE FROM meta WHERE k = 'commit'")
+                con.execute("COMMIT")
+            except BaseException:
+                con.execute("ROLLBACK")
+                raise
+            log.info("patch archive: version of every entry added (all pieces downloaded again)")
 
     def _shrink_wal(self) -> None:
         """Move what patch_it.db-wal holds into patch_it.db and empty it. SQLite writes every
@@ -343,6 +369,28 @@ class CachePatch:
             self.skip_version = self.version
 
     # -- answers ----------------------------------------------------------------------------
+    def entry_version(self, key: int) -> tuple[int, str | None, int] | None:
+        """(kind, text, version) of the patch entry of a key, version NULL read as the current
+        patch version; None if the key is not in the patch."""
+        with self.rlock:
+            row = self.reader.execute("SELECT kind, text, version FROM patch WHERE key = ?",
+                                      (key,)).fetchone()
+        return None if row is None else (row[0], row[1], self.version if row[2] is None else row[2])
+
+    def valid_suggestion(self, key: int, src_hash: int | None) -> lt.Suggestion | None:
+        """The suggestion in use for a key, if still valid (lt_server.SUGGESTIONS_SCHEMA): made
+        for this English text (src_hash: the signed hash the addon has, None if unknown) and not
+        older than the patch entry of its key."""
+        s = self.suggestion_of(key) if self.suggestion_of else None
+        if s is None:
+            return None
+        if s.src_hash is not None and src_hash not in (None, 0) and s.src_hash != src_hash:
+            return None  # ArenaNet changed the English text
+        entry = self.entry_version(key)
+        if entry is not None and s.version < entry[2]:
+            return None  # the patch entry changed after the suggestion
+        return s
+
     def lookup(self, key: int, src_hash: int) -> tuple[str | None, bool]:
         """(translation from the patch or None, True if the patch entry is outdated).
 
@@ -387,16 +435,34 @@ class CachePatch:
         self._ids_failed = value
 
     # -- cache.db ---------------------------------------------------------------------------
-    def _shown(self, row: str) -> str:
-        """SQL for the text of a patch (or applied) row as it is in cache.db."""
-        return f"lt_shown({row}.key, {row}.text)" if self.show_keys else f"{row}.text"
+    def _shown(self, row: str, column: str = "text") -> str:
+        """SQL for the text of a patch (or applied, or suggestions) row as it is in cache.db."""
+        return f"lt_shown({row}.key, {row}.{column})" if self.show_keys else f"{row}.{column}"
 
     def _open_cache(self, db: Path) -> sqlite3.Connection:
         con = sqlite3.connect(str(db), timeout=10, isolation_level=None)
         mode = self.show_keys
         con.create_function("lt_shown", 2, lambda k, t: shown_text(k, t, mode), deterministic=True)
         con.execute("ATTACH DATABASE ? AS p", (str(self.path),))
+        if self.map_path and self.map_path.is_file():
+            con.execute("ATTACH DATABASE ? AS m", (str(self.map_path),))  # only read
         return con
+
+    def _has_suggestions(self, con: sqlite3.Connection) -> bool:
+        return con.execute("SELECT 1 FROM pragma_database_list WHERE name = 'm'").fetchone() is not None \
+            and con.execute("SELECT 1 FROM m.sqlite_master WHERE name = 'suggestions'").fetchone() is not None
+
+    def _suggestions_sql(self) -> str:
+        """SELECT of the valid suggestions in use (lt_server.SUGGESTIONS_SCHEMA) of the keys the
+        addon holds: key, text as shown, hash to send, with cache.db as main and the map as m.
+        Parameters: cache_key, current patch version. Same rule as valid_suggestion."""
+        return (f"SELECT s.key, {self._shown('s', 'suggestion')}, coalesce(s.src_hash, t.src_hash, 0) "
+                "FROM m.suggestions s "
+                "JOIN main.translations t ON t.cache_key = ? AND t.id = s.key "
+                "LEFT JOIN p.patch pt ON pt.key = s.key "
+                "WHERE s.id = (SELECT max(id) FROM m.suggestions s2 WHERE s2.key = s.key) "
+                "AND (s.src_hash IS NULL OR coalesce(t.src_hash, 0) IN (0, s.src_hash)) "
+                "AND (pt.key IS NULL OR s.version >= coalesce(pt.version, ?))")
 
     def _delete_rows(self, con: sqlite3.Connection, table: str) -> int:
         """Delete the keys of a temp table from cache.db, CHUNK rows per transaction, so the addon
@@ -429,6 +495,11 @@ class CachePatch:
             self._sent.update((k, t) for k, _h, t in block)
         return sent
 
+    def send_text(self, key: int, src_hash: int, text: str) -> int:
+        """Send one text to the game as it is (not from the patch); returns the texts sent."""
+        return self._push([(key, src_hash, shown_text(key, text, self.show_keys))]) \
+            if self.sender else 0
+
     def apply(self, db: Path | None, keys: set[int] | None = None) -> int:
         """Bring the game in line with the patch (all of it, or only `keys` after an update of
         some pieces): the rows of cache.db with another text are sent to the addon, which shows
@@ -440,7 +511,7 @@ class CachePatch:
                 empty = self.reader.execute("SELECT 1 FROM patch LIMIT 1").fetchone() is None
                 has_auto = self.reader.execute(
                     f"SELECT 1 FROM patch WHERE kind = {KIND_AUTO} LIMIT 1").fetchone() is not None
-            if empty or not has_table(db, need_hash=True):
+            if (empty and not self.map_path) or not has_table(db, need_hash=True):
                 return 0
             if self.ids_failed():
                 log.warning("patch not applied: the string IDs did not match the map")
@@ -489,6 +560,17 @@ class CachePatch:
                         "JOIN main.translations t ON t.cache_key = ? AND t.id = pt.key "
                         f"WHERE pt.kind = {KIND_DROP} AND pt.key NOT IN (SELECT key FROM p.dropped)"
                         + restrict.format("pt"), (ck,))
+                if self._has_suggestions(con):
+                    # a valid suggestion takes the place of the patch: its text is the one the game
+                    # must show, and its row is never removed
+                    con.execute("CREATE TEMP TABLE s (key INTEGER PRIMARY KEY, text TEXT, h INTEGER)")
+                    con.execute("INSERT INTO temp.s " + self._suggestions_sql() + restrict.format("s"),
+                                (ck, self.version))
+                    con.execute("DELETE FROM temp.w WHERE key IN (SELECT key FROM temp.s)")
+                    con.execute("DELETE FROM temp.r WHERE key IN (SELECT key FROM temp.s)")
+                    con.execute("INSERT INTO temp.w SELECT s.key, s.text, s.h, NULL FROM temp.s s "
+                                "JOIN main.translations t ON t.cache_key = ? AND t.id = s.key "
+                                "WHERE t.text IS NOT s.text", (ck,))
                 if self.sender:
                     push = [r for r in con.execute("SELECT key, h, text FROM temp.w ORDER BY key")
                             if self._sent.get(r[0]) != r[2]]
@@ -579,14 +661,19 @@ class CachePatch:
         self.apply(db)
 
     # -- loading ----------------------------------------------------------------------------
+    INSERT = "INSERT INTO patch (key, kind, text, src_hash, piece, version) VALUES (?, ?, ?, ?, ?, ?)"
+
     @staticmethod
     def _rows_of(strings: dict[int, str], auto: dict[int, str], drop: set[int],
-                 hashes: dict[int, str], piece: int | None) -> list[tuple]:
-        """(key, kind, text, src_hash, piece) rows; src_hash as Text Translator keeps it (signed)."""
+                 hashes: dict[int, str], piece: int | None,
+                 versions: dict[int, int] | None = None) -> list[tuple]:
+        """(key, kind, text, src_hash, piece, version) rows; src_hash as Text Translator keeps it
+        (signed); version None when the piece has none."""
         hs = {k: lt.hash_int(v) for k, v in hashes.items()}
-        rows = [(k, KIND_REVIEWED, v, hs.get(k), piece) for k, v in strings.items()]
-        rows += [(k, KIND_AUTO, v, hs.get(k), piece) for k, v in auto.items()]
-        rows += [(k, KIND_DROP, None, None, piece) for k in drop]
+        vs = versions or {}
+        rows = [(k, KIND_REVIEWED, v, hs.get(k), piece, vs.get(k)) for k, v in strings.items()]
+        rows += [(k, KIND_AUTO, v, hs.get(k), piece, vs.get(k)) for k, v in auto.items()]
+        rows += [(k, KIND_DROP, None, None, piece, None) for k in drop]
         return rows
 
     def _replace_all(self, con: sqlite3.Connection, data: dict, source: str, commit: str) -> None:
@@ -596,8 +683,7 @@ class CachePatch:
         fp = lt.Patch.parse_glossary(data)
         con.execute("DELETE FROM patch")
         con.execute("DELETE FROM pieces")
-        con.executemany("INSERT INTO patch (key, kind, text, src_hash, piece) VALUES (?, ?, ?, ?, ?)",
-                        self._rows_of(strings, auto, drop, {}, None))
+        con.executemany(self.INSERT, self._rows_of(strings, auto, drop, {}, None))
         self._set_meta(con, version=version, glossary=fp, width=None, commit=commit or None,
                        source=source)
 
@@ -728,10 +814,10 @@ class CachePatch:
                 else:
                     for part in _chunks(numbers):
                         marks = ",".join("?" * len(part))
-                        for k, kind, text, h in con.execute(
-                                f"SELECT key, kind, text, src_hash FROM patch WHERE piece IN ({marks})",
-                                part):
-                            old[k] = (kind, text, h)
+                        for k, kind, text, h, v in con.execute(
+                                "SELECT key, kind, text, src_hash, version FROM patch "
+                                f"WHERE piece IN ({marks})", part):
+                            old[k] = (kind, text, h, v)
                         con.execute(f"DELETE FROM patch WHERE piece IN ({marks})", part)
                     con.executemany("DELETE FROM pieces WHERE name = ?",
                                     [(n,) for n in (*files, *removed)])
@@ -740,14 +826,15 @@ class CachePatch:
                     body = files[name].read_bytes()
                     if len(body) != size or hashlib.sha256(body).hexdigest() != sha:
                         raise ValueError(f"piece {name} does not match the index")
-                    strings, auto, drop, hashes = lt.parse_piece(json.loads(body), number, width)
-                    rows = self._rows_of(strings, auto, drop, hashes, number)
-                    con.executemany("INSERT INTO patch (key, kind, text, src_hash, piece) "
-                                    "VALUES (?, ?, ?, ?, ?)", rows)
+                    data = json.loads(body)
+                    strings, auto, drop, hashes = lt.parse_piece(data, number, width)
+                    rows = self._rows_of(strings, auto, drop, hashes, number,
+                                         lt.parse_piece_versions(data))
+                    con.executemany(self.INSERT, rows)
                     con.execute("INSERT INTO pieces (name, sha256, entries, size) VALUES (?, ?, ?, ?)",
                                 (name, sha, len(rows), size))
                     if not full:
-                        new.update((r[0], (r[1], r[2], r[3])) for r in rows)
+                        new.update((r[0], (r[1], r[2], r[3], r[5])) for r in rows)
                 self._set_meta(con, version=index["version"], glossary=index["glossary"],
                                width=width, commit=commit or None, source="pieces")
                 con.execute("COMMIT")

@@ -24,6 +24,7 @@ import urllib.request
 import zipfile
 import zlib
 from collections import deque
+from dataclasses import dataclass
 from pathlib import Path
 
 import plurale_it  # Italian plural markers for names (same folder)
@@ -693,9 +694,14 @@ class PatchUpdater(GlossaryUpdater):
 # patch/<lang>/pNNNN.json   the keys from NNNN*width to (NNNN+1)*width-1:
 #                           {"strings": {...}, "auto": {...}, "drop": [...],
 #                            "src_hash": {key: "0123456789abcdef"}}
+#                            "version": {key: n}}
 # A key always stays in the same piece, so a new version only changes the pieces of the keys that
-# changed. Version and glossary fingerprint are only in the index: otherwise every piece would
-# change at every version. Empty sections are left out.
+# changed. The patch version and glossary fingerprint are only in the index: otherwise every piece
+# would change at every version. Empty sections are left out.
+# "version" = the patch version in which the entry of that key last changed (text, kind or
+# src_hash), made by stamp_versions(): a suggestion of a contributor (KeyMap suggestions) counts
+# until the patch entry of its key changes after it. A key without it counts as changed in the
+# current version (pieces published before this field existed).
 # "src_hash" = english_hash() of the raw English text the translation was made from: the same hash
 # Text Translator (v0.2.0) sends with every text and keeps in cache.db (column src_hash, same name).
 # The module does not use a translation whose English text changed, and writes the patch into
@@ -737,7 +743,7 @@ def _ordered(section: dict[int, str]) -> dict[str, str]:
 
 
 def piece_bytes(strings: dict[int, str], auto: dict[int, str], drop: set[int],
-                hashes: dict[int, str]) -> bytes:
+                hashes: dict[int, str], versions: dict[int, int] | None = None) -> bytes:
     """Content of one piece: always the same bytes for the same entries (sorted, compact)."""
     data: dict = {}
     if strings:
@@ -748,18 +754,22 @@ def piece_bytes(strings: dict[int, str], auto: dict[int, str], drop: set[int],
         data["drop"] = sorted(drop)
     if hashes:
         data["src_hash"] = _ordered(hashes)
+    if versions:
+        data["version"] = _ordered(versions)
     return (json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n").encode("utf-8")
 
 
 def split_patch(strings: dict[int, str], auto: dict[int, str], drop: set[int],
-                hashes: dict[int, str], width: int) -> dict[str, bytes]:
-    """Piece file name -> content. `hashes` may hold keys that are not published (ignored)."""
+                hashes: dict[int, str], width: int,
+                versions: dict[int, int] | None = None) -> dict[str, bytes]:
+    """Piece file name -> content. `hashes` and `versions` (see stamp_versions) may hold keys that
+    are not published (ignored)."""
     if width <= 0:
         raise ValueError("width must be positive")
-    groups: dict[int, tuple[dict, dict, set, dict]] = {}
+    groups: dict[int, tuple[dict, dict, set, dict, dict]] = {}
 
-    def group(k: int) -> tuple[dict, dict, set, dict]:
-        return groups.setdefault(k // width, ({}, {}, set(), {}))
+    def group(k: int) -> tuple[dict, dict, set, dict, dict]:
+        return groups.setdefault(k // width, ({}, {}, set(), {}, {}))
 
     for k, v in strings.items():
         group(k)[0][k] = v
@@ -772,7 +782,40 @@ def split_patch(strings: dict[int, str], auto: dict[int, str], drop: set[int],
     for k, h in hashes.items():
         if (k in strings or k in auto) and h:
             group(k)[3][k] = h
+    for k, n in (versions or {}).items():
+        if k in strings or k in auto:
+            group(k)[4][k] = n
     return {piece_name(n): piece_bytes(*groups[n]) for n in sorted(groups)}
+
+
+def stamp_versions(old_dir: Path | None, strings: dict[int, str], auto: dict[int, str],
+                   hashes: dict[int, str], version: int) -> dict[int, int]:
+    """The "version" of every published key, for split_patch: the one of the pieces published
+    before (old_dir, e.g. patch/it) when its entry (kind, text, src_hash) did not change, else
+    `version`, the one being published. Keys of old pieces without "version" keep the version of
+    the old index. Used by the publishing tool."""
+    old: dict[int, tuple[int, str, str, int]] = {}  # key -> (kind, text, src_hash, version)
+    index = old_dir / "index.json" if old_dir else None
+    if index and index.is_file():
+        idx = json.loads(index.read_text(encoding="utf-8"))
+        for name in idx.get("pieces", {}):
+            path = old_dir / name
+            if not path.is_file():
+                continue
+            data = json.loads(path.read_text(encoding="utf-8"))
+            hs, vs = data.get("src_hash", {}), data.get("version", {})
+            for kind, section in ((0, data.get("strings", {})), (1, data.get("auto", {}))):
+                for k, text in section.items():
+                    old[int(k)] = (kind, text, hs.get(k, ""), int(vs.get(k, idx.get("version", 0))))
+    out = {}
+    for kind, section in ((0, strings), (1, auto)):
+        for k, text in section.items():
+            if kind == 1 and k in strings:
+                continue
+            prev = old.get(k)
+            same = prev is not None and prev[:3] == (kind, text, hashes.get(k, ""))
+            out[k] = prev[3] if same else version
+    return out
 
 
 def index_bytes(version: int, glossary: str, width: int, pieces: dict[str, bytes]) -> bytes:
@@ -841,6 +884,19 @@ def parse_piece(data: dict, number: int, width: int
     return strings, auto, drop, hashes
 
 
+def parse_piece_versions(data: dict) -> dict[int, int]:
+    """The "version" section of a piece (key -> patch version of its last change), {} if none."""
+    raw = data.get("version", {})
+    if not isinstance(raw, dict):
+        raise ValueError("patch piece: 'version' must be an object")
+    out = {}
+    for k, n in raw.items():
+        if not str(k).isdigit() or not isinstance(n, int) or isinstance(n, bool) or n < 0:
+            raise ValueError(f"patch piece: bad 'version' entry {k!r}")
+        out[int(k)] = n
+    return out
+
+
 # --------------------------------------------------------------------------- #
 # Local map: string ID <-> English <-> translation (private, never shared)
 # --------------------------------------------------------------------------- #
@@ -848,9 +904,51 @@ def norm(text: str) -> str:
     return html.unescape(text).strip()
 
 
+# Suggestions: translations written by a contributor on the correction page (editor.py), kept in
+# map_<lang>.db next to the texts, so the map sent to the author carries them. One row per save:
+# the last row of a key is the one in use, the older ones are its history (undo deletes the last).
+# A suggestion is used (shown in game, answered by the module) while it is valid:
+# - its version (the patch version when it was saved) is >= the version of the patch entry of its
+#   key (lt_server.stamp_versions): when the patch entry changes after it, the patch wins;
+# - its src_hash (hash of the English it was made for) is NULL or the one the addon has now: when
+#   ArenaNet changes the English text, the module translates the new text.
+# Rule implemented twice, in patch_db.CachePatch.valid_suggestion (answers) and in the SQL of
+# patch_db.CachePatch.apply (cache.db): keep them the same.
+SUGGESTIONS_SCHEMA = """
+CREATE TABLE IF NOT EXISTS suggestions (
+    id         INTEGER PRIMARY KEY,   -- order of the saves: the last of a key is the one in use
+    key        INTEGER NOT NULL,      -- string ID
+    source     TEXT NOT NULL,         -- English text ('' if the module never received it)
+    suggestion TEXT NOT NULL,         -- the translation proposed
+    author     TEXT NOT NULL,         -- name of the contributor (IT\\contributor.json)
+    version    INTEGER NOT NULL,      -- patch version when it was saved
+    src_hash   INTEGER                -- hash of the English as in cache.db, NULL if unknown
+);
+CREATE INDEX IF NOT EXISTS suggestions_key ON suggestions(key, id);
+"""
+
+
+@dataclass(frozen=True)
+class Suggestion:
+    id: int
+    key: int
+    source: str
+    suggestion: str
+    author: str
+    version: int
+    src_hash: int | None
+
+
+def like_pattern(words: str) -> str:
+    """A LIKE pattern matching `words` anywhere, with % _ and \\ taken literally."""
+    escaped = words.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    return f"%{escaped}%"
+
+
 class KeyMap:
     """Map string ID -> English -> translation (map_<lang>.db), filled by the module with every text it
-    answers. It stays on this PC: it contains English game text."""
+    answers. It stays on this PC: it contains English game text. It also holds the suggestions of
+    a contributor (table suggestions)."""
 
     def __init__(self, path: Path) -> None:
         self.path = path
@@ -866,6 +964,7 @@ class KeyMap:
             it TEXT,
             how TEXT,          -- 'live' (seen while playing), 'contrib...' (merged from a contributor)
             seen INTEGER)""")
+        self.con.executescript(SUGGESTIONS_SCHEMA)
         self.con.commit()
         # The addon ends the module without closing the connection, so close() does not run when
         # the game closes. Merge now what the previous session left in the -wal, so map_<lang>.db
@@ -899,6 +998,69 @@ class KeyMap:
     def count(self) -> int:
         with self.lock:
             return self.con.execute("SELECT count(*) FROM texts").fetchone()[0]
+
+    def get(self, key: int) -> tuple[str, str | None, str | None] | None:
+        """(en, it, how) of a key, or None."""
+        with self.lock:
+            return self.con.execute("SELECT en, it, how FROM texts WHERE key = ?", (key,)).fetchone()
+
+    def search_english(self, words: str, limit: int, exact: bool = False) -> list[int]:
+        """Keys whose English text contains `words` (case-insensitive for ASCII); with `exact`,
+        whose English text is `words` and nothing else."""
+        sql, arg = ("en = ?", words) if exact else ("en LIKE ? ESCAPE '\\'", like_pattern(words))
+        with self.lock:
+            return [k for (k,) in self.con.execute(
+                f"SELECT key FROM texts WHERE {sql} ORDER BY key LIMIT ?", (arg, limit))]
+
+    # -- suggestions (contributors, see SUGGESTIONS_SCHEMA) ----------------------------------
+    def add_suggestion(self, key: int, source: str, text: str, author: str, version: int,
+                       src_hash: int | None) -> None:
+        with self.lock:
+            if self.closed:
+                raise RuntimeError("map closed")
+            with self.con:
+                self.con.execute("INSERT INTO suggestions (key, source, suggestion, author, version, "
+                                 "src_hash) VALUES (?, ?, ?, ?, ?, ?)",
+                                 (key, source, text, author, version, src_hash))
+
+    def suggestions(self, key: int) -> list[Suggestion]:
+        """The suggestions of a key, the last one (the one in use) first."""
+        with self.lock:
+            if self.closed:
+                return []
+            return [Suggestion(*r) for r in self.con.execute(
+                "SELECT id, key, source, suggestion, author, version, src_hash FROM suggestions "
+                "WHERE key = ? ORDER BY id DESC", (key,))]
+
+    def suggestion(self, key: int) -> Suggestion | None:
+        """The last suggestion of a key (the one in use, if still valid), or None."""
+        with self.lock:
+            if self.closed:
+                return None
+            r = self.con.execute(
+                "SELECT id, key, source, suggestion, author, version, src_hash FROM suggestions "
+                "WHERE key = ? ORDER BY id DESC LIMIT 1", (key,)).fetchone()
+        return Suggestion(*r) if r else None
+
+    def recent_suggestions(self, limit: int = 50) -> list[Suggestion]:
+        """The last suggestions saved, newest first."""
+        with self.lock:
+            if self.closed:
+                return []
+            return [Suggestion(*r) for r in self.con.execute(
+                "SELECT id, key, source, suggestion, author, version, src_hash FROM suggestions "
+                "ORDER BY id DESC LIMIT ?", (limit,))]
+
+    def remove_last_suggestion(self, key: int) -> bool:
+        """Undo: delete the last suggestion of a key, so the one before (or the patch, or the
+        translation of the module) is used again. False if the key has none."""
+        with self.lock:
+            if self.closed:
+                raise RuntimeError("map closed")
+            with self.con:
+                cur = self.con.execute("DELETE FROM suggestions WHERE id = (SELECT max(id) FROM "
+                                       "suggestions WHERE key = ?)", (key,))
+            return cur.rowcount > 0
 
     def close(self) -> None:
         """Write the -wal file into map_<lang>.db and go back to a single file, then close.
