@@ -1,4 +1,4 @@
-"""Local Translator: the correction page of the contributors (http://translate-ui.localhost:8770).
+"""Local Translator: the correction page of the contributors (http://suggestions.localhost:8770).
 
 Only for contributors: the page is on when IT\\contributor.json exists, with the name the
 suggestions are signed with, and optionally the "show keys" mode (string IDs in the game, instead
@@ -14,7 +14,7 @@ counts until the patch entry of its key changes after it; "Annulla" deletes the 
 the key and the game goes back to the one before, the patch, or the translation of the module.
 
 The server listens on 127.0.0.1 only, accepts only requests addressed to that host, localhost or
-translate-ui.localhost (no DNS rebinding) and saves only same-origin JSON requests (no other site can post to it).
+suggestions.localhost (no DNS rebinding) and saves only same-origin JSON requests (no other site can post to it).
 """
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ log = logging.getLogger("lt")
 
 EDITOR_PORT = 8770
 # browsers send every *.localhost name to 127.0.0.1 by themselves (RFC 6761): no hosts file
-EDITOR_HOST = "translate-ui.localhost"
+EDITOR_HOST = "suggestions.localhost"
 CONTRIBUTOR_FILE = "contributor.json"  # in IT\: turns the page on, {"author": "<name>"}
 RESULTS = 50          # rows per search
 MAX_BYTES = 65535     # longest text the addon accepts (UTF-8 bytes)
