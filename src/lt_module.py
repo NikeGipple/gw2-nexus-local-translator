@@ -537,6 +537,7 @@ class Dispatcher:
                 # the patch or of the model, the one undoing the suggestion goes back to
                 self.keymap.save([(k, en, it, "live") for k, _h, en, it in out
                                    if en.strip() and en != it and k not in self.suggested])
+                self.keymap.learn_english([(k, en) for k, _h, en, _it in out if k in self.suggested])
             except Exception as exc:  # noqa: BLE001
                 log.debug("map save failed: %s", exc)
         self.suggested.difference_update(k for k, _h, _en, _it in out)

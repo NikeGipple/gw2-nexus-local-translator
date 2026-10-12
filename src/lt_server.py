@@ -918,7 +918,10 @@ SUGGESTIONS_SCHEMA = """
 CREATE TABLE IF NOT EXISTS suggestions (
     id         INTEGER PRIMARY KEY,   -- order of the saves: the last of a key is the one in use
     key        INTEGER NOT NULL,      -- string ID
-    source     TEXT NOT NULL,         -- English text ('' if the module never received it)
+    en_source  TEXT NOT NULL,         -- English text, '' while unknown: filled in when the game
+                                      -- sends the text (KeyMap.learn_english)
+    suggestion_source TEXT,           -- Italian text in the game when it was saved (patch, module
+                                      -- or an earlier suggestion), NULL if unknown
     suggestion TEXT NOT NULL,         -- the translation proposed
     author     TEXT NOT NULL,         -- name of the contributor (IT\\contributor.json)
     version    INTEGER NOT NULL,      -- patch version when it was saved
@@ -932,7 +935,8 @@ CREATE INDEX IF NOT EXISTS suggestions_key ON suggestions(key, id);
 class Suggestion:
     id: int
     key: int
-    source: str
+    en_source: str
+    suggestion_source: str | None
     suggestion: str
     author: str
     version: int
@@ -964,6 +968,7 @@ class KeyMap:
             it TEXT,
             how TEXT,          -- 'live' (seen while playing), 'contrib...' (merged from a contributor)
             seen INTEGER)""")
+        self._upgrade_suggestions()
         self.con.executescript(SUGGESTIONS_SCHEMA)
         self.con.commit()
         # The addon ends the module without closing the connection, so close() does not run when
@@ -976,6 +981,14 @@ class KeyMap:
         except sqlite3.Error as exc:
             log.debug("map: checkpoint at start failed: %s", exc)
         self.lock = threading.Lock()
+
+    def _upgrade_suggestions(self) -> None:
+        """Suggestions table of the first test builds: source -> en_source, + suggestion_source."""
+        cols = {r[1] for r in self.con.execute("PRAGMA table_info(suggestions)")}
+        if "source" in cols:
+            self.con.execute("ALTER TABLE suggestions RENAME COLUMN source TO en_source")
+        if cols and "suggestion_source" not in cols:
+            self.con.execute("ALTER TABLE suggestions ADD COLUMN suggestion_source TEXT")
 
     def save(self, rows: list[tuple[int, str, str, str]]) -> int:
         """rows: (key, en, it, how). A 'live' row always wins over an older kind."""
@@ -1013,15 +1026,35 @@ class KeyMap:
                 f"SELECT key FROM texts WHERE {sql} ORDER BY key LIMIT ?", (arg, limit))]
 
     # -- suggestions (contributors, see SUGGESTIONS_SCHEMA) ----------------------------------
-    def add_suggestion(self, key: int, source: str, text: str, author: str, version: int,
-                       src_hash: int | None) -> None:
+    _SUGG_COLS = "id, key, en_source, suggestion_source, suggestion, author, version, src_hash"
+
+    def add_suggestion(self, key: int, en_source: str, suggestion_source: str | None, text: str,
+                       author: str, version: int, src_hash: int | None) -> None:
         with self.lock:
             if self.closed:
                 raise RuntimeError("map closed")
             with self.con:
-                self.con.execute("INSERT INTO suggestions (key, source, suggestion, author, version, "
-                                 "src_hash) VALUES (?, ?, ?, ?, ?, ?)",
-                                 (key, source, text, author, version, src_hash))
+                self.con.execute("INSERT INTO suggestions (key, en_source, suggestion_source, "
+                                 "suggestion, author, version, src_hash) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                                 (key, en_source, suggestion_source, text, author, version, src_hash))
+
+    def learn_english(self, rows: list[tuple[int, str]]) -> None:
+        """(key, English) of texts answered with a suggestion: the English goes into the map (its
+        translation untouched) and into the suggestions of the key that do not have it yet."""
+        rows = [(k, en) for k, en in rows if en.strip()]
+        if not rows:
+            return
+        now = int(time.time())
+        with self.lock:
+            if self.closed:
+                return
+            with self.con:
+                self.con.executemany(
+                    "INSERT INTO texts (key, en, it, how, seen) VALUES (?, ?, NULL, 'live', ?) "
+                    "ON CONFLICT(key) DO UPDATE SET en = excluded.en, seen = excluded.seen",
+                    [(k, en, now) for k, en in rows])
+                self.con.executemany("UPDATE suggestions SET en_source = ? WHERE key = ? "
+                                     "AND en_source = ''", [(en, k) for k, en in rows])
 
     def suggestions(self, key: int) -> list[Suggestion]:
         """The suggestions of a key, the last one (the one in use) first."""
@@ -1029,8 +1062,7 @@ class KeyMap:
             if self.closed:
                 return []
             return [Suggestion(*r) for r in self.con.execute(
-                "SELECT id, key, source, suggestion, author, version, src_hash FROM suggestions "
-                "WHERE key = ? ORDER BY id DESC", (key,))]
+                f"SELECT {self._SUGG_COLS} FROM suggestions WHERE key = ? ORDER BY id DESC", (key,))]
 
     def suggestion(self, key: int) -> Suggestion | None:
         """The last suggestion of a key (the one in use, if still valid), or None."""
@@ -1038,8 +1070,8 @@ class KeyMap:
             if self.closed:
                 return None
             r = self.con.execute(
-                "SELECT id, key, source, suggestion, author, version, src_hash FROM suggestions "
-                "WHERE key = ? ORDER BY id DESC LIMIT 1", (key,)).fetchone()
+                f"SELECT {self._SUGG_COLS} FROM suggestions WHERE key = ? ORDER BY id DESC LIMIT 1",
+                (key,)).fetchone()
         return Suggestion(*r) if r else None
 
     def recent_suggestions(self, limit: int = 50) -> list[Suggestion]:
@@ -1048,8 +1080,7 @@ class KeyMap:
             if self.closed:
                 return []
             return [Suggestion(*r) for r in self.con.execute(
-                "SELECT id, key, source, suggestion, author, version, src_hash FROM suggestions "
-                "ORDER BY id DESC LIMIT ?", (limit,))]
+                f"SELECT {self._SUGG_COLS} FROM suggestions ORDER BY id DESC LIMIT ?", (limit,))]
 
     def remove_last_suggestion(self, key: int) -> bool:
         """Undo: delete the last suggestion of a key, so the one before (or the patch, or the

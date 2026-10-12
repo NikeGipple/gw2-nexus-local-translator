@@ -160,7 +160,7 @@ class Editor:
         history = self.keymap.suggestions(key)  # last first
         active = self.patch.valid_suggestion(key, h)
         last = history[0] if history else None
-        en = (mrow[0] if mrow else "") or (last.source if last else "")
+        en = (mrow[0] if mrow else "") or (last.en_source if last else "")
         # what "Annulla" goes back to: the suggestion before, the patch, the module's translation
         prev = None
         if history:
@@ -187,9 +187,12 @@ class Editor:
         if len(text.encode("utf-8")) > MAX_BYTES:
             raise ValueError("text too long")
         with self.lock:
-            _shown, h = self._shown(key)
+            shown, h = self._shown(key)
             mrow = self.keymap.get(key)
-            self.keymap.add_suggestion(key, mrow[0] if mrow else "", text, self.author,
+            if shown is None:  # the game does not hold it: what it would show
+                entry = self.patch.entry_version(key)
+                shown = entry[1] if entry and entry[0] != KIND_DROP else (mrow[1] if mrow else None)
+            self.keymap.add_suggestion(key, mrow[0] if mrow else "", shown, text, self.author,
                                        self.patch.version, h if h else None)
             sent = self.patch.apply(self.cache_db, {key})
         log.info("editor: suggestion for key %d%s", key,
