@@ -38,16 +38,62 @@ def raw_url(path: str, branch: str = DEFAULT_BRANCH) -> str:
     return f"https://raw.githubusercontent.com/{GITHUB_REPO}/{branch}/{path}"
 
 
-GLOSSARY_URL = raw_url("glossary/glossary_it.json")
+# --------------------------------------------------------------------------- #
+# Language of the module
+# --------------------------------------------------------------------------- #
+# One exe for every language: the module folder (local_translator_<code>) or "--lang <code>" in
+# module.toml chooses one of these, and set_language() sets everything that depends on it.
+# Italian is the default of the developer tools; the module never falls back to it (lt_module).
+class Language:
+    def __init__(self, code: str, cache_key: str, label: str, model: str, recipe: dict[str, str],
+                 article: str, plural: bool) -> None:
+        self.code = code            # folder local_translator_<code>, files *_<code>, patch/<code>/
+        self.cache_key = cache_key  # Text Translator's cache key (shown in its menu)
+        self.label = label          # in the log
+        self.data_dir = code.upper()  # IT\, PT_BR\ next to the exe
+        self.model = model          # GitHub Release asset: <tag>/<file>
+        self.recipe = recipe        # Italian/Portuguese head of "Recipe: X" (see recipe_split)
+        self.article = re.compile(article, re.IGNORECASE)  # articles dropped from names
+        self.plural = plural        # plural markers for names (plurale_it): Italian only for now
+
+    def file(self, stem: str, ext: str) -> str:
+        """glossary + .json -> glossary_it.json / glossary_pt_br.json"""
+        return f"{stem}_{self.code}{ext}"
+
+
+LANGUAGES = {
+    "it": Language("it", "it", "IT", "model-it-v1/opus-mt-en-it-ct2.zip",
+                   {"Recipe": "Ricetta: ", "Recipes": "Ricette: ",
+                    "Recipe[s]": 'Ricetta[pl:"Ricette"]: '},
+                   r"(?:(?:il|lo|la|i|gli|le|un|uno|una) |(?:l|un)['’])", plural=True),
+    # model: OPUS-MT Tatoeba eng-por (opus-2021-02-18), label >>pob<< in its config.json
+    "pt_br": Language("pt_br", "pt-BR", "PT-BR", "model-pt-br-v1/opus-mt-en-pt-br-ct2.zip",
+                      {"Recipe": "Receita: ", "Recipes": "Receitas: ",
+                       "Recipe[s]": 'Receita[pl:"Receitas"]: '},
+                      r"(?:(?:o|a|os|as|um|uma|uns|umas) )", plural=False),
+}
+LANG = LANGUAGES["it"]
+
+
+def set_language(code: str) -> Language:
+    """Make `code` the language of the module (KeyError if unknown)."""
+    global LANG, GLOSSARY_URL, PATCH_URL, MODEL_URL, PLURAL_RULES
+    LANG = LANGUAGES[code]
+    GLOSSARY_URL = raw_url(f"glossary/{LANG.file('glossary', '.json')}")
+    PATCH_URL = raw_url(f"patch/{LANG.file('patch', '.json')}")
+    MODEL_URL = f"https://github.com/{GITHUB_REPO}/releases/download/{LANG.model}"
+    PLURAL_RULES = plurale_it.make_plural if LANG.plural else None
+    return LANG
+
+
+GLOSSARY_URL = raw_url(f"glossary/{LANG.file('glossary', '.json')}")
 # Curated translations by string ID (key -> translation), applied by the module. Since v0.5 the
 # module reads the patch split in pieces (patch/<lang>/index.json + pNNNN.json, see split_patch);
 # this single file is still published for the modules up to v0.4.
-PATCH_URL = raw_url("patch/patch_it.json")
+PATCH_URL = raw_url(f"patch/{LANG.file('patch', '.json')}")
 # The model is published once as a GitHub Release (fixed tag, e.g. model-it-v1) and downloaded on first run.
-MODEL_URL = (
-    "https://github.com/NikeGipple/gw2-nexus-local-translator/"
-    "releases/download/model-it-v1/opus-mt-en-it-ct2.zip"
-)  # a matching "<url>.sha256" file is downloaded and checked too
+MODEL_URL = f"https://github.com/{GITHUB_REPO}/releases/download/{LANG.model}"
+# (a matching "<url>.sha256" file is downloaded and checked too)
 UPDATE_INTERVAL = 15 * 60  # seconds between two checks for a new glossary or patch
 # Largest glossary or patch accepted (GitHub refuses files over 100 MB). The old limit of 5 MB cut
 # bigger files: the JSON could not be read and the update failed with only "update skipped".
@@ -71,10 +117,10 @@ PROTECT_VERSION = 5
 # 2026-10-09: 'Gamberetto[pl:"Gamberetti"]' shows "Gamberetto" for 1 item, "Gamberetti" for more,
 # and two markers in one string work), but "[s]" would add an English "s" ("Funghi commestibilis").
 PLURAL_RE = re.compile(r'(?<=\w)\[s\]|[\w\'’-]+\[pl:"([^"\[\]\n]*)"\]')
-# Plural rules of the module language (Italian: plurale_it.make_plural). The language is set in
-# lt_module (CACHE_KEY "it", IT\ folder, *_it files). Another language needs its own rules, a
-# plurale_<lang>.py with the same make_plural(singular, english, plural_or_None) -> (text, outcome,
-# changes), or None: then names are translated in the plural form as before, without markers.
+# Plural rules of the module language (Italian: plurale_it.make_plural; set by set_language).
+# Another language needs its own rules, a plurale_<lang>.py with the same make_plural(singular,
+# english, plural_or_None) -> (text, outcome, changes), or None: then names are translated in the
+# plural form as before, without markers (Brazilian Portuguese for now).
 PLURAL_RULES = plurale_it.make_plural
 # Plural markers written by the rules in a translation
 IT_PL_RE = re.compile(r'\[pl:"[^"\[\]\n]*"\]')
@@ -191,7 +237,6 @@ def feminine(text: str, roles: dict[str, str] | None) -> str:
 
 # Names: an article the model put in front of a name ("L'Insignia...", "Una Pietra...") goes
 # away when the English name has none (item and NPC names have no article in the game).
-IT_ARTICLE_RE = re.compile(r"(?:(?:il|lo|la|i|gli|le|un|uno|una) |(?:l|un)['’])", re.IGNORECASE)
 EN_ARTICLE_RE = re.compile(r"(?:the|a|an)\b", re.IGNORECASE)
 
 
@@ -201,7 +246,7 @@ def drop_article(text: str, english: str) -> str:
         return text
     pre, core, post = Glossary.WRAP_RE.fullmatch(text).groups()
     ecore = Glossary.WRAP_RE.fullmatch(english).group(2)
-    m = IT_ARTICLE_RE.match(core)
+    m = LANG.article.match(core)
     if not m or EN_ARTICLE_RE.match(ecore.lstrip()):
         return text
     rest = core[m.end():]
@@ -213,7 +258,6 @@ def drop_article(text: str, english: str) -> str:
 # "Recipe: X" / "Recipe[s]: X": the item name is translated on its own (the same translation as
 # the item itself, glossary patterns included) and gets the Italian prefix.
 RECIPE_RE = re.compile(r"(Recipe(?:\[s\]|s)?): (\S.*)")
-RECIPE_IT = {"Recipe": "Ricetta: ", "Recipes": "Ricette: ", "Recipe[s]": 'Ricetta[pl:"Ricette"]: '}
 
 
 def recipe_split(line: str) -> tuple[str, str, str] | None:
@@ -224,7 +268,141 @@ def recipe_split(line: str) -> tuple[str, str, str] | None:
     m = RECIPE_RE.fullmatch(core)
     if not m:
         return None
-    return pre + RECIPE_IT[m.group(1)], m.group(2), post
+    return pre + LANG.recipe[m.group(1)], m.group(2), post
+
+
+# --- Lines translated in pieces --------------------------------------------------------------------
+# OPUS-MT loses text in long or composite lines: "Storyteller: Abaddon" became "Abaddon", the second
+# sentence of a dialogue disappeared, markup around a text left whole descriptions in English. So a
+# line is split on <br>, "Title: subtitle", the em dash and the end of a sentence; each piece goes
+# through the glossary and the model on its own, then the pieces are joined again. Tested on 300
+# lines of the cache (_supporto/tools/prova_it.py): lines left in English 75 -> 41, lost text 7 -> 0.
+# Lines already in the cache are not translated again (PROTECT_VERSION is not raised on purpose).
+PIECE_SEP_RE = re.compile(r"(<br\s*/?>|:\s+|\s*—\s*|(?<=[.!?…])\s+(?=[^\sa-z]))")
+_EDGE = r"(?:%[A-Za-z]+\d*%|</?[A-Za-z][^<>\n]*>)"
+PIECE_LEAD_RE = re.compile(rf"\s*(?:{_EDGE})*")
+PIECE_TAIL_RE = re.compile(rf"(?:{_EDGE})*\s*$")
+# Never split: "Guild Wars 2: <expansion>", abbreviations ("World vs. World") and glossary terms
+# that contain a separator ("Convergence: Mount Balrior", "Dragon Slash—Boost").
+NO_SPLIT_RE = re.compile(r"\bGuild Wars(?: 2)?: "
+                         r"|\b(?:vs|Mr|Mrs|Ms|Dr|St|Mt|Lt|Sgt|Capt|Gen|Jr|Sr|No|Vol)\.\s")
+PIECE_SEPS = ("—", ": ", ". ", "! ", "? ", "<br")
+END_PUNCT = tuple(".!?…")
+MASK_RE = re.compile(r"\x00(\d+)\x00")
+
+
+def _piece_edges(piece: str) -> tuple[str, str, str]:
+    """(markup before, text, markup after): markup glued to the start or the end of a piece stays
+    out of the model ("<c=@flavor>Text.</c>", "%str1%%str2%Name%str3%%str4%"), unless a space
+    separates it, as in "%str1% evades your %str3%." (there it is part of the sentence)."""
+    pre = PIECE_LEAD_RE.match(piece).group(0)
+    if pre and piece[len(pre):len(pre) + 1].isspace():
+        pre = re.match(r"\s*", piece).group(0)
+    core = piece[len(pre):]
+    post = PIECE_TAIL_RE.search(core).group(0)
+    if post and core[:len(core) - len(post)][-1:].isspace() and post.strip():
+        post = re.search(r"\s*$", core).group(0)
+    return pre, core[:len(core) - len(post)] if post else core, post
+
+
+def split_pieces(line: str, glossary: "Glossary") -> list[tuple[str, str]] | None:
+    """[("sep", text) | ("txt", text)] joined back give the line; None if splitting changes nothing
+    (one piece, no markup around it): then the line is translated whole as before."""
+    masks: list[str] = []
+
+    def mask(m: re.Match) -> str:
+        masks.append(m.group(0))
+        return f"\x00{len(masks) - 1}\x00"
+
+    for src, _ in glossary.terms:  # longest first
+        if src in line and any(sep in src for sep in PIECE_SEPS):
+            line = glossary.term_regex(src).sub(mask, line)
+    line = NO_SPLIT_RE.sub(mask, line)
+
+    def unmask(text: str) -> str:
+        while "\x00" in text:
+            text = MASK_RE.sub(lambda m: masks[int(m.group(1))], text)
+        return text
+
+    out: list[tuple[str, str]] = []
+    for i, part in enumerate(PIECE_SEP_RE.split(line)):
+        if i % 2:
+            out.append(("sep", part))
+        elif part:
+            pre, core, post = _piece_edges(part)
+            if pre:
+                out.append(("sep", pre))
+            if core:
+                # a masked glossary term has no letters left, but it is text
+                text = re.search(r"[A-Za-z]", core) or ("\x00" in core and re.search(r"[A-Za-z]", unmask(core)))
+                out.append(("txt" if text else "sep", unmask(core)))
+            if post:
+                out.append(("sep", post))
+    if sum(k == "txt" for k, _ in out) <= 1 and not any(k == "sep" and t.strip() for k, t in out):
+        return None
+    return [(k, unmask(t)) for k, t in out]
+
+
+_NUM_WORDS = {w: i for i, w in enumerate(
+    "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen "
+    "sixteen seventeen eighteen nineteen".split())}
+_NUM_WORDS.update({w: 10 * (i + 2) for i, w in enumerate(
+    "twenty thirty forty fifty sixty seventy eighty ninety".split())})
+
+
+def _english_numbers(text: str) -> set[int]:
+    """Numbers of an English text, written in digits or in words ("Twenty-Five" -> 25, 20, 5)."""
+    nums = {int(n) for n in re.findall(r"\d+", text)}
+    for m in re.finditer(r"\b([a-z]+)(?:-([a-z]+))?\b", text.lower()):
+        a, b = _NUM_WORDS.get(m.group(1)), _NUM_WORDS.get(m.group(2) or "")
+        if a is not None:
+            nums.update({a, a + (b or 0)} | ({b} if b is not None else set()))
+    if re.search(r"\b(first|second|third|I{1,3})\b", text):
+        nums.update(range(1, 4))
+    return nums
+
+
+def invented_piece(src: str, out: str) -> bool:
+    """The model added text that is not in a short piece: "Tide Turner" -> "Tide TurnerCity in New
+    Jersey USA", "Season Twenty-Five" -> "Season 22 Episode 17". Then the piece stays in English."""
+    if len(out.split()) > 2 * len(src.split()) + 1:
+        return True
+    if out.startswith(src.rstrip()) and len(out) > len(src.rstrip()) + 3:
+        return True
+    return bool({int(n) for n in re.findall(r"\d+", out)} - _english_numbers(src))
+
+
+def same_case(src: str, out: str) -> str:
+    """First letter of `out` upper or lower case as in `src` (pieces after ": " and the em dash: the
+    model capitalizes them). Untouched when one of the two starts with a number ("2a Temporada")."""
+    a = next((c for c in src if c.isalnum()), "")
+    i = next((k for k, c in enumerate(out) if c.isalnum()), None)
+    if not a.isalpha() or i is None or not out[i].isalpha():
+        return out
+    return out[:i] + (out[i].upper() if a.isupper() else out[i].lower()) + out[i + 1:]
+
+
+def join_pieces(parts: list[tuple[str, str]], done: dict[str, str], fixed: set[str]) -> str:
+    """The translated line from its pieces (`done`: piece -> translation, `fixed`: pieces given by
+    the glossary, never checked)."""
+    out, prev = [], ""
+    for kind, t in parts:
+        if kind == "sep":
+            out.append(t)
+            prev = t
+            continue
+        r = done.get(t, t)
+        if t not in fixed and r != t and invented_piece(t, r):
+            r = t
+        if r != t:
+            # final full stop added by the model to a name or title that has none in English
+            if r.endswith(".") and not r.endswith("..") and not t.rstrip().endswith(END_PUNCT):
+                r = r[:-1]
+            if prev.strip() in (":", "—"):
+                r = same_case(t, r)
+        out.append(r)
+        prev = ""
+    return "".join(out)
 
 
 def _cased(word: str, like: str) -> str:
@@ -423,12 +601,12 @@ class GlossaryUpdater(threading.Thread):
     """Downloads a JSON file from GitHub when it changes (ETag), validates it and applies it."""
 
     what = "glossary"
-    filename = "glossary_it.json"
+    stem = "glossary"
 
     def __init__(self, glossary: Glossary, data_dir: Path, on_change, url: str) -> None:
         super().__init__(daemon=True, name=f"{self.what}-updater")
         self.glossary, self.on_change, self.url = glossary, on_change, url
-        self.path = data_dir / self.filename
+        self.path = data_dir / LANG.file(self.stem, ".json")
         self.etag_path = self.path.with_suffix(".etag")
         self.checks = 0
 
@@ -636,7 +814,7 @@ class Patch:
             log.warning("cannot save %s: %s", self.skip_path, exc)
 
     def _applied_path(self) -> Path | None:
-        return self.skip_path.with_name("patch_it.applied.json") if self.skip_path else None
+        return self.skip_path.with_name(LANG.file("patch", ".applied.json")) if self.skip_path else None
 
     def _read_applied(self) -> dict[int, str]:
         """Automatic texts already written into the addon's database (key -> text)."""
@@ -647,7 +825,7 @@ class Patch:
             return {}
 
     def _dropped_path(self) -> Path | None:
-        return self.skip_path.with_name("patch_it.dropped.json") if self.skip_path else None
+        return self.skip_path.with_name(LANG.file("patch", ".dropped.json")) if self.skip_path else None
 
     def _read_dropped(self) -> set[int]:
         """'drop' keys already removed from the addon's database once (never removed twice)."""
@@ -664,7 +842,7 @@ class Patch:
 
 class PatchUpdater(GlossaryUpdater):
     what = "patch"
-    filename = "patch_it.json"
+    stem = "patch"
 
     def __init__(self, patch: Patch, data_dir: Path, db: Path | None, url: str) -> None:
         self.patch, self.db = patch, db
@@ -1118,7 +1296,7 @@ class FakeTranslator:
     """Echo translator, used with --fake to test the whole chain without a model."""
 
     def translate(self, texts: list[str]) -> list[str]:
-        return [f"[IT] {t}" for t in texts]
+        return [f"[{LANG.label}] {t}" for t in texts]
 
 
 class CT2Translator:
@@ -1443,19 +1621,34 @@ class Engine:
         return protected, restore
 
     def _translate_lines(self, lines: list[str]) -> dict[str, str]:
-        """Translations of these lines; recipes ("Recipe[s]: X") are made from the item name."""
-        recipes = {line: r for line in lines if (r := recipe_split(line))}
-        if not recipes:
-            return self._translate_plain(lines)
+        """Translations of these lines; recipes ("Recipe[s]: X") are made from the item name, and
+        composite lines are translated in pieces (see split_pieces). Names with plural markers and
+        recipes are never split."""
         g = self.glossary
+        recipes = {line: r for line in lines if (r := recipe_split(line))}
+        pieces = {line: p for line in lines if line not in recipes and not plural_name(line)
+                  and (p := split_pieces(resolve_plural(line), g)) is not None}
+        if not recipes and not pieces:
+            return self._translate_plain(lines)
         names = [n for n in dict.fromkeys(r[1] for r in recipes.values())
                  if g.lookup(n) is None and n not in self.cache]
-        results = self._translate_plain([x for x in lines if x not in recipes] + names)
+        texts = list(dict.fromkeys(t for p in pieces.values() for k, t in p if k == "txt"))
+        done = {t: f for t in texts if (f := g.lookup(t)) is not None}
+        fixed = set(done)
+        done.update({t: self.cache[t] for t in texts if t not in done and t in self.cache})
+        whole = [x for x in lines if x not in recipes and x not in pieces]
+        results = self._translate_plain(list(dict.fromkeys(
+            whole + names + [t for t in texts if t not in done])))
         for line, (head, name, tail) in recipes.items():
-            fixed = g.lookup(name)
-            it = fixed if fixed is not None else results.get(name, self.cache.get(name, name))
+            fixed_name = g.lookup(name)
+            it = fixed_name if fixed_name is not None else results.get(name, self.cache.get(name, name))
             results[line] = head + drop_article(it, name) + tail
-        return results
+        done.update({t: results[t] for t in texts if t in results})
+        for line, parts in pieces.items():
+            results[line] = join_pieces(parts, done, fixed)
+        # the pieces are not lines of the game: not returned, so not saved in the cache
+        keep = set(lines) | set(names)
+        return {k: v for k, v in results.items() if k in keep}
 
     def _translate_plain(self, lines: list[str]) -> dict[str, str]:
         results: dict[str, str] = {}
@@ -1478,12 +1671,19 @@ class Engine:
         outs = [p for p, _ in prepared]
         for i, out in zip(model_idx, model_outs):
             outs[i] = out
-        for line, src, (_, restore), out in zip(lines, srcs, prepared, outs):
-            if not out.strip() or not all(ph in out for ph in restore):
-                results[line] = line  # a placeholder got lost: keep the English text, never break markup
+        for line, src, (prot, restore), out in zip(lines, srcs, prepared, outs):
+            # a placeholder or a "%%" (literal % of the game, "%num1%%% Map complete") got lost: keep
+            # the English text, never break markup. "%%" is not protected with a placeholder: the
+            # Italian model then moved it ("Durata +6%% Fury"); the Portuguese one sometimes drops it.
+            if (not out.strip() or not all(ph in out for ph in restore)
+                    or out.count("%%") < prot.count("%%")):
+                results[line] = line
                 continue
             for ph, original in restore.items():
                 out = out.replace(ph, original)
+            # final full stop added by the model to a name or title ("Dragon" -> "Dragão.")
+            if out.endswith(".") and not out.endswith("..") and not line.rstrip().endswith(END_PUNCT):
+                out = out[:-1]
             out = masculine(fix_percent(out, line))
             if plural_name(line):
                 out = italian_plural(line, src, drop_article(out, src))

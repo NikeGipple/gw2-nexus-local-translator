@@ -228,3 +228,5 @@ Claude outputs/
 *.db-journal
 *.jsonl
 *.csv
+# Master patch (patch_<lang>.json): local only, modules read the pieces in patch/<lang>/
+patch/patch_*.json

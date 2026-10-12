@@ -721,7 +721,7 @@ class CachePatch:
         """First start of v0.5: import patch_it.json and the JSON registries of v0.4 (left on disk,
         never read again). Later starts: import patch_it.json again if it changed and is not
         older (strumenti.bat option 7 copies the repository's patch there)."""
-        pfile = lang_dir / "patch_it.json"
+        pfile = lang_dir / lt.LANG.file("patch", ".json")
         if self.migrated:
             if not pfile.is_file():
                 return
@@ -749,10 +749,11 @@ class CachePatch:
 
         t0 = time.perf_counter()
         data = _read_json(pfile) if pfile.is_file() else None
-        applied = _read_json(lang_dir / "patch_it.applied.json")
-        skip = _read_json(lang_dir / "patch_it.skip.json")
-        dropped = _read_json(lang_dir / "patch_it.dropped.json")
-        failed = _read_json(lang_dir / "patch_it.ids_failed.json")
+        name = lambda ext: lang_dir / lt.LANG.file("patch", ext)  # noqa: E731
+        applied = _read_json(name(".applied.json"))
+        skip = _read_json(name(".skip.json"))
+        dropped = _read_json(name(".dropped.json"))
+        failed = _read_json(name(".ids_failed.json"))
         with self.lock:
             con = self.writer
             con.execute("BEGIN IMMEDIATE")
@@ -777,7 +778,7 @@ class CachePatch:
                 if isinstance(dropped, list):
                     con.executemany("INSERT OR IGNORE INTO dropped (key) VALUES (?)",
                                     [(int(k),) for k in dropped if str(k).isdigit()])
-                if (lang_dir / "patch_it.ids_failed.json").exists():
+                if name(".ids_failed.json").exists():
                     self._set_meta(con, ids_failed=json.dumps(failed if isinstance(failed, dict)
                                                               else {"reason": "migrated"}))
                 self._set_meta(con, migrated=1,
@@ -861,7 +862,7 @@ class PieceUpdater(threading.Thread):
         self.patch, self.lang, self.db = patch, lang, db
         self.branch, self.repo, self.use_api = branch, repo, use_api
         self.raw_base = (raw_base or f"https://raw.githubusercontent.com/{repo}").rstrip("/")
-        self.tmp = patch.path.with_name("patch_it.download")
+        self.tmp = patch.path.with_name(lt.LANG.file("patch", ".download"))
         self.checks = 0
 
     def run(self) -> None:
