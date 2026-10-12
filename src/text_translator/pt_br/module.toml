@@ -1,0 +1,3 @@
+name = "Português do Brasil (Local Translator)"
+command = "Local_Translator_PT_BR.exe"
+args = ["--lang", "pt_br"]

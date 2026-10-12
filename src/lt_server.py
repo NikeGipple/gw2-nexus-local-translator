@@ -37,16 +37,62 @@ def raw_url(path: str, branch: str = DEFAULT_BRANCH) -> str:
     return f"https://raw.githubusercontent.com/{GITHUB_REPO}/{branch}/{path}"
 
 
-GLOSSARY_URL = raw_url("glossary/glossary_it.json")
+# --------------------------------------------------------------------------- #
+# Language of the module
+# --------------------------------------------------------------------------- #
+# One exe for every language: the module folder (local_translator_<code>) or "--lang <code>" in
+# module.toml chooses one of these, and set_language() sets everything that depends on it.
+# Italian is the default of the developer tools; the module never falls back to it (lt_module).
+class Language:
+    def __init__(self, code: str, cache_key: str, label: str, model: str, recipe: dict[str, str],
+                 article: str, plural: bool) -> None:
+        self.code = code            # folder local_translator_<code>, files *_<code>, patch/<code>/
+        self.cache_key = cache_key  # Text Translator's cache key (shown in its menu)
+        self.label = label          # in the log
+        self.data_dir = code.upper()  # IT\, PT_BR\ next to the exe
+        self.model = model          # GitHub Release asset: <tag>/<file>
+        self.recipe = recipe        # Italian/Portuguese head of "Recipe: X" (see recipe_split)
+        self.article = re.compile(article, re.IGNORECASE)  # articles dropped from names
+        self.plural = plural        # plural markers for names (plurale_it): Italian only for now
+
+    def file(self, stem: str, ext: str) -> str:
+        """glossary + .json -> glossary_it.json / glossary_pt_br.json"""
+        return f"{stem}_{self.code}{ext}"
+
+
+LANGUAGES = {
+    "it": Language("it", "it", "IT", "model-it-v1/opus-mt-en-it-ct2.zip",
+                   {"Recipe": "Ricetta: ", "Recipes": "Ricette: ",
+                    "Recipe[s]": 'Ricetta[pl:"Ricette"]: '},
+                   r"(?:(?:il|lo|la|i|gli|le|un|uno|una) |(?:l|un)['’])", plural=True),
+    # model: OPUS-MT Tatoeba eng-por (opus-2021-02-18), label >>pob<< in its config.json
+    "pt_br": Language("pt_br", "pt-BR", "PT-BR", "model-pt-br-v1/opus-mt-en-pt-br-ct2.zip",
+                      {"Recipe": "Receita: ", "Recipes": "Receitas: ",
+                       "Recipe[s]": 'Receita[pl:"Receitas"]: '},
+                      r"(?:(?:o|a|os|as|um|uma|uns|umas) )", plural=False),
+}
+LANG = LANGUAGES["it"]
+
+
+def set_language(code: str) -> Language:
+    """Make `code` the language of the module (KeyError if unknown)."""
+    global LANG, GLOSSARY_URL, PATCH_URL, MODEL_URL, PLURAL_RULES
+    LANG = LANGUAGES[code]
+    GLOSSARY_URL = raw_url(f"glossary/{LANG.file('glossary', '.json')}")
+    PATCH_URL = raw_url(f"patch/{LANG.file('patch', '.json')}")
+    MODEL_URL = f"https://github.com/{GITHUB_REPO}/releases/download/{LANG.model}"
+    PLURAL_RULES = plurale_it.make_plural if LANG.plural else None
+    return LANG
+
+
+GLOSSARY_URL = raw_url(f"glossary/{LANG.file('glossary', '.json')}")
 # Curated translations by string ID (key -> translation), applied by the module. Since v0.5 the
 # module reads the patch split in pieces (patch/<lang>/index.json + pNNNN.json, see split_patch);
 # this single file is still published for the modules up to v0.4.
-PATCH_URL = raw_url("patch/patch_it.json")
+PATCH_URL = raw_url(f"patch/{LANG.file('patch', '.json')}")
 # The model is published once as a GitHub Release (fixed tag, e.g. model-it-v1) and downloaded on first run.
-MODEL_URL = (
-    "https://github.com/NikeGipple/gw2-nexus-local-translator/"
-    "releases/download/model-it-v1/opus-mt-en-it-ct2.zip"
-)  # a matching "<url>.sha256" file is downloaded and checked too
+MODEL_URL = f"https://github.com/{GITHUB_REPO}/releases/download/{LANG.model}"
+# (a matching "<url>.sha256" file is downloaded and checked too)
 UPDATE_INTERVAL = 15 * 60  # seconds between two checks for a new glossary or patch
 # Largest glossary or patch accepted (GitHub refuses files over 100 MB). The old limit of 5 MB cut
 # bigger files: the JSON could not be read and the update failed with only "update skipped".
@@ -70,10 +116,10 @@ PROTECT_VERSION = 5
 # 2026-10-09: 'Gamberetto[pl:"Gamberetti"]' shows "Gamberetto" for 1 item, "Gamberetti" for more,
 # and two markers in one string work), but "[s]" would add an English "s" ("Funghi commestibilis").
 PLURAL_RE = re.compile(r'(?<=\w)\[s\]|[\w\'’-]+\[pl:"([^"\[\]\n]*)"\]')
-# Plural rules of the module language (Italian: plurale_it.make_plural). The language is set in
-# lt_module (CACHE_KEY "it", IT\ folder, *_it files). Another language needs its own rules, a
-# plurale_<lang>.py with the same make_plural(singular, english, plural_or_None) -> (text, outcome,
-# changes), or None: then names are translated in the plural form as before, without markers.
+# Plural rules of the module language (Italian: plurale_it.make_plural; set by set_language).
+# Another language needs its own rules, a plurale_<lang>.py with the same make_plural(singular,
+# english, plural_or_None) -> (text, outcome, changes), or None: then names are translated in the
+# plural form as before, without markers (Brazilian Portuguese for now).
 PLURAL_RULES = plurale_it.make_plural
 # Plural markers written by the rules in a translation
 IT_PL_RE = re.compile(r'\[pl:"[^"\[\]\n]*"\]')
@@ -190,7 +236,6 @@ def feminine(text: str, roles: dict[str, str] | None) -> str:
 
 # Names: an article the model put in front of a name ("L'Insignia...", "Una Pietra...") goes
 # away when the English name has none (item and NPC names have no article in the game).
-IT_ARTICLE_RE = re.compile(r"(?:(?:il|lo|la|i|gli|le|un|uno|una) |(?:l|un)['’])", re.IGNORECASE)
 EN_ARTICLE_RE = re.compile(r"(?:the|a|an)\b", re.IGNORECASE)
 
 
@@ -200,7 +245,7 @@ def drop_article(text: str, english: str) -> str:
         return text
     pre, core, post = Glossary.WRAP_RE.fullmatch(text).groups()
     ecore = Glossary.WRAP_RE.fullmatch(english).group(2)
-    m = IT_ARTICLE_RE.match(core)
+    m = LANG.article.match(core)
     if not m or EN_ARTICLE_RE.match(ecore.lstrip()):
         return text
     rest = core[m.end():]
@@ -212,7 +257,6 @@ def drop_article(text: str, english: str) -> str:
 # "Recipe: X" / "Recipe[s]: X": the item name is translated on its own (the same translation as
 # the item itself, glossary patterns included) and gets the Italian prefix.
 RECIPE_RE = re.compile(r"(Recipe(?:\[s\]|s)?): (\S.*)")
-RECIPE_IT = {"Recipe": "Ricetta: ", "Recipes": "Ricette: ", "Recipe[s]": 'Ricetta[pl:"Ricette"]: '}
 
 
 def recipe_split(line: str) -> tuple[str, str, str] | None:
@@ -223,7 +267,7 @@ def recipe_split(line: str) -> tuple[str, str, str] | None:
     m = RECIPE_RE.fullmatch(core)
     if not m:
         return None
-    return pre + RECIPE_IT[m.group(1)], m.group(2), post
+    return pre + LANG.recipe[m.group(1)], m.group(2), post
 
 
 # --- Lines translated in pieces --------------------------------------------------------------------
@@ -556,12 +600,12 @@ class GlossaryUpdater(threading.Thread):
     """Downloads a JSON file from GitHub when it changes (ETag), validates it and applies it."""
 
     what = "glossary"
-    filename = "glossary_it.json"
+    stem = "glossary"
 
     def __init__(self, glossary: Glossary, data_dir: Path, on_change, url: str) -> None:
         super().__init__(daemon=True, name=f"{self.what}-updater")
         self.glossary, self.on_change, self.url = glossary, on_change, url
-        self.path = data_dir / self.filename
+        self.path = data_dir / LANG.file(self.stem, ".json")
         self.etag_path = self.path.with_suffix(".etag")
         self.checks = 0
 
@@ -769,7 +813,7 @@ class Patch:
             log.warning("cannot save %s: %s", self.skip_path, exc)
 
     def _applied_path(self) -> Path | None:
-        return self.skip_path.with_name("patch_it.applied.json") if self.skip_path else None
+        return self.skip_path.with_name(LANG.file("patch", ".applied.json")) if self.skip_path else None
 
     def _read_applied(self) -> dict[int, str]:
         """Automatic texts already written into the addon's database (key -> text)."""
@@ -780,7 +824,7 @@ class Patch:
             return {}
 
     def _dropped_path(self) -> Path | None:
-        return self.skip_path.with_name("patch_it.dropped.json") if self.skip_path else None
+        return self.skip_path.with_name(LANG.file("patch", ".dropped.json")) if self.skip_path else None
 
     def _read_dropped(self) -> set[int]:
         """'drop' keys already removed from the addon's database once (never removed twice)."""
@@ -797,7 +841,7 @@ class Patch:
 
 class PatchUpdater(GlossaryUpdater):
     what = "patch"
-    filename = "patch_it.json"
+    stem = "patch"
 
     def __init__(self, patch: Patch, data_dir: Path, db: Path | None, url: str) -> None:
         self.patch, self.db = patch, db
@@ -1059,7 +1103,7 @@ class FakeTranslator:
     """Echo translator, used with --fake to test the whole chain without a model."""
 
     def translate(self, texts: list[str]) -> list[str]:
-        return [f"[IT] {t}" for t in texts]
+        return [f"[{LANG.label}] {t}" for t in texts]
 
 
 class CT2Translator:

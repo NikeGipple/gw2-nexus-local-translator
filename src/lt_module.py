@@ -1,9 +1,11 @@
 """Local Translator: local translation module for Ideka's "Text Translator" Nexus addon.
 
-Local Translator is meant for any language the game can be translated into from English; each
-language is built as its own module (local_translator_<lang>). Italian is the first one, and for
-now the language is set in the code (CACHE_KEY, IT\\ folder, *_it files, the GitHub URLs, and the
-plural rules lt_server.PLURAL_RULES from plurale_it.py).
+Local Translator is meant for any language the game can be translated into from English. The
+same exe serves every language (lt_server.LANGUAGES): each one is its own module folder
+(local_translator_<code>, e.g. local_translator_it, local_translator_pt_br) and the language comes
+from "--lang <code>" in module.toml or, without it, from the folder name. An unknown language
+stops the module (never another language by mistake). The language sets the cache key, the data
+folder (IT\\, PT_BR\\), the *_<code> files, the GitHub files and the model.
 
 Protocol: https://github.com/ideka/modulep (version 2, Text Translator v0.2.0 or newer). The
 addon starts this exe itself (module.toml), sends every game text with its string ID and the hash
@@ -16,7 +18,8 @@ runs (patch_db.CachePatch.apply, checked every lt.UPDATE_INTERVAL).
 
 Glossary, OPUS-MT engine and map come from lt_server.py, imported as a library; the patch archive
 (IT\\patch_it.db, updated from GitHub piece by piece) from patch_db.py.
-Data lives in IT\\ next to this exe (model, glossary, patch_it.db, cache_it.jsonl, map_it.db).
+Data lives in IT\\ (PT_BR\\...) next to this exe (model, glossary, patch_it.db, cache_it.jsonl,
+map_it.db; *_pt_br for Brazilian Portuguese).
 
 Developer commands (strumenti.bat options 4, 5 and 14): --export-review, --import-review and
 --show-keys text|all|off ("show keys" mode: with the file IT\\show_keys.txt the texts in the game
@@ -47,8 +50,7 @@ VERSION = "0.8.0"        # version of the release: raise it at every new zip (sh
 PROTOCOL = 2              # Text Translator v0.2.0 (texts carry the hash of the English)
 SOURCE_LANG = 0          # English: the game must be set to English
 RESULT_VERSION = 1       # raise it to make the addon ask again for every cached text
-CACHE_KEY = "it"
-PATCH_LANG = "it"        # patch/<lang>/ on GitHub
+CACHE_KEY = lt.LANG.cache_key  # set by main() once the language is known
 MAX_MESSAGE = 0x10_0000
 KIND_TEXT, KIND_CANCEL = 0, 1
 
@@ -545,11 +547,24 @@ def cache_db_watcher(patch: CachePatch, cache_db: Path) -> None:
 
 
 # --------------------------------------------------------------------------- #
+def module_language(module_dir: Path, requested: str | None) -> str | None:
+    """Language code: --lang (module.toml), otherwise the folder name local_translator_<code>.
+    None if unknown. Started from the sources (developers, not the exe): Italian."""
+    if requested:
+        return requested.lower() if requested.lower() in lt.LANGUAGES else None
+    m = re.fullmatch(r"local_translator_(\w+)", module_dir.name, re.IGNORECASE)
+    if m:
+        return m.group(1).lower() if m.group(1).lower() in lt.LANGUAGES else None
+    return None if getattr(sys, "frozen", False) else "it"
+
+
 def main() -> int:
     module_dir = lt.app_dir()  # ...\addons\text_translator\modules\<folder>
     ap = argparse.ArgumentParser()
+    ap.add_argument("--lang", help="language code (lt_server.LANGUAGES); default: from the folder "
+                                   "name local_translator_<code>")
     ap.add_argument("--fake", action="store_true", help="answer '[IT] text', no model (test)")
-    ap.add_argument("--lang-dir", type=Path, default=module_dir / "IT")
+    ap.add_argument("--lang-dir", type=Path, default=None, help="data folder (default IT\\, PT_BR\\...)")
     ap.add_argument("--cache-db", type=Path, default=module_dir / "cache.db")
     ap.add_argument("--patch-file", type=Path, default=None, help="local patch (developers)")
     ap.add_argument("--no-update", action="store_true")
@@ -573,14 +588,28 @@ def main() -> int:
     # argparse would exit before the log exists, and the game would stay untranslated.
     args, unknown = ap.parse_known_args()
 
+    code = module_language(module_dir, args.lang)
+    if code is None:
+        # no handshake: Text Translator shows the module as failed, instead of a wrong language
+        (module_dir / "local_translator.log").write_text(
+            f"Local Translator v{VERSION}: unknown language (--lang {args.lang!r}, folder "
+            f"{module_dir.name!r}); known: {', '.join(lt.LANGUAGES)}\n", encoding="utf-8")
+        return 3
+    global CACHE_KEY
+    lang = lt.set_language(code)
+    CACHE_KEY = lang.cache_key
+    if args.lang_dir is None:
+        args.lang_dir = module_dir / lang.data_dir
+
     if args.export_review:  # developer commands, not started by the addon
-        n = lt.export_review(args.lang_dir / "map_it.db", args.patch_file or args.lang_dir / "patch_it.json",
+        n = lt.export_review(args.lang_dir / lang.file("map", ".db"),
+                             args.patch_file or args.lang_dir / lang.file("patch", ".json"),
                              args.export_review)
         print(f"{n} rows written to {args.export_review}")
         return 0
     if args.import_review:
         if not args.patch_file:
-            print("--import-review needs --patch-file (the repository's patch\\patch_it.json)")
+            print(f"--import-review needs --patch-file (the repository's patch\\{lang.file('patch', '.json')})")
             return 1
         changed, removed = lt.import_review(args.import_review, args.patch_file)
         print(f"patch {args.patch_file}: {changed} added/changed, {removed} removed")
@@ -608,7 +637,8 @@ def main() -> int:
 
     args.lang_dir.mkdir(parents=True, exist_ok=True)
     handlers: list[logging.Handler] = [RotatingFileHandler(
-        module_dir / "local_translator_it.log", maxBytes=500_000, backupCount=1, encoding="utf-8")]
+        module_dir / lang.file("local_translator", ".log"), maxBytes=500_000, backupCount=1,
+        encoding="utf-8")]
     handlers[0].setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
     if err is not None:
         h = StderrHandler(err)
@@ -616,8 +646,8 @@ def main() -> int:
         h.setFormatter(logging.Formatter("%(message)s"))
         handlers.append(h)
     logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO, handlers=handlers)
-    log.info("Local Translator IT v%s started (protocol %d, result version %d)", VERSION, PROTOCOL,
-             RESULT_VERSION)
+    log.info("Local Translator %s v%s started (protocol %d, result version %d, cache key %s)",
+             lang.label, VERSION, PROTOCOL, RESULT_VERSION, CACHE_KEY)
     lower_priority()
     if unknown:
         log.warning("ignored unknown arguments: %s", " ".join(unknown))
@@ -655,17 +685,19 @@ def main() -> int:
     threading.Thread(target=reader, daemon=True, name="stdin-reader").start()
 
     glossary = lt.Glossary()
-    if glossary.load_file(args.lang_dir / "glossary_it.json"):
-        where = "glossary_it.json"
-    else:
-        glossary.load_file(lt.bundled_dir() / "glossary_it.default.json")
+    gfile = lang.file("glossary", ".json")
+    if glossary.load_file(args.lang_dir / gfile):
+        where = gfile
+    elif glossary.load_file(lt.bundled_dir() / lang.file("glossary", ".default.json")):
         where = "built-in default"
+    else:
+        where = "none yet: downloaded from GitHub"
     # the glossary has no version number: its fingerprint identifies the content
     log.info("glossary %s (%s): %d exact, %d terms, %d patterns", glossary.fingerprint or "-", where,
              len(glossary.exact), len(glossary.terms), len(glossary.patterns))
     fake = args.fake or (args.lang_dir / "fake.txt").is_file()
     t0 = time.perf_counter()
-    patch = CachePatch(args.lang_dir / "patch_it.db", CACHE_KEY, RESULT_VERSION)
+    patch = CachePatch(args.lang_dir / lang.file("patch", ".db"), CACHE_KEY, RESULT_VERSION)
     patch.glossary = glossary  # to know whether 'auto' was made with this glossary
     patch.show_keys = show_keys_mode(args.lang_dir)
     if patch.show_keys:
@@ -685,10 +717,10 @@ def main() -> int:
              "same as yours" if patch.auto_current() else "different from yours",
              time.perf_counter() - t0)
     engine = ModuleEngine(lt.FakeTranslator() if fake else None, glossary,
-                          args.lang_dir / "cache_it.jsonl", args.cache_db, patch=patch)
+                          args.lang_dir / lang.file("cache", ".jsonl"), args.cache_db, patch=patch)
     keymap = None
     try:
-        keymap = lt.KeyMap(args.lang_dir / "map_it.db")
+        keymap = lt.KeyMap(args.lang_dir / lang.file("map", ".db"))
         maps.append(keymap)
         log.info("map: %d strings known", keymap.count())
     except Exception as exc:  # noqa: BLE001
@@ -705,7 +737,7 @@ def main() -> int:
     threading.Thread(target=dispatcher.run, daemon=True, name="dispatcher").start()
 
     if fake:
-        log.info("TEST MODE: answering '[IT] text', no real translation")
+        log.info("TEST MODE: answering '[%s] text', no real translation", lang.label)
     else:
         def load_model() -> None:
             model = args.lang_dir / "model"
@@ -734,9 +766,9 @@ def main() -> int:
                 log.warning("cannot apply the patch to %s: %s", args.cache_db, exc)
 
         lt.GlossaryUpdater(glossary, args.lang_dir, glossary_changed,
-                           lt.raw_url("glossary/glossary_it.json", args.branch)).start()
+                           lt.raw_url(f"glossary/{gfile}", args.branch)).start()
         if not args.patch_file:
-            PieceUpdater(patch, PATCH_LANG, args.cache_db, args.branch).start()
+            PieceUpdater(patch, lang.code, args.cache_db, args.branch).start()
 
     while True:  # everything runs in threads; the reader exits the process when stdin closes
         time.sleep(3600)
