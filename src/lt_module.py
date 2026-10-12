@@ -51,7 +51,7 @@ from patch_db import (CachePatch, PieceUpdater, SHOW_MODES, has_table, key_tag, 
                       sync_key_tags)
 import editor  # noqa: E402
 
-VERSION = "0.9.0"        # version of the release: raise it at every new zip (shown in the log)
+VERSION = "0.9.1"        # version of the release: raise it at every new zip (shown in the log)
 PROTOCOL = 2              # Text Translator v0.2.0 (texts carry the hash of the English)
 SOURCE_LANG = 0          # English: the game must be set to English
 RESULT_VERSION = 1       # raise it to make the addon ask again for every cached text
