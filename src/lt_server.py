@@ -1478,12 +1478,19 @@ class Engine:
         outs = [p for p, _ in prepared]
         for i, out in zip(model_idx, model_outs):
             outs[i] = out
-        for line, src, (_, restore), out in zip(lines, srcs, prepared, outs):
-            if not out.strip() or not all(ph in out for ph in restore):
-                results[line] = line  # a placeholder got lost: keep the English text, never break markup
+        for line, src, (prot, restore), out in zip(lines, srcs, prepared, outs):
+            # a placeholder or a "%%" (literal % of the game, "%num1%%% Map complete") got lost: keep
+            # the English text, never break markup. "%%" is not protected with a placeholder: the
+            # Italian model then moved it ("Durata +6%% Fury"); the Portuguese one sometimes drops it.
+            if (not out.strip() or not all(ph in out for ph in restore)
+                    or out.count("%%") < prot.count("%%")):
+                results[line] = line
                 continue
             for ph, original in restore.items():
                 out = out.replace(ph, original)
+            # final full stop added by the model to a name or title ("Dragon" -> "Dragão.")
+            if out.endswith(".") and not out.endswith("..") and not line.rstrip().endswith(END_PUNCT):
+                out = out[:-1]
             out = masculine(fix_percent(out, line))
             if plural_name(line):
                 out = italian_plural(line, src, drop_article(out, src))

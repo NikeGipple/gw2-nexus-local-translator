@@ -90,8 +90,6 @@ The curated Italian translations, identified by the game's internal string ID, a
 
 `src_hash` is the hash of the English text the translation was made from, computed as Text Translator does (XXH3-64) and named like the column where Text Translator keeps it. If the game sends a different English text for that ID, for example after a game update, the module translates the new text instead of showing the old translation. `0000000000000000` marks a translation that is outdated and waiting to be redone. The patch contains no English game text.
 
-[`patch/patch_it.json`](patch/patch_it.json) holds the same translations in a single file, for modules up to v0.4.
-
 To report a wrong translation, open an issue with the Italian text you see in game and where you saw it.
 
 ## Your local files
