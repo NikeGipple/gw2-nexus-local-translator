@@ -63,7 +63,8 @@ SHOW_KEYS_FILE = "show_keys.txt"  # in IT\: "show keys" mode (see patch_db.sync_
 
 def show_keys_mode(lang_dir: Path) -> str | None:
     """Mode of the "show keys" file: "all" if it says so (also "tutte"), otherwise "text";
-    None without the file. An empty file (made by hand by a helper) means "text"."""
+    None without the file. An empty file (made by hand by a helper) means "text". A contributor
+    sets it in IT\\contributor.json instead (editor.contributor), which wins over the file."""
     try:
         words = (lang_dir / SHOW_KEYS_FILE).read_text(encoding="utf-8", errors="replace").split()
     except OSError:
@@ -685,10 +686,14 @@ def main() -> int:
     t0 = time.perf_counter()
     patch = CachePatch(args.lang_dir / "patch_it.db", CACHE_KEY, RESULT_VERSION)
     patch.glossary = glossary  # to know whether 'auto' was made with this glossary
-    patch.show_keys = show_keys_mode(args.lang_dir)
+    contrib = editor.contributor(args.lang_dir)
+    if contrib and contrib.show_keys is not editor.NOT_SET:
+        patch.show_keys, where = contrib.show_keys, editor.CONTRIBUTOR_FILE
+    else:
+        patch.show_keys, where = show_keys_mode(args.lang_dir), SHOW_KEYS_FILE
     if patch.show_keys:
         log.info("SHOW KEYS mode '%s' (%s): texts start with their string ID", patch.show_keys,
-                 SHOW_KEYS_FILE)
+                 where)
     try:
         patch.migrate(args.lang_dir)  # v0.4 files, or IT\\patch_it.json copied by option 7
     except Exception:  # noqa: BLE001 - the archive is still usable
@@ -716,12 +721,11 @@ def main() -> int:
                             args.cache_db)
     holder["d"] = dispatcher
     patch.sender = dispatcher.push  # patch texts the game must change are sent at once
-    author = editor.contributor(args.lang_dir)
-    if author and keymap:  # contributors: their suggestions count, and the correction page is on
+    if contrib and keymap:  # contributors: their suggestions count, and the correction page is on
         patch.map_path, patch.suggestion_of = keymap.path, keymap.suggestion
-        log.info("contributor %s: suggestions on", author)
+        log.info("contributor %s: suggestions on", contrib.author)
         if args.editor_port:
-            editor.start(editor.Editor(patch, keymap, args.cache_db, CACHE_KEY, author),
+            editor.start(editor.Editor(patch, keymap, args.cache_db, CACHE_KEY, contrib.author),
                          args.editor_port)
     ready.set()
     for req in early:

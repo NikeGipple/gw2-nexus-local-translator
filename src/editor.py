@@ -1,9 +1,10 @@
 """Local Translator: the correction page of the contributors (http://127.0.0.1:8770).
 
 Only for contributors: the page is on when IT\\contributor.json exists, with the name the
-suggestions are signed with:
+suggestions are signed with, and optionally the "show keys" mode (string IDs in the game, instead
+of the file IT\\show_keys.txt; see contributor()):
 
-    {"author": "Ralkeon"}
+    {"author": "Ralkeon", "show_keys": "text"}
 
 Search a text as seen in the game (Italian, English when the module knows it, or the string ID),
 write the translation and save: it becomes a suggestion, a new row of the table suggestions of
@@ -22,6 +23,7 @@ import logging
 import re
 import sqlite3
 import threading
+from dataclasses import dataclass
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -51,8 +53,24 @@ def plain(text: str) -> str:
     return text.strip()
 
 
-def contributor(lang_dir: Path) -> str | None:
-    """The author name of IT\\contributor.json, None without the file (not a contributor)."""
+@dataclass(frozen=True)
+class Contributor:
+    author: str
+    # "show keys" mode (patch_db.key_tag): "text", "all", None = off; NOT_SET: the file
+    # IT\show_keys.txt decides, as for everybody
+    show_keys: str | None | object
+
+
+NOT_SET = object()
+
+
+def contributor(lang_dir: Path) -> Contributor | None:
+    """The settings of IT\\contributor.json, None without the file (not a contributor):
+
+        {"author": "Ralkeon", "show_keys": "text"}
+
+    show_keys (optional): "text" (string IDs before the texts with words), "all" (every text,
+    templates too), false (off); true = "text"."""
     path = lang_dir / CONTRIBUTOR_FILE
     try:
         data = json.loads(path.read_text(encoding="utf-8-sig"))
@@ -65,7 +83,15 @@ def contributor(lang_dir: Path) -> str | None:
     if not isinstance(author, str) or not author.strip():
         log.warning("%s: no \"author\"", path.name)
         return None
-    return author.strip()
+    mode = data.get("show_keys", NOT_SET)
+    if mode is True:
+        mode = "text"
+    elif mode in (False, None, "off"):
+        mode = None
+    elif mode is not NOT_SET and mode not in ("text", "all"):
+        log.warning("%s: show_keys must be \"text\", \"all\" or false, not %r", path.name, mode)
+        mode = NOT_SET
+    return Contributor(author.strip(), mode)
 
 
 class Editor:
