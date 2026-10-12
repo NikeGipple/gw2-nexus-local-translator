@@ -1,4 +1,4 @@
-"""Local Translator: the correction page of the contributors (http://127.0.0.1:8770).
+"""Local Translator: the correction page of the contributors (http://translate-ui.localhost:8770).
 
 Only for contributors: the page is on when IT\\contributor.json exists, with the name the
 suggestions are signed with, and optionally the "show keys" mode (string IDs in the game, instead
@@ -13,8 +13,8 @@ included, is what contributors send to the author, who reviews them for the patc
 counts until the patch entry of its key changes after it; "Annulla" deletes the last suggestion of
 the key and the game goes back to the one before, the patch, or the translation of the module.
 
-The server listens on 127.0.0.1 only, accepts only requests addressed to that host (no DNS
-rebinding) and saves only same-origin JSON requests (no other site can post to it).
+The server listens on 127.0.0.1 only, accepts only requests addressed to that host, localhost or
+translate-ui.localhost (no DNS rebinding) and saves only same-origin JSON requests (no other site can post to it).
 """
 from __future__ import annotations
 
@@ -35,6 +35,8 @@ from patch_db import KIND_AUTO, KIND_DROP, KIND_REVIEWED, CachePatch, untagged
 log = logging.getLogger("lt")
 
 EDITOR_PORT = 8770
+# browsers send every *.localhost name to 127.0.0.1 by themselves (RFC 6761): no hosts file
+EDITOR_HOST = "translate-ui.localhost"
 CONTRIBUTOR_FILE = "contributor.json"  # in IT\: turns the page on, {"author": "<name>"}
 RESULTS = 50          # rows per search
 MAX_BYTES = 65535     # longest text the addon accepts (UTF-8 bytes)
@@ -231,7 +233,7 @@ class Editor:
 
 
 def _handler(editor: Editor, port: int) -> type[BaseHTTPRequestHandler]:
-    hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
+    hosts = {f"127.0.0.1:{port}", f"localhost:{port}", f"{EDITOR_HOST}:{port}"}
     origins = {f"http://{h}" for h in hosts}
 
     class Handler(BaseHTTPRequestHandler):
@@ -328,7 +330,7 @@ def start(editor: Editor, port: int = EDITOR_PORT) -> ThreadingHTTPServer | None
         return None
     server.daemon_threads = True
     threading.Thread(target=server.serve_forever, daemon=True, name="editor").start()
-    log.info("editor page: http://127.0.0.1:%d", port)
+    log.info("editor page: http://%s:%d", EDITOR_HOST, port)
     return server
 
 
