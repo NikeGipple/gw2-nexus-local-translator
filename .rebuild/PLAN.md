@@ -133,8 +133,7 @@ Each step: what it adds -> checks it completes (`run.py check NAME[:part]`). Don
 `name — commit`. Same 5 module files as the original (tools and strumenti.bat use their names).
 
 ### A. The module talks to the addon (lt_module.py)
-1a. Handshake: frames out (u32 length), protocol_string, the handshake values; exit at once.
-    -> s01_start:it_folder.handshake
+1a. handshake — done
 1b. Wait until the addon closes stdin, then exit 0. -> s01_start:it_folder.exit
 2. Language of the module: LANGUAGES (code, cache key, label, data dir), --lang / folder name,
    unknown -> local_translator.log + exit 3. -> s01 (handshake/exit parts)
