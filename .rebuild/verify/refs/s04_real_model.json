@@ -1,0 +1,335 @@
+{
+ "all_answered": true,
+ "answers": {
+  "1": [
+   [
+    0,
+    0,
+    "Parla con il mercante a Arco del Leone."
+   ]
+  ],
+  "10": [
+   [
+    0,
+    9,
+    "Cittadino[f:\"Cittadina\"]"
+   ]
+  ],
+  "11": [
+   [
+    0,
+    10,
+    "Cittadino[f:\"Cittadina\"] pettegolezzo[f:\"pettegolezza\"]"
+   ]
+  ],
+  "12": [
+   [
+    0,
+    11,
+    "Thief"
+   ]
+  ],
+  "13": [
+   [
+    0,
+    12,
+    "Il drago è sveglio. Corri!"
+   ]
+  ],
+  "14": [
+   [
+    0,
+    13,
+    "Gambali"
+   ]
+  ],
+  "15": [
+   [
+    0,
+    14,
+    "Arco lungo Berserker's"
+   ]
+  ],
+  "16": [
+   [
+    0,
+    15,
+    "La tua salute e' bassa."
+   ]
+  ],
+  "17": [
+   [
+    0,
+    16,
+    "Apri il petto per avere la tua ricompensa."
+   ]
+  ],
+  "18": [
+   [
+    0,
+    17,
+    "%str1% evita il tuo %str3%."
+   ]
+  ],
+  "19": [
+   [
+    0,
+    18,
+    "Vai alla Waypoint."
+   ]
+  ],
+  "2": [
+   [
+    0,
+    1,
+    "Sconfiggi il campione."
+   ]
+  ],
+  "20": [
+   [
+    0,
+    19,
+    "Scortate la roulotte a Divinity's Reach."
+   ]
+  ],
+  "21": [
+   [
+    0,
+    20,
+    "Estetica Sbloccata"
+   ]
+  ],
+  "22": [
+   [
+    0,
+    21,
+    "Fare doppio clic per consumare."
+   ]
+  ],
+  "23": [
+   [
+    0,
+    22,
+    "Arco corto Hunter's"
+   ]
+  ],
+  "24": [
+   [
+    0,
+    23,
+    "Mystic Coin[s]"
+   ]
+  ],
+  "25": [
+   [
+    0,
+    24,
+    "Completamento mappa: 100%%"
+   ]
+  ],
+  "26": [
+   [
+    0,
+    25,
+    "Proteggete il villaggio dai centauri."
+   ]
+  ],
+  "27": [
+   [
+    0,
+    26,
+    "Reward giornaliero di login"
+   ]
+  ],
+  "28": [
+   [
+    0,
+    27,
+    "Raccogliere gettoni bandito %num1%"
+   ]
+  ],
+  "29": [
+   [
+    0,
+    28,
+    "Aiuta il Lionguard."
+   ]
+  ],
+  "3": [
+   [
+    0,
+    2,
+    "Dà il 5%% in più di potenza."
+   ]
+  ],
+  "30": [
+   [
+    0,
+    29,
+    "Usa tutto"
+   ]
+  ],
+  "4": [
+   [
+    0,
+    3,
+    "Ricetta: Arco lungo Pact"
+   ]
+  ],
+  "5": [
+   [
+    0,
+    4,
+    "Medaglia[pl:\"Medaglie\"] di juta precisa"
+   ]
+  ],
+  "6": [
+   [
+    0,
+    5,
+    "Large Bone[s]"
+   ]
+  ],
+  "7": [
+   [
+    0,
+    6,
+    "Storyteller: Abaddon"
+   ]
+  ],
+  "8": [
+   [
+    0,
+    7,
+    "<c=@flavor>Una vecchia lama, ancora affilata.</c>"
+   ]
+  ],
+  "9": [
+   [
+    0,
+    8,
+    "Vincere %num1% giochi arena valutati"
+   ]
+  ]
+ },
+ "cache": [
+  {
+   "s": "Escort the caravan to Divinity's Reach.",
+   "t": "Scortate la roulotte a Divinity's Reach."
+  },
+  {
+   "s": "Talk to the merchant in Lion's Arch.",
+   "t": "Parla con il mercante a Arco del Leone."
+  },
+  {
+   "s": "%str1% evades your %str3%.",
+   "t": "%str1% evita il tuo %str3%."
+  },
+  {
+   "s": "<c=@flavor>An old blade, still sharp.</c>",
+   "t": "<c=@flavor>Una vecchia lama, ancora affilata.</c>"
+  },
+  {
+   "s": "Citizen",
+   "t": "Cittadino[f:\"Cittadina\"]"
+  },
+  {
+   "s": "Collect %num1% bandit token[s]",
+   "t": "Raccogliere gettoni bandito %num1%"
+  },
+  {
+   "s": "Daily Login Reward",
+   "t": "Reward giornaliero di login"
+  },
+  {
+   "s": "Defeat the champion.",
+   "t": "Sconfiggi il campione."
+  },
+  {
+   "s": "Double-click to consume.",
+   "t": "Fare doppio clic per consumare."
+  },
+  {
+   "s": "Gives 5% more power.",
+   "t": "Dà il 5%% in più di potenza."
+  },
+  {
+   "s": "Go to the Waypoint.",
+   "t": "Vai alla Waypoint."
+  },
+  {
+   "s": "Gossiping Citizen",
+   "t": "Cittadino[f:\"Cittadina\"] pettegolezzo[f:\"pettegolezza\"]"
+  },
+  {
+   "s": "Help the Lionguard.",
+   "t": "Aiuta il Lionguard."
+  },
+  {
+   "s": "Large Bone[s]",
+   "t": "Large Bone[s]"
+  },
+  {
+   "s": "Leggings",
+   "t": "Gambali"
+  },
+  {
+   "s": "Map completion: 100%%",
+   "t": "Completamento mappa: 100%%"
+  },
+  {
+   "s": "Mystic Coin[s]",
+   "t": "Mystic Coin[s]"
+  },
+  {
+   "s": "Open the chest to get your reward.",
+   "t": "Apri il petto per avere la tua ricompensa."
+  },
+  {
+   "s": "Precise Jute Medal[s]",
+   "t": "Medaglia[pl:\"Medaglie\"] di juta precisa"
+  },
+  {
+   "s": "Protect the village from the centaurs.",
+   "t": "Proteggete il villaggio dai centauri."
+  },
+  {
+   "s": "Recipe: Pact Longbow",
+   "t": "Ricetta: Arco lungo Pact"
+  },
+  {
+   "s": "Storyteller: Abaddon",
+   "t": "Storyteller: Abaddon"
+  },
+  {
+   "s": "The dragon is awake. Run!",
+   "t": "Il drago è sveglio. Corri!"
+  },
+  {
+   "s": "Thief",
+   "t": "Thief"
+  },
+  {
+   "s": "Use All",
+   "t": "Usa tutto"
+  },
+  {
+   "s": "Win %num1% rated arena game[s]",
+   "t": "Vincere %num1% giochi arena valutati"
+  },
+  {
+   "s": "Your health is low.",
+   "t": "La tua salute e' bassa."
+  }
+ ],
+ "log": [
+  "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+  "i: addon closed the connection: exiting",
+  "i: glossary c7884ff7daa9ac1f (glossary_it.json): 9 exact, 9924 terms, 111 patterns",
+  "i: glossary sync: cache reset (0 lines)",
+  "i: map: 0 strings known",
+  "i: model loaded (2 threads)",
+  "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+  "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+ ]
+}

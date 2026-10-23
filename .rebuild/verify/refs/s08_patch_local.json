@@ -1,0 +1,1352 @@
+{
+ "after_patch_file": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno "
+    ],
+    [
+     0,
+     1,
+     "GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno "
+    ]
+   ]
+  },
+  "applied": [],
+  "cache_db": [
+   [
+    1,
+    "it",
+    1,
+    "GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno "
+   ],
+   [
+    2,
+    "it",
+    2,
+    "Prova due"
+   ]
+  ],
+  "dropped": [
+   [
+    3
+   ]
+  ],
+  "has_file_sig": false,
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary update skipped: <urlopen error offline (fake network)>",
+   "i: map: 2 strings known",
+   "i: patch updated: v1, 1 pieces downloaded (0 KB), 0 removed; 1 reviewed, 0 automatic, 0 with the hash of the English",
+   "i: patch v1: 1 translations sent to the game (1 changed, 0 new)",
+   "i: patch v50: 1 reviewed, 1 automatic, 1 drop, 0 with the hash of the English; made with glossary e7b9f216dc792a7a (same as yours) (ready in <t> s)"
+  ],
+  "meta": [
+   [
+    "commit",
+    "cccccccccccccccccccccccccccccccccccccccc"
+   ],
+   [
+    "glossary",
+    "e7b9f216dc792a7a"
+   ],
+   [
+    "migrated",
+    "1"
+   ],
+   [
+    "source",
+    "pieces"
+   ],
+   [
+    "version",
+    "1"
+   ],
+   [
+    "width",
+    "100"
+   ]
+  ],
+  "patch": [
+   [
+    1,
+    0,
+    "GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno GitHub uno ",
+    null,
+    0,
+    null
+   ]
+  ],
+  "skip": [],
+  "tables": {
+   "applied": [
+    "key",
+    "text"
+   ],
+   "dropped": [
+    "key"
+   ],
+   "meta": [
+    "k",
+    "v"
+   ],
+   "patch": [
+    "key",
+    "kind",
+    "text",
+    "src_hash",
+    "piece",
+    "version"
+   ],
+   "pieces": [
+    "name",
+    "sha256",
+    "entries",
+    "size"
+   ],
+   "skip": [
+    "key"
+   ]
+  }
+ },
+ "archive_h": {
+  "answers": {
+   "5": [
+    [
+     0,
+     1,
+     "Cinque"
+    ]
+   ]
+  },
+  "applied": [],
+  "cache_db": [
+   [
+    5,
+    "it",
+    1,
+    "Cinque"
+   ]
+  ],
+  "dropped": [],
+  "has_file_sig": false,
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive moved to src_hash (all pieces downloaded again)",
+   "i: patch archive: version of every entry added (all pieces downloaded again)",
+   "i: patch v9: 1 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "meta": [
+   [
+    "migrated",
+    "1"
+   ],
+   [
+    "source",
+    "pieces"
+   ],
+   [
+    "version",
+    "9"
+   ]
+  ],
+  "patch": [
+   [
+    5,
+    0,
+    "Cinque",
+    null,
+    0,
+    null
+   ]
+  ],
+  "skip": [],
+  "tables": {
+   "applied": [
+    "key",
+    "text"
+   ],
+   "dropped": [
+    "key"
+   ],
+   "meta": [
+    "k",
+    "v"
+   ],
+   "patch": [
+    "key",
+    "kind",
+    "text",
+    "piece",
+    "src_hash",
+    "version"
+   ],
+   "pieces": [
+    "name",
+    "sha256",
+    "entries",
+    "size"
+   ],
+   "skip": [
+    "key"
+   ]
+  }
+ },
+ "archive_no_version": {
+  "answers": {
+   "5": [
+    [
+     0,
+     1,
+     "Cinque"
+    ]
+   ]
+  },
+  "applied": [],
+  "cache_db": [
+   [
+    5,
+    "it",
+    1,
+    "Cinque"
+   ]
+  ],
+  "dropped": [],
+  "has_file_sig": false,
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive: version of every entry added (all pieces downloaded again)",
+   "i: patch v9: 1 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "meta": [
+   [
+    "migrated",
+    "1"
+   ],
+   [
+    "source",
+    "pieces"
+   ],
+   [
+    "version",
+    "9"
+   ]
+  ],
+  "patch": [
+   [
+    5,
+    0,
+    "Cinque",
+    null,
+    0,
+    null
+   ]
+  ],
+  "skip": [],
+  "tables": {
+   "applied": [
+    "key",
+    "text"
+   ],
+   "dropped": [
+    "key"
+   ],
+   "meta": [
+    "k",
+    "v"
+   ],
+   "patch": [
+    "key",
+    "kind",
+    "text",
+    "src_hash",
+    "piece",
+    "version"
+   ],
+   "pieces": [
+    "name",
+    "sha256",
+    "entries",
+    "size"
+   ],
+   "skip": [
+    "key"
+   ]
+  }
+ },
+ "migrate": {
+  "answers": {
+   "10": [
+    [
+     0,
+     1,
+     "[IT] Ten"
+    ]
+   ],
+   "12": [
+    [
+     0,
+     2,
+     "[IT] Twelve"
+    ]
+   ]
+  },
+  "applied": [
+   [
+    11,
+    "Undici"
+   ]
+  ],
+  "cache_db": [
+   [
+    10,
+    "it",
+    1,
+    "[IT] Ten"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "Undici"
+   ],
+   [
+    12,
+    "it",
+    2,
+    "[IT] Twelve"
+   ]
+  ],
+  "dropped": [
+   [
+    13
+   ],
+   [
+    16
+   ]
+  ],
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/cache_it.jsonl",
+   "IT/map_it.db",
+   "IT/patch_it.applied.json",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal",
+   "IT/patch_it.dropped.json",
+   "IT/patch_it.ids_failed.json",
+   "IT/patch_it.json",
+   "IT/patch_it.skip.json"
+  ],
+  "has_file_sig": true,
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v3, 1 reviewed, 2 automatic, 1 drop",
+   "i: patch v3: 1 reviewed, 2 automatic, 1 drop, 0 with the hash of the English; made with glossary old-fp (different from yours) (ready in <t> s)",
+   "w: patch not applied: the string IDs did not match the map",
+   "w: patch_it.ids_failed.json unreadable: Expecting value: line 1 column 1 (char 0)"
+  ],
+  "meta": [
+   [
+    "glossary",
+    "old-fp"
+   ],
+   [
+    "ids_failed",
+    "{\"reason\": \"migrated\"}"
+   ],
+   [
+    "migrated",
+    "1"
+   ],
+   [
+    "skip_version",
+    "3"
+   ],
+   [
+    "source",
+    "file"
+   ],
+   [
+    "version",
+    "3"
+   ]
+  ],
+  "patch": [
+   [
+    10,
+    0,
+    "Dieci",
+    null,
+    null,
+    null
+   ],
+   [
+    11,
+    1,
+    "Undici",
+    null,
+    null,
+    null
+   ],
+   [
+    12,
+    1,
+    "Dodici",
+    null,
+    null,
+    null
+   ],
+   [
+    13,
+    2,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "skip": [
+   [
+    12
+   ],
+   [
+    15
+   ]
+  ],
+  "tables": {
+   "applied": [
+    "key",
+    "text"
+   ],
+   "dropped": [
+    "key"
+   ],
+   "meta": [
+    "k",
+    "v"
+   ],
+   "patch": [
+    "key",
+    "kind",
+    "text",
+    "src_hash",
+    "piece",
+    "version"
+   ],
+   "pieces": [
+    "name",
+    "sha256",
+    "entries",
+    "size"
+   ],
+   "skip": [
+    "key"
+   ]
+  }
+ },
+ "migrate_invalid_patch": {
+  "answers": {},
+  "applied": [],
+  "cache_db": [],
+  "dropped": [],
+  "has_file_sig": true,
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)",
+   "w: patch patch_it.json unreadable: patch: bad entry 'x' in 'strings'"
+  ],
+  "meta": [
+   [
+    "migrated",
+    "1"
+   ]
+  ],
+  "patch": [],
+  "skip": [],
+  "tables": {
+   "applied": [
+    "key",
+    "text"
+   ],
+   "dropped": [
+    "key"
+   ],
+   "meta": [
+    "k",
+    "v"
+   ],
+   "patch": [
+    "key",
+    "kind",
+    "text",
+    "src_hash",
+    "piece",
+    "version"
+   ],
+   "pieces": [
+    "name",
+    "sha256",
+    "entries",
+    "size"
+   ],
+   "skip": [
+    "key"
+   ]
+  }
+ },
+ "old_suggestions": {
+  "answers": {},
+  "applied": [],
+  "cache_db": [],
+  "dropped": [],
+  "has_file_sig": false,
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "map_tables": {
+   "suggestions": [
+    "id",
+    "key",
+    "en_source",
+    "suggestion",
+    "author",
+    "version",
+    "src_hash",
+    "suggestion_source"
+   ],
+   "texts": [
+    "key",
+    "en",
+    "it",
+    "how",
+    "seen"
+   ]
+  },
+  "meta": [
+   [
+    "migrated",
+    "1"
+   ]
+  ],
+  "patch": [],
+  "rows": [
+   [
+    1,
+    7,
+    "Seven",
+    "Sette",
+    "Ann",
+    0,
+    null,
+    null
+   ]
+  ],
+  "skip": [],
+  "tables": {
+   "applied": [
+    "key",
+    "text"
+   ],
+   "dropped": [
+    "key"
+   ],
+   "meta": [
+    "k",
+    "v"
+   ],
+   "patch": [
+    "key",
+    "kind",
+    "text",
+    "src_hash",
+    "piece",
+    "version"
+   ],
+   "pieces": [
+    "name",
+    "sha256",
+    "entries",
+    "size"
+   ],
+   "skip": [
+    "key"
+   ]
+  }
+ },
+ "patch_file": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "Prova uno"
+    ]
+   ],
+   "2": [
+    [
+     0,
+     2,
+     "Prova due"
+    ]
+   ]
+  },
+  "applied": [],
+  "cache_db": [
+   [
+    1,
+    "it",
+    1,
+    "Prova uno"
+   ],
+   [
+    2,
+    "it",
+    2,
+    "Prova due"
+   ]
+  ],
+  "dropped": [
+   [
+    3
+   ]
+  ],
+  "has_file_sig": false,
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: glossary update skipped: <urlopen error offline (fake network)>",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v50: 1 old translations removed from cache.db (visible at next game start)",
+   "i: patch v50: 1 reviewed, 1 automatic, 1 drop, 0 with the hash of the English; made with glossary e7b9f216dc792a7a (same as yours) (ready in <t> s)",
+   "i: test patch loaded: <W>/addons/text_translator/modules/local_translator_it/test_patch.json"
+  ],
+  "meta": [
+   [
+    "glossary",
+    "e7b9f216dc792a7a"
+   ],
+   [
+    "migrated",
+    "1"
+   ],
+   [
+    "source",
+    "patch-file"
+   ],
+   [
+    "version",
+    "50"
+   ]
+  ],
+  "net": [
+   "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/main",
+   "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/main/glossary/glossary_it.json"
+  ],
+  "patch": [
+   [
+    1,
+    0,
+    "Prova uno",
+    null,
+    null,
+    null
+   ],
+   [
+    2,
+    1,
+    "Prova due",
+    null,
+    null,
+    null
+   ],
+   [
+    3,
+    2,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "skip": [],
+  "tables": {
+   "applied": [
+    "key",
+    "text"
+   ],
+   "dropped": [
+    "key"
+   ],
+   "meta": [
+    "k",
+    "v"
+   ],
+   "patch": [
+    "key",
+    "kind",
+    "text",
+    "src_hash",
+    "piece",
+    "version"
+   ],
+   "pieces": [
+    "name",
+    "sha256",
+    "entries",
+    "size"
+   ],
+   "skip": [
+    "key"
+   ]
+  }
+ },
+ "patch_file_missing": {
+  "answers": {},
+  "applied": [],
+  "cache_db": [],
+  "dropped": [],
+  "has_file_sig": false,
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "meta": [
+   [
+    "migrated",
+    "1"
+   ]
+  ],
+  "patch": [],
+  "skip": [],
+  "tables": {
+   "applied": [
+    "key",
+    "text"
+   ],
+   "dropped": [
+    "key"
+   ],
+   "meta": [
+    "k",
+    "v"
+   ],
+   "patch": [
+    "key",
+    "kind",
+    "text",
+    "src_hash",
+    "piece",
+    "version"
+   ],
+   "pieces": [
+    "name",
+    "sha256",
+    "entries",
+    "size"
+   ],
+   "skip": [
+    "key"
+   ]
+  }
+ },
+ "reimport_broken": {
+  "answers": {},
+  "applied": [
+   [
+    11,
+    "Undici"
+   ]
+  ],
+  "cache_db": [
+   [
+    10,
+    "it",
+    1,
+    "[IT] Ten"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "Undici"
+   ],
+   [
+    12,
+    "it",
+    2,
+    "[IT] Twelve"
+   ]
+  ],
+  "dropped": [
+   [
+    13
+   ],
+   [
+    16
+   ]
+  ],
+  "has_file_sig": true,
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache loaded: 2 translations",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: map: 2 strings known",
+   "i: patch v4: 1 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary e7b9f216dc792a7a (same as yours) (ready in <t> s)",
+   "w: patch not applied: the string IDs did not match the map",
+   "w: patch_it.json unreadable: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+  ],
+  "meta": [
+   [
+    "glossary",
+    "e7b9f216dc792a7a"
+   ],
+   [
+    "ids_failed",
+    "{\"reason\": \"migrated\"}"
+   ],
+   [
+    "migrated",
+    "1"
+   ],
+   [
+    "skip_version",
+    "3"
+   ],
+   [
+    "source",
+    "file"
+   ],
+   [
+    "version",
+    "4"
+   ]
+  ],
+  "patch": [
+   [
+    10,
+    0,
+    "Dieci nuova",
+    null,
+    null,
+    null
+   ]
+  ],
+  "skip": [
+   [
+    12
+   ],
+   [
+    15
+   ]
+  ],
+  "tables": {
+   "applied": [
+    "key",
+    "text"
+   ],
+   "dropped": [
+    "key"
+   ],
+   "meta": [
+    "k",
+    "v"
+   ],
+   "patch": [
+    "key",
+    "kind",
+    "text",
+    "src_hash",
+    "piece",
+    "version"
+   ],
+   "pieces": [
+    "name",
+    "sha256",
+    "entries",
+    "size"
+   ],
+   "skip": [
+    "key"
+   ]
+  }
+ },
+ "reimport_newer": {
+  "answers": {
+   "10": [
+    [
+     0,
+     1,
+     "[IT] Ten"
+    ]
+   ]
+  },
+  "applied": [
+   [
+    11,
+    "Undici"
+   ]
+  ],
+  "cache_db": [
+   [
+    10,
+    "it",
+    1,
+    "[IT] Ten"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "Undici"
+   ],
+   [
+    12,
+    "it",
+    2,
+    "[IT] Twelve"
+   ]
+  ],
+  "dropped": [
+   [
+    13
+   ],
+   [
+    16
+   ]
+  ],
+  "has_file_sig": true,
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache loaded: 2 translations",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: local patch file imported: v4 (patch_it.json)",
+   "i: map: 2 strings known",
+   "i: patch v4: 1 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary e7b9f216dc792a7a (same as yours) (ready in <t> s)",
+   "w: patch not applied: the string IDs did not match the map"
+  ],
+  "meta": [
+   [
+    "glossary",
+    "e7b9f216dc792a7a"
+   ],
+   [
+    "ids_failed",
+    "{\"reason\": \"migrated\"}"
+   ],
+   [
+    "migrated",
+    "1"
+   ],
+   [
+    "skip_version",
+    "3"
+   ],
+   [
+    "source",
+    "file"
+   ],
+   [
+    "version",
+    "4"
+   ]
+  ],
+  "patch": [
+   [
+    10,
+    0,
+    "Dieci nuova",
+    null,
+    null,
+    null
+   ]
+  ],
+  "skip": [
+   [
+    12
+   ],
+   [
+    15
+   ]
+  ],
+  "tables": {
+   "applied": [
+    "key",
+    "text"
+   ],
+   "dropped": [
+    "key"
+   ],
+   "meta": [
+    "k",
+    "v"
+   ],
+   "patch": [
+    "key",
+    "kind",
+    "text",
+    "src_hash",
+    "piece",
+    "version"
+   ],
+   "pieces": [
+    "name",
+    "sha256",
+    "entries",
+    "size"
+   ],
+   "skip": [
+    "key"
+   ]
+  }
+ },
+ "reimport_older": {
+  "answers": {},
+  "applied": [
+   [
+    11,
+    "Undici"
+   ]
+  ],
+  "cache_db": [
+   [
+    10,
+    "it",
+    1,
+    "[IT] Ten"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "Undici"
+   ],
+   [
+    12,
+    "it",
+    2,
+    "[IT] Twelve"
+   ]
+  ],
+  "dropped": [
+   [
+    13
+   ],
+   [
+    16
+   ]
+  ],
+  "has_file_sig": true,
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache loaded: 2 translations",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: local patch file v2 ignored: older than v4",
+   "i: map: 2 strings known",
+   "i: patch v4: 1 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary e7b9f216dc792a7a (same as yours) (ready in <t> s)",
+   "w: patch not applied: the string IDs did not match the map"
+  ],
+  "meta": [
+   [
+    "glossary",
+    "e7b9f216dc792a7a"
+   ],
+   [
+    "ids_failed",
+    "{\"reason\": \"migrated\"}"
+   ],
+   [
+    "migrated",
+    "1"
+   ],
+   [
+    "skip_version",
+    "3"
+   ],
+   [
+    "source",
+    "file"
+   ],
+   [
+    "version",
+    "4"
+   ]
+  ],
+  "patch": [
+   [
+    10,
+    0,
+    "Dieci nuova",
+    null,
+    null,
+    null
+   ]
+  ],
+  "skip": [
+   [
+    12
+   ],
+   [
+    15
+   ]
+  ],
+  "tables": {
+   "applied": [
+    "key",
+    "text"
+   ],
+   "dropped": [
+    "key"
+   ],
+   "meta": [
+    "k",
+    "v"
+   ],
+   "patch": [
+    "key",
+    "kind",
+    "text",
+    "src_hash",
+    "piece",
+    "version"
+   ],
+   "pieces": [
+    "name",
+    "sha256",
+    "entries",
+    "size"
+   ],
+   "skip": [
+    "key"
+   ]
+  }
+ },
+ "reimport_same_file": {
+  "answers": {},
+  "applied": [
+   [
+    11,
+    "Undici"
+   ]
+  ],
+  "cache_db": [
+   [
+    10,
+    "it",
+    1,
+    "[IT] Ten"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "Undici"
+   ],
+   [
+    12,
+    "it",
+    2,
+    "[IT] Twelve"
+   ]
+  ],
+  "dropped": [
+   [
+    13
+   ],
+   [
+    16
+   ]
+  ],
+  "has_file_sig": true,
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache loaded: 2 translations",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: map: 2 strings known",
+   "i: patch v4: 1 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary e7b9f216dc792a7a (same as yours) (ready in <t> s)",
+   "w: patch not applied: the string IDs did not match the map"
+  ],
+  "meta": [
+   [
+    "glossary",
+    "e7b9f216dc792a7a"
+   ],
+   [
+    "ids_failed",
+    "{\"reason\": \"migrated\"}"
+   ],
+   [
+    "migrated",
+    "1"
+   ],
+   [
+    "skip_version",
+    "3"
+   ],
+   [
+    "source",
+    "file"
+   ],
+   [
+    "version",
+    "4"
+   ]
+  ],
+  "patch": [
+   [
+    10,
+    0,
+    "Dieci nuova",
+    null,
+    null,
+    null
+   ]
+  ],
+  "skip": [
+   [
+    12
+   ],
+   [
+    15
+   ]
+  ],
+  "tables": {
+   "applied": [
+    "key",
+    "text"
+   ],
+   "dropped": [
+    "key"
+   ],
+   "meta": [
+    "k",
+    "v"
+   ],
+   "patch": [
+    "key",
+    "kind",
+    "text",
+    "src_hash",
+    "piece",
+    "version"
+   ],
+   "pieces": [
+    "name",
+    "sha256",
+    "entries",
+    "size"
+   ],
+   "skip": [
+    "key"
+   ]
+  }
+ },
+ "tiny_gzip_piece": {
+  "answers": {},
+  "applied": [],
+  "cache_db": [],
+  "dropped": [],
+  "has_file_sig": false,
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: glossary update skipped: <urlopen error offline (fake network)>",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch update skipped: file larger than 24 bytes",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "meta": [
+   [
+    "migrated",
+    "1"
+   ]
+  ],
+  "patch": [],
+  "skip": [],
+  "tables": {
+   "applied": [
+    "key",
+    "text"
+   ],
+   "dropped": [
+    "key"
+   ],
+   "meta": [
+    "k",
+    "v"
+   ],
+   "patch": [
+    "key",
+    "kind",
+    "text",
+    "src_hash",
+    "piece",
+    "version"
+   ],
+   "pieces": [
+    "name",
+    "sha256",
+    "entries",
+    "size"
+   ],
+   "skip": [
+    "key"
+   ]
+  }
+ }
+}

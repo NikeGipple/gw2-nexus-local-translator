@@ -1,0 +1,1594 @@
+{
+ "answers": {
+  "1": [
+   [
+    0,
+    11,
+    "Salve"
+   ],
+   [
+    0,
+    11,
+    "Salve a tutti"
+   ],
+   [
+    0,
+    11,
+    "Salve a tutti"
+   ],
+   [
+    0,
+    11,
+    "Salve"
+   ],
+   [
+    0,
+    11,
+    "Ciao"
+   ]
+  ],
+  "3": [
+   [
+    0,
+    33,
+    "Tre corretto"
+   ],
+   [
+    0,
+    99,
+    "Patch tre"
+   ]
+  ],
+  "7": [
+   [
+    0,
+    77,
+    "Sette"
+   ]
+  ]
+ },
+ "cache_db": [
+  [
+   1,
+   "it",
+   11,
+   "Ciao"
+  ],
+  [
+   3,
+   "it",
+   99,
+   "Patch tre"
+  ],
+  [
+   4,
+   "it",
+   44,
+   "Auto quattro"
+  ],
+  [
+   6,
+   "it",
+   66,
+   "Sei <c=@x>colore</c>"
+  ]
+ ],
+ "calls": [
+  [
+   "page None",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "text/html; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "page": {
+     "author_shown": true,
+     "length_gt": true
+    },
+    "status": 200
+   }
+  ],
+  [
+   "page localhost:<port>",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "text/html; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "page": {
+     "author_shown": true,
+     "length_gt": true
+    },
+    "status": 200
+   }
+  ],
+  [
+   "page suggestions.localhost:<port>",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "text/html; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "page": {
+     "author_shown": true,
+     "length_gt": true
+    },
+    "status": 200
+   }
+  ],
+  [
+   "page evil.example",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "bad host"
+    },
+    "status": 403
+   }
+  ],
+  [
+   "page 127.0.0.1:1",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "bad host"
+    },
+    "status": 403
+   }
+  ],
+  [
+   "not found",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "not found"
+    },
+    "status": 404
+   }
+  ],
+  [
+   "search 'Ciao'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Hello",
+      "key": 1,
+      "patch": null,
+      "prev": null,
+      "shown": "Ciao",
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "search exact 'Ciao'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Hello",
+      "key": 1,
+      "patch": null,
+      "prev": null,
+      "shown": "Ciao",
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "search 'ciao'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Hello",
+      "key": 1,
+      "patch": null,
+      "prev": null,
+      "shown": "Ciao",
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "search exact 'ciao'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [],
+    "status": 200
+   }
+  ],
+  [
+   "search 'hello'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Hello",
+      "key": 1,
+      "patch": null,
+      "prev": null,
+      "shown": "Ciao",
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "search exact 'hello'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [],
+    "status": 200
+   }
+  ],
+  [
+   "search 'HELLO'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Hello",
+      "key": 1,
+      "patch": null,
+      "prev": null,
+      "shown": "Ciao",
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "search exact 'HELLO'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [],
+    "status": 200
+   }
+  ],
+  [
+   "search '3'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Patch text",
+      "key": 3,
+      "patch": {
+       "kind": "reviewed",
+       "text": "Patch tre",
+       "version": 3
+      },
+      "prev": null,
+      "shown": "Patch tre",
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "search exact '3'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Patch text",
+      "key": 3,
+      "patch": {
+       "kind": "reviewed",
+       "text": "Patch tre",
+       "version": 3
+      },
+      "prev": null,
+      "shown": "Patch tre",
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "search ''",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [],
+    "status": 200
+   }
+  ],
+  [
+   "search exact ''",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [],
+    "status": 200
+   }
+  ],
+  [
+   "search '  '",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [],
+    "status": 200
+   }
+  ],
+  [
+   "search exact '  '",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [],
+    "status": 200
+   }
+  ],
+  [
+   "search 'colore'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Six colour",
+      "key": 6,
+      "patch": null,
+      "prev": null,
+      "shown": "Sei <c=@x>colore</c>",
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "search exact 'colore'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [],
+    "status": 200
+   }
+  ],
+  [
+   "search 'Sei colore'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Six colour",
+      "key": 6,
+      "patch": null,
+      "prev": null,
+      "shown": "Sei <c=@x>colore</c>",
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "search exact 'Sei colore'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Six colour",
+      "key": 6,
+      "patch": null,
+      "prev": null,
+      "shown": "Sei <c=@x>colore</c>",
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "search '100%'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Goodbye 100%",
+      "key": 2,
+      "patch": null,
+      "prev": null,
+      "shown": null,
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "search exact '100%'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [],
+    "status": 200
+   }
+  ],
+  [
+   "search '_'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [],
+    "status": 200
+   }
+  ],
+  [
+   "search exact '_'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [],
+    "status": 200
+   }
+  ],
+  [
+   "search 'Patch tre'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Patch text",
+      "key": 3,
+      "patch": {
+       "kind": "reviewed",
+       "text": "Patch tre",
+       "version": 3
+      },
+      "prev": null,
+      "shown": "Patch tre",
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "search exact 'Patch tre'",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Patch text",
+      "key": 3,
+      "patch": {
+       "kind": "reviewed",
+       "text": "Patch tre",
+       "version": 3
+      },
+      "prev": null,
+      "shown": "Patch tre",
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "recent empty",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [],
+    "status": 200
+   }
+  ],
+  [
+   "save 1",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "en": "Hello",
+     "key": 1,
+     "patch": null,
+     "prev": {
+      "text": "Ciao",
+      "what": "module"
+     },
+     "shown": "<read while the addon saves>",
+     "suggestion": {
+      "author": "Ann <&\">",
+      "text": "Salve",
+      "valid": true,
+      "version": 3
+     },
+     "undo": 1
+    },
+    "status": 200
+   }
+  ],
+  [
+   "save 1 -> settled",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Hello",
+      "key": 1,
+      "patch": null,
+      "prev": {
+       "text": "Ciao",
+       "what": "module"
+      },
+      "shown": "Salve",
+      "suggestion": {
+       "author": "Ann <&\">",
+       "text": "Salve",
+       "valid": true,
+       "version": 3
+      },
+      "undo": 1
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "save 1 again",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "en": "Hello",
+     "key": 1,
+     "patch": null,
+     "prev": {
+      "author": "Ann <&\">",
+      "text": "Salve",
+      "what": "suggestion"
+     },
+     "shown": "<read while the addon saves>",
+     "suggestion": {
+      "author": "Ann <&\">",
+      "text": "Salve a tutti",
+      "valid": true,
+      "version": 3
+     },
+     "undo": 2
+    },
+    "status": 200
+   }
+  ],
+  [
+   "save 1 again -> settled",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Hello",
+      "key": 1,
+      "patch": null,
+      "prev": {
+       "author": "Ann <&\">",
+       "text": "Salve",
+       "what": "suggestion"
+      },
+      "shown": "Salve a tutti",
+      "suggestion": {
+       "author": "Ann <&\">",
+       "text": "Salve a tutti",
+       "valid": true,
+       "version": 3
+      },
+      "undo": 2
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "save 3 (patch)",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "en": "Patch text",
+     "key": 3,
+     "patch": {
+      "kind": "reviewed",
+      "text": "Patch tre",
+      "version": 3
+     },
+     "prev": {
+      "text": "Patch tre",
+      "what": "reviewed"
+     },
+     "shown": "<read while the addon saves>",
+     "suggestion": {
+      "author": "Ann <&\">",
+      "text": "Tre corretto",
+      "valid": true,
+      "version": 3
+     },
+     "undo": 1
+    },
+    "status": 200
+   }
+  ],
+  [
+   "save 3 (patch) -> settled",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Patch text",
+      "key": 3,
+      "patch": {
+       "kind": "reviewed",
+       "text": "Patch tre",
+       "version": 3
+      },
+      "prev": {
+       "text": "Patch tre",
+       "what": "reviewed"
+      },
+      "shown": "Tre corretto",
+      "suggestion": {
+       "author": "Ann <&\">",
+       "text": "Tre corretto",
+       "valid": true,
+       "version": 3
+      },
+      "undo": 1
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "save 7 (unknown)",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "en": "",
+     "key": 7,
+     "patch": null,
+     "prev": {
+      "text": null,
+      "what": "module"
+     },
+     "shown": "<read while the addon saves>",
+     "suggestion": {
+      "author": "Ann <&\">",
+      "text": "Sette",
+      "valid": true,
+      "version": 3
+     },
+     "undo": 1
+    },
+    "status": 200
+   }
+  ],
+  [
+   "save 7 (unknown) -> settled",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "",
+      "key": 7,
+      "patch": null,
+      "prev": {
+       "text": null,
+       "what": "module"
+      },
+      "shown": null,
+      "suggestion": {
+       "author": "Ann <&\">",
+       "text": "Sette",
+       "valid": true,
+       "version": 3
+      },
+      "undo": 1
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "save 4 same text",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "en": "",
+     "key": 4,
+     "patch": {
+      "kind": "automatic",
+      "text": "Auto quattro",
+      "version": 3
+     },
+     "prev": {
+      "text": "Auto quattro",
+      "what": "automatic"
+     },
+     "shown": "<read while the addon saves>",
+     "suggestion": {
+      "author": "Ann <&\">",
+      "text": "Auto quattro",
+      "valid": true,
+      "version": 3
+     },
+     "undo": 1
+    },
+    "status": 200
+   }
+  ],
+  [
+   "save 4 same text -> settled",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "",
+      "key": 4,
+      "patch": {
+       "kind": "automatic",
+       "text": "Auto quattro",
+       "version": 3
+      },
+      "prev": {
+       "text": "Auto quattro",
+       "what": "automatic"
+      },
+      "shown": "Auto quattro",
+      "suggestion": {
+       "author": "Ann <&\">",
+       "text": "Auto quattro",
+       "valid": true,
+       "version": 3
+      },
+      "undo": 1
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "recent",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "author": "Ann <&\">",
+      "key": 4,
+      "text": "Auto quattro",
+      "version": 3
+     },
+     {
+      "author": "Ann <&\">",
+      "key": 7,
+      "text": "Sette",
+      "version": 3
+     },
+     {
+      "author": "Ann <&\">",
+      "key": 3,
+      "text": "Tre corretto",
+      "version": 3
+     },
+     {
+      "author": "Ann <&\">",
+      "key": 1,
+      "text": "Salve a tutti",
+      "version": 3
+     },
+     {
+      "author": "Ann <&\">",
+      "key": 1,
+      "text": "Salve",
+      "version": 3
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "search 1",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Hello",
+      "key": 1,
+      "patch": null,
+      "prev": {
+       "author": "Ann <&\">",
+       "text": "Salve",
+       "what": "suggestion"
+      },
+      "shown": "Salve a tutti",
+      "suggestion": {
+       "author": "Ann <&\">",
+       "text": "Salve a tutti",
+       "valid": true,
+       "version": 3
+      },
+      "undo": 2
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "undo 1",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "en": "Hello",
+     "key": 1,
+     "patch": null,
+     "prev": {
+      "text": "Ciao",
+      "what": "module"
+     },
+     "shown": "<read while the addon saves>",
+     "suggestion": {
+      "author": "Ann <&\">",
+      "text": "Salve",
+      "valid": true,
+      "version": 3
+     },
+     "undo": 1
+    },
+    "status": 200
+   }
+  ],
+  [
+   "undo 1 -> settled",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Hello",
+      "key": 1,
+      "patch": null,
+      "prev": {
+       "text": "Ciao",
+       "what": "module"
+      },
+      "shown": "Salve",
+      "suggestion": {
+       "author": "Ann <&\">",
+       "text": "Salve",
+       "valid": true,
+       "version": 3
+      },
+      "undo": 1
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "undo 1 again",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "en": "Hello",
+     "key": 1,
+     "patch": null,
+     "prev": null,
+     "shown": "<read while the addon saves>",
+     "suggestion": null,
+     "undo": 0
+    },
+    "status": 200
+   }
+  ],
+  [
+   "undo 1 again -> settled",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Hello",
+      "key": 1,
+      "patch": null,
+      "prev": null,
+      "shown": "Ciao",
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "undo 1 nothing",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "nothing to undo"
+    },
+    "status": 400
+   }
+  ],
+  [
+   "undo 3",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "en": "Patch text changed",
+     "key": 3,
+     "patch": {
+      "kind": "reviewed",
+      "text": "Patch tre",
+      "version": 3
+     },
+     "prev": null,
+     "shown": "<read while the addon saves>",
+     "suggestion": null,
+     "undo": 0
+    },
+    "status": 200
+   }
+  ],
+  [
+   "undo 3 -> settled",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Patch text changed",
+      "key": 3,
+      "patch": {
+       "kind": "reviewed",
+       "text": "Patch tre",
+       "version": 3
+      },
+      "prev": null,
+      "shown": "Patch tre",
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "undo 7",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "en": "Seven",
+     "key": 7,
+     "patch": null,
+     "prev": null,
+     "shown": "<read while the addon saves>",
+     "suggestion": null,
+     "undo": 0
+    },
+    "status": 200
+   }
+  ],
+  [
+   "undo 7 -> settled",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Seven",
+      "key": 7,
+      "patch": null,
+      "prev": null,
+      "shown": null,
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "search 7",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": [
+     {
+      "en": "Seven",
+      "key": 7,
+      "patch": null,
+      "prev": null,
+      "shown": null,
+      "suggestion": null,
+      "undo": 0
+     }
+    ],
+    "status": 200
+   }
+  ],
+  [
+   "save bad origin",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "forbidden"
+    },
+    "status": 403
+   }
+  ],
+  [
+   "save no origin",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "forbidden"
+    },
+    "status": 403
+   }
+  ],
+  [
+   "save no json type",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "forbidden"
+    },
+    "status": 403
+   }
+  ],
+  [
+   "save bad host",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "bad host"
+    },
+    "status": 403
+   }
+  ],
+  [
+   "post other path",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "not found"
+    },
+    "status": 404
+   }
+  ],
+  [
+   "bad json",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+    },
+    "status": 400
+   }
+  ],
+  [
+   "no key",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "'key'"
+    },
+    "status": 400
+   }
+  ],
+  [
+   "bad key",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "bad key"
+    },
+    "status": 400
+   }
+  ],
+  [
+   "huge key",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "bad key"
+    },
+    "status": 400
+   }
+  ],
+  [
+   "text key",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "invalid literal for int() with base 10: 'abc'"
+    },
+    "status": 400
+   }
+  ],
+  [
+   "empty text",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "empty text"
+    },
+    "status": 400
+   }
+  ],
+  [
+   "too long",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "text too long"
+    },
+    "status": 400
+   }
+  ],
+  [
+   "too big",
+   {
+    "headers": {
+     "Cache-Control": "no-store",
+     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'",
+     "Content-Type": "application/json; charset=utf-8",
+     "X-Content-Type-Options": "nosniff"
+    },
+    "json": {
+     "error": "request too big"
+    },
+    "status": 400
+   }
+  ]
+ ],
+ "contributor_blank": [
+  "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+  "i: TEST MODE: answering '[IT] text', no real translation",
+  "i: addon closed the connection: exiting",
+  "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+  "i: glossary sync: cache reset (0 lines)",
+  "i: map: 0 strings known",
+  "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+  "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)",
+  "w: contributor.json: no \"author\""
+ ],
+ "contributor_broken": [
+  "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+  "i: TEST MODE: answering '[IT] text', no real translation",
+  "i: addon closed the connection: exiting",
+  "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+  "i: glossary sync: cache reset (0 lines)",
+  "i: map: 0 strings known",
+  "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+  "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)",
+  "w: contributor.json unreadable: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+ ],
+ "contributor_list": [
+  "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+  "i: TEST MODE: answering '[IT] text', no real translation",
+  "i: addon closed the connection: exiting",
+  "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+  "i: glossary sync: cache reset (0 lines)",
+  "i: map: 0 strings known",
+  "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+  "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)",
+  "w: contributor.json: no \"author\""
+ ],
+ "contributor_no_author": [
+  "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+  "i: TEST MODE: answering '[IT] text', no real translation",
+  "i: addon closed the connection: exiting",
+  "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+  "i: glossary sync: cache reset (0 lines)",
+  "i: map: 0 strings known",
+  "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+  "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)",
+  "w: contributor.json: no \"author\""
+ ],
+ "log": [
+  "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+  "i: TEST MODE: answering '[IT] text', no real translation",
+  "i: addon closed the connection: exiting",
+  "i: contributor Ann <&\">: suggestions on",
+  "i: editor page: http://suggestions.localhost:<port>",
+  "i: editor: suggestion for key 1",
+  "i: editor: suggestion for key 1",
+  "i: editor: suggestion for key 1 undone",
+  "i: editor: suggestion for key 1 undone",
+  "i: editor: suggestion for key 3",
+  "i: editor: suggestion for key 3 undone",
+  "i: editor: suggestion for key 4 (not sent: same text, or the game does not hold it yet)",
+  "i: editor: suggestion for key 7 (not sent: same text, or the game does not hold it yet)",
+  "i: editor: suggestion for key 7 undone",
+  "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+  "i: glossary sync: cache reset (0 lines)",
+  "i: map: 4 strings known",
+  "i: patch archive created from the v0.4 files in <t> s: v3, 1 reviewed, 1 automatic, 1 drop",
+  "i: patch v3: 1 reviewed, 1 automatic, 1 drop, 0 with the hash of the English; made with glossary x (different from yours) (ready in <t> s)",
+  "i: patch v3: 1 translations sent to the game (1 changed, 0 new)",
+  "i: patch v3: 1 translations sent to the game (1 changed, 0 new)",
+  "i: patch v3: 1 translations sent to the game (1 changed, 0 new)",
+  "i: patch v3: 1 translations sent to the game (1 changed, 0 new)"
+ ],
+ "map": [
+  [
+   1,
+   "Hello",
+   "Ciao",
+   "live"
+  ],
+  [
+   2,
+   "Goodbye 100%",
+   null,
+   "live"
+  ],
+  [
+   3,
+   "Patch text changed",
+   "Patch tre",
+   "live"
+  ],
+  [
+   6,
+   "Six colour",
+   "Sei colore",
+   "live"
+  ],
+  [
+   7,
+   "Seven",
+   null,
+   "live"
+  ]
+ ],
+ "port_taken": [
+  "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+  "i: TEST MODE: answering '[IT] text', no real translation",
+  "i: addon closed the connection: exiting",
+  "i: contributor Bo: suggestions on",
+  "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+  "i: glossary sync: cache reset (0 lines)",
+  "i: map: 0 strings known",
+  "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+  "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)",
+  "w: editor page not started (port <port>): [Errno 98] Address already in use"
+ ],
+ "suggestions": [
+  [
+   5,
+   4,
+   "",
+   "Auto quattro",
+   "Auto quattro",
+   "Ann <&\">",
+   3,
+   44
+  ]
+ ]
+}

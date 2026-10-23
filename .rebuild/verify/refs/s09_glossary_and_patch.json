@@ -1,0 +1,335 @@
+{
+ "glossary_changed": {
+  "answers": {
+   "2": [
+    [
+     0,
+     2,
+     "[IT] Two"
+    ]
+   ],
+   "3": [
+    [
+     0,
+     3,
+     "Altro testo"
+    ]
+   ]
+  },
+  "applied": [
+   [
+    3,
+    "Altro testo"
+   ]
+  ],
+  "cache": [
+   {
+    "s": "Two",
+    "t": "[IT] Two"
+   }
+  ],
+  "cache_db": [
+   [
+    1,
+    "it",
+    0,
+    "[IT] The Drago sleeps!"
+   ],
+   [
+    2,
+    "it",
+    2,
+    "[IT] Two"
+   ],
+   [
+    3,
+    "it",
+    3,
+    "Altro testo"
+   ]
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache loaded: 1 translations",
+   "i: cache.db: 2 old translations removed (glossary changed; asked again at next game start)",
+   "i: glossary 67acfde825ebafca (glossary_it.json): 0 exact, 1 terms, 0 patterns",
+   "i: glossary sync: 1 entries changed, 1 cached lines dropped, 0 kept",
+   "i: glossary updated: 4b1777e80339f1ff (0 exact, 1 terms)",
+   "i: map: 1 strings known",
+   "i: patch up to date (v1)",
+   "i: patch v1: 1 reviewed, 2 automatic, 0 drop, 0 with the hash of the English; made with glossary made-with-another-glossary (different from yours) (ready in <t> s)"
+  ],
+  "meta": [
+   [
+    "commit",
+    "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+   ],
+   [
+    "glossary",
+    "made-with-another-glossary"
+   ],
+   [
+    "migrated",
+    "1"
+   ],
+   [
+    "skip_version",
+    "1"
+   ],
+   [
+    "source",
+    "pieces"
+   ],
+   [
+    "version",
+    "1"
+   ],
+   [
+    "width",
+    "100"
+   ]
+  ],
+  "skip": [
+   [
+    2
+   ]
+  ]
+ },
+ "local_translation": {
+  "answers": {
+   "4": [
+    [
+     0,
+     4,
+     "[IT] The Drago sleeps"
+    ]
+   ]
+  },
+  "applied": [],
+  "cache": [
+   {
+    "s": "The Dragon sleeps",
+    "t": "[IT] The Drago sleeps"
+   }
+  ],
+  "cache_db": [
+   [
+    1,
+    "it",
+    0,
+    "[IT] The Drago sleeps!"
+   ],
+   [
+    2,
+    "it",
+    0,
+    "x [IT] The Drago sleeps"
+   ],
+   [
+    3,
+    "it",
+    0,
+    "Altro testo"
+   ],
+   [
+    4,
+    "it",
+    4,
+    "[IT] The Drago sleeps"
+   ]
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary 67acfde825ebafca (glossary_it.json): 0 exact, 1 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "meta": [
+   [
+    "migrated",
+    "1"
+   ]
+  ],
+  "skip": []
+ },
+ "patch_v1": {
+  "answers": {},
+  "applied": [
+   [
+    2,
+    "x [IT] The Drago sleeps"
+   ],
+   [
+    3,
+    "Altro testo"
+   ]
+  ],
+  "cache": [
+   {
+    "s": "The Dragon sleeps",
+    "t": "[IT] The Drago sleeps"
+   }
+  ],
+  "cache_db": [
+   [
+    1,
+    "it",
+    0,
+    "[IT] The Drago sleeps!"
+   ],
+   [
+    2,
+    "it",
+    0,
+    "x [IT] The Drago sleeps"
+   ],
+   [
+    3,
+    "it",
+    0,
+    "Altro testo"
+   ],
+   [
+    4,
+    "it",
+    4,
+    "[IT] The Drago sleeps"
+   ]
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache loaded: 1 translations",
+   "i: glossary 67acfde825ebafca (glossary_it.json): 0 exact, 1 terms, 0 patterns",
+   "i: glossary up to date",
+   "i: map: 1 strings known",
+   "i: patch updated: v1, 1 pieces downloaded (0 KB), 0 removed; 1 reviewed, 2 automatic, 0 with the hash of the English",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "meta": [
+   [
+    "commit",
+    "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+   ],
+   [
+    "glossary",
+    "made-with-another-glossary"
+   ],
+   [
+    "migrated",
+    "1"
+   ],
+   [
+    "source",
+    "pieces"
+   ],
+   [
+    "version",
+    "1"
+   ],
+   [
+    "width",
+    "100"
+   ]
+  ],
+  "skip": []
+ },
+ "patch_with_my_glossary": {
+  "answers": {
+   "2": [
+    [
+     0,
+     2,
+     "x [IT] The Drago sleeps"
+    ],
+    [
+     0,
+     2,
+     "x [IT] The Drago sleeps"
+    ]
+   ]
+  },
+  "applied": [
+   [
+    2,
+    "x [IT] The Drago sleeps"
+   ],
+   [
+    3,
+    "Altro testo"
+   ]
+  ],
+  "cache": [
+   {
+    "s": "Two",
+    "t": "[IT] Two"
+   }
+  ],
+  "cache_db": [
+   [
+    1,
+    "it",
+    0,
+    "[IT] The Drago sleeps!"
+   ],
+   [
+    2,
+    "it",
+    2,
+    "x [IT] The Drago sleeps"
+   ],
+   [
+    3,
+    "it",
+    3,
+    "Altro testo"
+   ]
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache loaded: 1 translations",
+   "i: glossary 4b1777e80339f1ff (glossary_it.json): 0 exact, 1 terms, 0 patterns",
+   "i: glossary up to date",
+   "i: map: 3 strings known",
+   "i: patch updated: v2, 0 pieces downloaded (0 KB), 0 removed; 1 reviewed, 2 automatic, 0 with the hash of the English",
+   "i: patch v1: 1 reviewed, 2 automatic, 0 drop, 0 with the hash of the English; made with glossary made-with-another-glossary (different from yours) (ready in <t> s)",
+   "i: patch v2: 1 translations sent to the game (1 changed, 0 new)"
+  ],
+  "meta": [
+   [
+    "commit",
+    "ffffffffffffffffffffffffffffffffffffffff"
+   ],
+   [
+    "glossary",
+    "4b1777e80339f1ff"
+   ],
+   [
+    "migrated",
+    "1"
+   ],
+   [
+    "source",
+    "pieces"
+   ],
+   [
+    "version",
+    "2"
+   ],
+   [
+    "width",
+    "100"
+   ]
+  ],
+  "skip": []
+ }
+}

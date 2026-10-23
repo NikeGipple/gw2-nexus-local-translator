@@ -1,0 +1,1299 @@
+{
+ "first": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1001,
+     ""
+    ]
+   ],
+   "10": [
+    [
+     0,
+     1010,
+     "[null]"
+    ]
+   ],
+   "11": [
+    [
+     0,
+     1011,
+     "x"
+    ]
+   ],
+   "12": [
+    [
+     0,
+     1012,
+     "12345"
+    ]
+   ],
+   "13": [
+    [
+     0,
+     1013,
+     "6]2Tgarbled"
+    ]
+   ],
+   "14": [
+    [
+     0,
+     1014,
+     "Waypoint"
+    ]
+   ],
+   "15": [
+    [
+     0,
+     1015,
+     "<c=@reminder>Waypoint</c>"
+    ]
+   ],
+   "16": [
+    [
+     0,
+     1016,
+     "%str1%Gambali%str2%"
+    ]
+   ],
+   "17": [
+    [
+     0,
+     1017,
+     "Arco lungo Pact"
+    ]
+   ],
+   "18": [
+    [
+     0,
+     1018,
+     "<c=@reminder>Arco corto Strong Bandit</c>"
+    ]
+   ],
+   "19": [
+    [
+     0,
+     1019,
+     "[IT] Welcome to Arco del Leone!"
+    ]
+   ],
+   "2": [
+    [
+     0,
+     1002,
+     "   "
+    ]
+   ],
+   "20": [
+    [
+     0,
+     1020,
+     "[IT] Visit Arco del Leone and Divinity's Reach."
+    ]
+   ],
+   "21": [
+    [
+     0,
+     1021,
+     "dio dei raid"
+    ]
+   ],
+   "22": [
+    [
+     0,
+     1022,
+     "[IT] Dio dei raid of Arco del Leone"
+    ]
+   ],
+   "23": [
+    [
+     0,
+     1023,
+     "Osso[pl:\"Ossi\"] grande[pl:\"grandi\"]"
+    ]
+   ],
+   "24": [
+    [
+     0,
+     1024,
+     "[IT] Plaza of<br>[IT] Dwayna"
+    ]
+   ],
+   "25": [
+    [
+     0,
+     1025,
+     "[IT] You might use Might."
+    ]
+   ],
+   "26": [
+    [
+     0,
+     1026,
+     "[IT] Edible Mushroom"
+    ]
+   ],
+   "27": [
+    [
+     0,
+     1027,
+     "[IT] Recovered Tool Box"
+    ]
+   ],
+   "28": [
+    [
+     0,
+     1028,
+     "[IT] Win %num2% rated arena games"
+    ]
+   ],
+   "29": [
+    [
+     0,
+     1029,
+     "Ricetta: Arco lungo Pact"
+    ]
+   ],
+   "3": [
+    [
+     0,
+     1003,
+     "((123))"
+    ]
+   ],
+   "30": [
+    [
+     0,
+     1030,
+     "Ricetta[pl:\"Ricette\"]: Osso[pl:\"Ossi\"] grande[pl:\"grandi\"]"
+    ]
+   ],
+   "31": [
+    [
+     0,
+     1031,
+     "Ricette: Arco corto Strong Bandit"
+    ]
+   ],
+   "32": [
+    [
+     0,
+     1032,
+     "[IT] Storyteller: [IT] Abaddon"
+    ]
+   ],
+   "33": [
+    [
+     0,
+     1033,
+     "[IT] Go now. [IT] Run fast! [IT] Why? [IT] Because."
+    ]
+   ],
+   "34": [
+    [
+     0,
+     1034,
+     "[IT] Guild Wars 2: End of Dragons"
+    ]
+   ],
+   "35": [
+    [
+     0,
+     1035,
+     "[IT] World vs. World"
+    ]
+   ],
+   "36": [
+    [
+     0,
+     1036,
+     "Convergenza: Monte Balrior"
+    ]
+   ],
+   "37": [
+    [
+     0,
+     1037,
+     "Dragon Slash—Boost"
+    ]
+   ],
+   "38": [
+    [
+     0,
+     1038,
+     "[IT] Title — [iT] subtitle"
+    ]
+   ],
+   "39": [
+    [
+     0,
+     1039,
+     "[IT] Line<br>[IT] Other line"
+    ]
+   ],
+   "4": [
+    [
+     0,
+     1004,
+     "(new string)"
+    ]
+   ],
+   "40": [
+    [
+     0,
+     1040,
+     "<c=@flavor>[IT] Some flavor text.</c>"
+    ]
+   ],
+   "41": [
+    [
+     0,
+     1041,
+     "[IT] %str1% evades your %str3%."
+    ]
+   ],
+   "42": [
+    [
+     0,
+     1042,
+     "Usa tutto"
+    ]
+   ],
+   "43": [
+    [
+     0,
+     1043,
+     "[IT] Gives 5%% more power"
+    ]
+   ],
+   "44": [
+    [
+     0,
+     1044,
+     "[IT] Gives 5%% more power"
+    ]
+   ],
+   "45": [
+    [
+     0,
+     1045,
+     "[IT] Damage %num1%%%"
+    ]
+   ],
+   "46": [
+    [
+     0,
+     1046,
+     "[IT] Cittadino"
+    ]
+   ],
+   "47": [
+    [
+     0,
+     1047,
+     "[IT] Cittadino pettegolo di Arco"
+    ]
+   ],
+   "48": [
+    [
+     0,
+     1048,
+     "[IT] Ladro"
+    ]
+   ],
+   "49": [
+    [
+     0,
+     1049,
+     "[IT] Mr. Smith goes home. [IT] He sleeps."
+    ]
+   ],
+   "5": [
+    [
+     0,
+     1005,
+     "[IT] Hello world"
+    ],
+    [
+     0,
+     99,
+     "[IT] Hello world again"
+    ]
+   ],
+   "50": [
+    [
+     0,
+     1050,
+     "[IT] God"
+    ]
+   ],
+   "51": [
+    [
+     0,
+     1051,
+     "[IT] Season Twenty-Five"
+    ]
+   ],
+   "52": [
+    [
+     0,
+     1052,
+     "[IT] Tide Turner"
+    ]
+   ],
+   "6": [
+    [
+     0,
+     1006,
+     "[IT] Hello world"
+    ]
+   ],
+   "7": [
+    [
+     0,
+     1007,
+     "[IT] First line\n\n[IT] Third line"
+    ]
+   ],
+   "8": [
+    [
+     0,
+     1008,
+     "%str1%%str2%"
+    ]
+   ],
+   "9": [
+    [
+     0,
+     1009,
+     "<c=@flavor></c>"
+    ]
+   ]
+  },
+  "cache": [
+   {
+    "s": "Raid god of Lion's Arch",
+    "t": "[IT] Dio dei raid of Arco del Leone"
+   },
+   {
+    "s": "Visit Lion's Arch and Divinity's Reach.",
+    "t": "[IT] Visit Arco del Leone and Divinity's Reach."
+   },
+   {
+    "s": "Welcome to Lion's Arch!",
+    "t": "[IT] Welcome to Arco del Leone!"
+   },
+   {
+    "s": "%str1% evades your %str3%.",
+    "t": "[IT] %str1% evades your %str3%."
+   },
+   {
+    "s": "<c=@flavor>Some flavor text.</c>",
+    "t": "<c=@flavor>[IT] Some flavor text.</c>"
+   },
+   {
+    "s": "Cittadino pettegolo di Arco",
+    "t": "[IT] Cittadino pettegolo di Arco"
+   },
+   {
+    "s": "Cittadino",
+    "t": "[IT] Cittadino"
+   },
+   {
+    "s": "Convergence: Mount Balrior",
+    "t": "Convergenza: Monte Balrior"
+   },
+   {
+    "s": "Damage %num1%%%",
+    "t": "[IT] Damage %num1%%%"
+   },
+   {
+    "s": "Dragon Slash—Boost",
+    "t": "Dragon Slash—Boost"
+   },
+   {
+    "s": "Edible Mushroom[s]",
+    "t": "[IT] Edible Mushroom"
+   },
+   {
+    "s": "First line",
+    "t": "[IT] First line"
+   },
+   {
+    "s": "Gives 5% more power",
+    "t": "[IT] Gives 5%% more power"
+   },
+   {
+    "s": "Gives 5%% more power",
+    "t": "[IT] Gives 5%% more power"
+   },
+   {
+    "s": "Go now. Run fast! Why? Because.",
+    "t": "[IT] Go now. [IT] Run fast! [IT] Why? [IT] Because."
+   },
+   {
+    "s": "Guild Wars 2: End of Dragons",
+    "t": "[IT] Guild Wars 2: End of Dragons"
+   },
+   {
+    "s": "Hello world again",
+    "t": "[IT] Hello world again"
+   },
+   {
+    "s": "Hello world",
+    "t": "[IT] Hello world"
+   },
+   {
+    "s": "Ladro/a",
+    "t": "[IT] Ladro"
+   },
+   {
+    "s": "Large Bone[s]",
+    "t": "Osso[pl:\"Ossi\"] grande[pl:\"grandi\"]"
+   },
+   {
+    "s": "Line<br>Other line",
+    "t": "[IT] Line<br>[IT] Other line"
+   },
+   {
+    "s": "Mr. Smith goes home. He sleeps.",
+    "t": "[IT] Mr. Smith goes home. [IT] He sleeps."
+   },
+   {
+    "s": "Plaza of<br>Dwayna",
+    "t": "[IT] Plaza of<br>[IT] Dwayna"
+   },
+   {
+    "s": "Recipe: Pact Longbow",
+    "t": "Ricetta: Arco lungo Pact"
+   },
+   {
+    "s": "Recipe[s]: Large Bone[s]",
+    "t": "Ricetta[pl:\"Ricette\"]: Osso[pl:\"Ossi\"] grande[pl:\"grandi\"]"
+   },
+   {
+    "s": "Recipes: Strong Bandit Short Bow",
+    "t": "Ricette: Arco corto Strong Bandit"
+   },
+   {
+    "s": "Recovered Tool Box[pl:\"Boxes\"]",
+    "t": "[IT] Recovered Tool Box"
+   },
+   {
+    "s": "Season Twenty-Five",
+    "t": "[IT] Season Twenty-Five"
+   },
+   {
+    "s": "Storyteller: Abaddon",
+    "t": "[IT] Storyteller: [IT] Abaddon"
+   },
+   {
+    "s": "Third line",
+    "t": "[IT] Third line"
+   },
+   {
+    "s": "Tide Turner",
+    "t": "[IT] Tide Turner"
+   },
+   {
+    "s": "Title — subtitle",
+    "t": "[IT] Title — [iT] subtitle"
+   },
+   {
+    "s": "Win %num2% rated arena game[s]",
+    "t": "[IT] Win %num2% rated arena games"
+   },
+   {
+    "s": "World vs. World",
+    "t": "[IT] World vs. World"
+   },
+   {
+    "s": "You might use Might.",
+    "t": "[IT] You might use Might."
+   },
+   {
+    "s": "[f:\"Goddess\"]God",
+    "t": "[IT] God"
+   },
+   {
+    "s": "raid god",
+    "t": "dio dei raid"
+   }
+  ],
+  "cache_db": [
+   [
+    1,
+    "it",
+    1001,
+    ""
+   ],
+   [
+    10,
+    "it",
+    1010,
+    "[null]"
+   ],
+   [
+    11,
+    "it",
+    1011,
+    "x"
+   ],
+   [
+    12,
+    "it",
+    1012,
+    "12345"
+   ],
+   [
+    13,
+    "it",
+    1013,
+    "6]2Tgarbled"
+   ],
+   [
+    14,
+    "it",
+    1014,
+    "Waypoint"
+   ],
+   [
+    15,
+    "it",
+    1015,
+    "<c=@reminder>Waypoint</c>"
+   ],
+   [
+    16,
+    "it",
+    1016,
+    "%str1%Gambali%str2%"
+   ],
+   [
+    17,
+    "it",
+    1017,
+    "Arco lungo Pact"
+   ],
+   [
+    18,
+    "it",
+    1018,
+    "<c=@reminder>Arco corto Strong Bandit</c>"
+   ],
+   [
+    19,
+    "it",
+    1019,
+    "[IT] Welcome to Arco del Leone!"
+   ],
+   [
+    2,
+    "it",
+    1002,
+    "   "
+   ],
+   [
+    20,
+    "it",
+    1020,
+    "[IT] Visit Arco del Leone and Divinity's Reach."
+   ],
+   [
+    21,
+    "it",
+    1021,
+    "dio dei raid"
+   ],
+   [
+    22,
+    "it",
+    1022,
+    "[IT] Dio dei raid of Arco del Leone"
+   ],
+   [
+    23,
+    "it",
+    1023,
+    "Osso[pl:\"Ossi\"] grande[pl:\"grandi\"]"
+   ],
+   [
+    24,
+    "it",
+    1024,
+    "[IT] Plaza of<br>[IT] Dwayna"
+   ],
+   [
+    25,
+    "it",
+    1025,
+    "[IT] You might use Might."
+   ],
+   [
+    26,
+    "it",
+    1026,
+    "[IT] Edible Mushroom"
+   ],
+   [
+    27,
+    "it",
+    1027,
+    "[IT] Recovered Tool Box"
+   ],
+   [
+    28,
+    "it",
+    1028,
+    "[IT] Win %num2% rated arena games"
+   ],
+   [
+    29,
+    "it",
+    1029,
+    "Ricetta: Arco lungo Pact"
+   ],
+   [
+    3,
+    "it",
+    1003,
+    "((123))"
+   ],
+   [
+    30,
+    "it",
+    1030,
+    "Ricetta[pl:\"Ricette\"]: Osso[pl:\"Ossi\"] grande[pl:\"grandi\"]"
+   ],
+   [
+    31,
+    "it",
+    1031,
+    "Ricette: Arco corto Strong Bandit"
+   ],
+   [
+    32,
+    "it",
+    1032,
+    "[IT] Storyteller: [IT] Abaddon"
+   ],
+   [
+    33,
+    "it",
+    1033,
+    "[IT] Go now. [IT] Run fast! [IT] Why? [IT] Because."
+   ],
+   [
+    34,
+    "it",
+    1034,
+    "[IT] Guild Wars 2: End of Dragons"
+   ],
+   [
+    35,
+    "it",
+    1035,
+    "[IT] World vs. World"
+   ],
+   [
+    36,
+    "it",
+    1036,
+    "Convergenza: Monte Balrior"
+   ],
+   [
+    37,
+    "it",
+    1037,
+    "Dragon Slash—Boost"
+   ],
+   [
+    38,
+    "it",
+    1038,
+    "[IT] Title — [iT] subtitle"
+   ],
+   [
+    39,
+    "it",
+    1039,
+    "[IT] Line<br>[IT] Other line"
+   ],
+   [
+    4,
+    "it",
+    1004,
+    "(new string)"
+   ],
+   [
+    40,
+    "it",
+    1040,
+    "<c=@flavor>[IT] Some flavor text.</c>"
+   ],
+   [
+    41,
+    "it",
+    1041,
+    "[IT] %str1% evades your %str3%."
+   ],
+   [
+    42,
+    "it",
+    1042,
+    "Usa tutto"
+   ],
+   [
+    43,
+    "it",
+    1043,
+    "[IT] Gives 5%% more power"
+   ],
+   [
+    44,
+    "it",
+    1044,
+    "[IT] Gives 5%% more power"
+   ],
+   [
+    45,
+    "it",
+    1045,
+    "[IT] Damage %num1%%%"
+   ],
+   [
+    46,
+    "it",
+    1046,
+    "[IT] Cittadino"
+   ],
+   [
+    47,
+    "it",
+    1047,
+    "[IT] Cittadino pettegolo di Arco"
+   ],
+   [
+    48,
+    "it",
+    1048,
+    "[IT] Ladro"
+   ],
+   [
+    49,
+    "it",
+    1049,
+    "[IT] Mr. Smith goes home. [IT] He sleeps."
+   ],
+   [
+    5,
+    "it",
+    99,
+    "[IT] Hello world again"
+   ],
+   [
+    50,
+    "it",
+    1050,
+    "[IT] God"
+   ],
+   [
+    51,
+    "it",
+    1051,
+    "[IT] Season Twenty-Five"
+   ],
+   [
+    52,
+    "it",
+    1052,
+    "[IT] Tide Turner"
+   ],
+   [
+    6,
+    "it",
+    1006,
+    "[IT] Hello world"
+   ],
+   [
+    7,
+    "it",
+    1007,
+    "[IT] First line\n\n[IT] Third line"
+   ],
+   [
+    8,
+    "it",
+    1008,
+    "%str1%%str2%"
+   ],
+   [
+    9,
+    "it",
+    1009,
+    "<c=@flavor></c>"
+   ]
+  ],
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/cache_it.jsonl",
+   "IT/glossary_it.json",
+   "IT/map_it.db",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal",
+   "cache.db",
+   "glossary_it.default.json",
+   "local_translator_it.log"
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary 33d48088b8569867 (glossary_it.json): 3 exact, 22 terms, 2 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "map": [
+   [
+    16,
+    "%str1%Leggings%str2%",
+    "%str1%Gambali%str2%",
+    "live"
+   ],
+   [
+    17,
+    "Pact Longbow",
+    "Arco lungo Pact",
+    "live"
+   ],
+   [
+    18,
+    "<c=@reminder>Strong Bandit Short Bow</c>",
+    "<c=@reminder>Arco corto Strong Bandit</c>",
+    "live"
+   ],
+   [
+    19,
+    "Welcome to Lion's Arch!",
+    "[IT] Welcome to Arco del Leone!",
+    "live"
+   ],
+   [
+    20,
+    "Visit Lion's Arch and Divinity's Reach.",
+    "[IT] Visit Arco del Leone and Divinity's Reach.",
+    "live"
+   ],
+   [
+    21,
+    "raid god",
+    "dio dei raid",
+    "live"
+   ],
+   [
+    22,
+    "Raid god of Lion's Arch",
+    "[IT] Dio dei raid of Arco del Leone",
+    "live"
+   ],
+   [
+    23,
+    "Large Bone[s]",
+    "Osso[pl:\"Ossi\"] grande[pl:\"grandi\"]",
+    "live"
+   ],
+   [
+    24,
+    "Plaza of<br>Dwayna",
+    "[IT] Plaza of<br>[IT] Dwayna",
+    "live"
+   ],
+   [
+    25,
+    "You might use Might.",
+    "[IT] You might use Might.",
+    "live"
+   ],
+   [
+    26,
+    "Edible Mushroom[s]",
+    "[IT] Edible Mushroom",
+    "live"
+   ],
+   [
+    27,
+    "Recovered Tool Box[pl:\"Boxes\"]",
+    "[IT] Recovered Tool Box",
+    "live"
+   ],
+   [
+    28,
+    "Win %num2% rated arena game[s]",
+    "[IT] Win %num2% rated arena games",
+    "live"
+   ],
+   [
+    29,
+    "Recipe: Pact Longbow",
+    "Ricetta: Arco lungo Pact",
+    "live"
+   ],
+   [
+    30,
+    "Recipe[s]: Large Bone[s]",
+    "Ricetta[pl:\"Ricette\"]: Osso[pl:\"Ossi\"] grande[pl:\"grandi\"]",
+    "live"
+   ],
+   [
+    31,
+    "Recipes: Strong Bandit Short Bow",
+    "Ricette: Arco corto Strong Bandit",
+    "live"
+   ],
+   [
+    32,
+    "Storyteller: Abaddon",
+    "[IT] Storyteller: [IT] Abaddon",
+    "live"
+   ],
+   [
+    33,
+    "Go now. Run fast! Why? Because.",
+    "[IT] Go now. [IT] Run fast! [IT] Why? [IT] Because.",
+    "live"
+   ],
+   [
+    34,
+    "Guild Wars 2: End of Dragons",
+    "[IT] Guild Wars 2: End of Dragons",
+    "live"
+   ],
+   [
+    35,
+    "World vs. World",
+    "[IT] World vs. World",
+    "live"
+   ],
+   [
+    36,
+    "Convergence: Mount Balrior",
+    "Convergenza: Monte Balrior",
+    "live"
+   ],
+   [
+    38,
+    "Title — subtitle",
+    "[IT] Title — [iT] subtitle",
+    "live"
+   ],
+   [
+    39,
+    "Line<br>Other line",
+    "[IT] Line<br>[IT] Other line",
+    "live"
+   ],
+   [
+    40,
+    "<c=@flavor>Some flavor text.</c>",
+    "<c=@flavor>[IT] Some flavor text.</c>",
+    "live"
+   ],
+   [
+    41,
+    "%str1% evades your %str3%.",
+    "[IT] %str1% evades your %str3%.",
+    "live"
+   ],
+   [
+    42,
+    "Use All",
+    "Usa tutto",
+    "live"
+   ],
+   [
+    43,
+    "Gives 5% more power",
+    "[IT] Gives 5%% more power",
+    "live"
+   ],
+   [
+    44,
+    "Gives 5%% more power",
+    "[IT] Gives 5%% more power",
+    "live"
+   ],
+   [
+    45,
+    "Damage %num1%%%",
+    "[IT] Damage %num1%%%",
+    "live"
+   ],
+   [
+    46,
+    "Cittadino",
+    "[IT] Cittadino",
+    "live"
+   ],
+   [
+    47,
+    "Cittadino pettegolo di Arco",
+    "[IT] Cittadino pettegolo di Arco",
+    "live"
+   ],
+   [
+    48,
+    "Ladro/a",
+    "[IT] Ladro",
+    "live"
+   ],
+   [
+    49,
+    "Mr. Smith goes home. He sleeps.",
+    "[IT] Mr. Smith goes home. [IT] He sleeps.",
+    "live"
+   ],
+   [
+    5,
+    "Hello world again",
+    "[IT] Hello world again",
+    "live"
+   ],
+   [
+    50,
+    "[f:\"Goddess\"]God",
+    "[IT] God",
+    "live"
+   ],
+   [
+    51,
+    "Season Twenty-Five",
+    "[IT] Season Twenty-Five",
+    "live"
+   ],
+   [
+    52,
+    "Tide Turner",
+    "[IT] Tide Turner",
+    "live"
+   ],
+   [
+    6,
+    "Hello world",
+    "[IT] Hello world",
+    "live"
+   ],
+   [
+    7,
+    "First line\n\nThird line",
+    "[IT] First line\n\n[IT] Third line",
+    "live"
+   ]
+  ],
+  "snapshot": "{\n\"terms\": {\n\"Convergence: Mount Balrior\": \"Convergenza: Monte Balrior\",\n\"convergence: mount balrior\": \"convergenza: monte balrior\",\n\"Convergence: mount balrior\": \"Convergenza: monte balrior\",\n\"Dragon Slash—Boost\": \"Dragon Slash—Boost\",\n\"dragon slash—boost\": \"dragon slash—boost\",\n\"Dragon slash—boost\": \"Dragon slash—boost\",\n\"Divinity's Reach\": \"Divinity's Reach\",\n\"divinity's reach\": \"divinity's reach\",\n\"Divinity's reach\": \"Divinity's reach\",\n\"Plaza of Dwayna\": \"Piazza di Dwayna\",\n\"plaza of dwayna\": \"piazza di dwayna\",\n\"Plaza of dwayna\": \"Piazza di dwayna\",\n\"Lion's Arch\": \"Arco del Leone\",\n\"lion's arch\": \"arco del leone\",\n\"Lion's arch\": \"Arco del leone\",\n\"Large Bone\": \"Osso grande\",\n\"large bone\": \"osso grande\",\n\"Large bone\": \"Osso grande\",\n\"Raid God\": \"Dio dei raid\",\n\"raid god\": \"dio dei raid\",\n\"Raid god\": \"Dio dei raid\",\n\"Might\": \"Might\"\n},\n\"exact\": {\n\"Waypoint\": \"Waypoint\",\n\"Leggings\": \"Gambali\",\n\"Use All\": \"Usa tutto\"\n},\n\"protect\": 5\n}"
+ },
+ "second": {
+  "answers": {
+   "101": [
+    [
+     0,
+     1101,
+     "[IT] Hello world"
+    ]
+   ],
+   "102": [
+    [
+     0,
+     1102,
+     "Arco lungo Pact"
+    ]
+   ],
+   "103": [
+    [
+     0,
+     1103,
+     "[IT] Welcome to Arco del Leone!"
+    ]
+   ],
+   "104": [
+    [
+     0,
+     1104,
+     "[IT] Brand new text"
+    ]
+   ]
+  },
+  "cache": [
+   {
+    "s": "Raid god of Lion's Arch",
+    "t": "[IT] Dio dei raid of Arco del Leone"
+   },
+   {
+    "s": "Visit Lion's Arch and Divinity's Reach.",
+    "t": "[IT] Visit Arco del Leone and Divinity's Reach."
+   },
+   {
+    "s": "Welcome to Lion's Arch!",
+    "t": "[IT] Welcome to Arco del Leone!"
+   },
+   {
+    "s": "%str1% evades your %str3%.",
+    "t": "[IT] %str1% evades your %str3%."
+   },
+   {
+    "s": "<c=@flavor>Some flavor text.</c>",
+    "t": "<c=@flavor>[IT] Some flavor text.</c>"
+   },
+   {
+    "s": "Brand new text",
+    "t": "[IT] Brand new text"
+   },
+   {
+    "s": "Cittadino pettegolo di Arco",
+    "t": "[IT] Cittadino pettegolo di Arco"
+   },
+   {
+    "s": "Cittadino",
+    "t": "[IT] Cittadino"
+   },
+   {
+    "s": "Convergence: Mount Balrior",
+    "t": "Convergenza: Monte Balrior"
+   },
+   {
+    "s": "Damage %num1%%%",
+    "t": "[IT] Damage %num1%%%"
+   },
+   {
+    "s": "Dragon Slash—Boost",
+    "t": "Dragon Slash—Boost"
+   },
+   {
+    "s": "Edible Mushroom[s]",
+    "t": "[IT] Edible Mushroom"
+   },
+   {
+    "s": "First line",
+    "t": "[IT] First line"
+   },
+   {
+    "s": "Gives 5% more power",
+    "t": "[IT] Gives 5%% more power"
+   },
+   {
+    "s": "Gives 5%% more power",
+    "t": "[IT] Gives 5%% more power"
+   },
+   {
+    "s": "Go now. Run fast! Why? Because.",
+    "t": "[IT] Go now. [IT] Run fast! [IT] Why? [IT] Because."
+   },
+   {
+    "s": "Guild Wars 2: End of Dragons",
+    "t": "[IT] Guild Wars 2: End of Dragons"
+   },
+   {
+    "s": "Hello world again",
+    "t": "[IT] Hello world again"
+   },
+   {
+    "s": "Hello world",
+    "t": "[IT] Hello world"
+   },
+   {
+    "s": "Ladro/a",
+    "t": "[IT] Ladro"
+   },
+   {
+    "s": "Large Bone[s]",
+    "t": "Osso[pl:\"Ossi\"] grande[pl:\"grandi\"]"
+   },
+   {
+    "s": "Line<br>Other line",
+    "t": "[IT] Line<br>[IT] Other line"
+   },
+   {
+    "s": "Mr. Smith goes home. He sleeps.",
+    "t": "[IT] Mr. Smith goes home. [IT] He sleeps."
+   },
+   {
+    "s": "Plaza of<br>Dwayna",
+    "t": "[IT] Plaza of<br>[IT] Dwayna"
+   },
+   {
+    "s": "Recipe: Pact Longbow",
+    "t": "Ricetta: Arco lungo Pact"
+   },
+   {
+    "s": "Recipe[s]: Large Bone[s]",
+    "t": "Ricetta[pl:\"Ricette\"]: Osso[pl:\"Ossi\"] grande[pl:\"grandi\"]"
+   },
+   {
+    "s": "Recipes: Strong Bandit Short Bow",
+    "t": "Ricette: Arco corto Strong Bandit"
+   },
+   {
+    "s": "Recovered Tool Box[pl:\"Boxes\"]",
+    "t": "[IT] Recovered Tool Box"
+   },
+   {
+    "s": "Season Twenty-Five",
+    "t": "[IT] Season Twenty-Five"
+   },
+   {
+    "s": "Storyteller: Abaddon",
+    "t": "[IT] Storyteller: [IT] Abaddon"
+   },
+   {
+    "s": "Third line",
+    "t": "[IT] Third line"
+   },
+   {
+    "s": "Tide Turner",
+    "t": "[IT] Tide Turner"
+   },
+   {
+    "s": "Title — subtitle",
+    "t": "[IT] Title — [iT] subtitle"
+   },
+   {
+    "s": "Win %num2% rated arena game[s]",
+    "t": "[IT] Win %num2% rated arena games"
+   },
+   {
+    "s": "World vs. World",
+    "t": "[IT] World vs. World"
+   },
+   {
+    "s": "You might use Might.",
+    "t": "[IT] You might use Might."
+   },
+   {
+    "s": "[f:\"Goddess\"]God",
+    "t": "[IT] God"
+   },
+   {
+    "s": "raid god",
+    "t": "dio dei raid"
+   }
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache loaded: 37 translations",
+   "i: glossary 33d48088b8569867 (glossary_it.json): 3 exact, 22 terms, 2 patterns",
+   "i: map: 39 strings known",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "map_count": [
+   [
+    43,
+    43
+   ]
+  ]
+ }
+}

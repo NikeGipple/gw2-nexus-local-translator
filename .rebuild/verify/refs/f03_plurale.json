@@ -1,0 +1,495 @@
+{
+ "make_plural": [
+  [
+   "Medaglia[pl:\"Medaglie\"] precisa[pl:\"precise\"] in juta",
+   "ok",
+   [
+    "Medaglia>Medaglie",
+    "precisa>precise"
+   ]
+  ],
+  [
+   "Medaglia[pl:\"Medaglie\"] precisa[pl:\"precise\"] in juta",
+   "ok",
+   [
+    "Medaglia>Medaglie",
+    "precisa>precise"
+   ]
+  ],
+  [
+   "Osso[pl:\"Ossi\"] grande[pl:\"grandi\"]",
+   "ok",
+   [
+    "Osso>Ossi",
+    "grande>grandi"
+   ]
+  ],
+  [
+   "Uomo[pl:\"Uomini\"] forte[pl:\"forti\"]",
+   "ok",
+   [
+    "Uomo>Uomini",
+    "forte>forti"
+   ]
+  ],
+  [
+   "Uovo[pl:\"Uova\"] d'oro",
+   "ok",
+   [
+    "Uovo>Uova"
+   ]
+  ],
+  [
+   "Arma[pl:\"Armi\"] magica[pl:\"magiche\"]",
+   "ok",
+   [
+    "Arma>Armi",
+    "magica>magiche"
+   ]
+  ],
+  [
+   "Problema[pl:\"Problemi\"] antico[pl:\"antichi\"]",
+   "ok",
+   [
+    "Problema>Problemi",
+    "antico>antichi"
+   ]
+  ],
+  [
+   "Artista[pl:\"Artisti\"] mistico[pl:\"mistici\"]",
+   "ok",
+   [
+    "Artista>Artisti",
+    "mistico>mistici"
+   ]
+  ],
+  [
+   "Tintura[pl:\"Tinture\"] Vino",
+   "ok",
+   [
+    "Tintura>Tinture"
+   ]
+  ],
+  [
+   "Tintura[pl:\"Tinture\"] rosa",
+   "ok",
+   [
+    "Tintura>Tinture"
+   ]
+  ],
+  [
+   "Gioiello[pl:\"Gioielli\"] smeraldo",
+   "ok",
+   [
+    "Gioiello>Gioielli"
+   ]
+  ],
+  [
+   "Lama[pl:\"Lame\"] del drago",
+   "ok",
+   [
+    "Lama>Lame"
+   ]
+  ],
+  [
+   "Lama",
+   "invariabile",
+   []
+  ],
+  [
+   "Ostriche",
+   "invariabile",
+   []
+  ],
+  [
+   "Arancia[pl:\"Arance\"]",
+   "ok",
+   [
+    "Arancia>Arance"
+   ]
+  ],
+  [
+   "Valigia[pl:\"Valigie\"]",
+   "ok",
+   [
+    "Valigia>Valigie"
+   ]
+  ],
+  [
+   "Città",
+   "invariabile",
+   []
+  ],
+  [
+   "Re",
+   "invariabile",
+   []
+  ],
+  [
+   "Amico[pl:\"Amici\"] fedele[pl:\"fedeli\"]",
+   "ok",
+   [
+    "Amico>Amici",
+    "fedele>fedeli"
+   ]
+  ],
+  [
+   "Mago[pl:\"Maghi\"] tecnico[pl:\"tecnici\"]",
+   "ok",
+   [
+    "Mago>Maghi",
+    "tecnico>tecnici"
+   ]
+  ],
+  [
+   "un Elmo",
+   "dubbio: un",
+   []
+  ],
+  [
+   "L'Elmo",
+   "dubbio: L'Elmo",
+   []
+  ],
+  [
+   "il[pl:\"i\"] Martello[pl:\"Martelli\"]",
+   "ok",
+   [
+    "il>i",
+    "Martello>Martelli"
+   ]
+  ],
+  [
+   "la[pl:\"le\"] Spada[pl:\"Spade\"]",
+   "ok",
+   [
+    "la>le",
+    "Spada>Spade"
+   ]
+  ],
+  [
+   "lo[pl:\"gli\"] Scudo[pl:\"Scudi\"]",
+   "ok",
+   [
+    "lo>gli",
+    "Scudo>Scudi"
+   ]
+  ],
+  [
+   "Pact Arco[pl:\"Archi\"]",
+   "ok",
+   [
+    "Arco>Archi"
+   ]
+  ],
+  [
+   "Fiala[pl:\"Fiale\"]: grande",
+   "ok",
+   [
+    "Fiala>Fiale"
+   ]
+  ],
+  [
+   "Pozione[pl:\"Pozioni\"] (forte)",
+   "ok",
+   [
+    "Pozione>Pozioni"
+   ]
+  ],
+  [
+   "Spada[pl:\"Spade\"], scudo",
+   "ok",
+   [
+    "Spada>Spade"
+   ]
+  ],
+  [
+   "Pietra[pl:\"Pietre\"] XYZ",
+   "ok",
+   [
+    "Pietra>Pietre"
+   ]
+  ],
+  [
+   "Pianta[pl:\"Piante\"] verde[pl:\"verdi\"] scuro[pl:\"scuri\"]",
+   "ok",
+   [
+    "Pianta>Piante",
+    "verde>verdi",
+    "scuro>scuri"
+   ]
+  ],
+  [
+   "Bacca[pl:\"Bacche\"] rossa[pl:\"rosse\"] matura[pl:\"mature\"]",
+   "ok",
+   [
+    "Bacca>Bacche",
+    "rossa>rosse",
+    "matura>mature"
+   ]
+  ],
+  [
+   "Bacca[pl:\"Bacche\"] rossa[pl:\"rosse\"] e matura[pl:\"mature\"]",
+   "ok",
+   [
+    "Bacca>Bacche",
+    "rossa>rosse",
+    "matura>mature (confermato)"
+   ]
+  ],
+  [
+   "Fungo[pl:\"Funghi\"] commestibile[pl:\"commestibili\"]",
+   "ok",
+   [
+    "Fungo>Funghi",
+    "commestibile>commestibili"
+   ]
+  ],
+  [
+   "Pelle[pl:\"Pelli\"] impregnata[pl:\"impregnate\"] del drago",
+   "ok",
+   [
+    "Pelle>Pelli",
+    "impregnata>impregnate"
+   ]
+  ],
+  [
+   "Spada[pl:\"Spade\"]",
+   "ok",
+   [
+    "Spada>Spade"
+   ]
+  ],
+  [
+   "Gnu",
+   "invariabile",
+   []
+  ],
+  [
+   "Tè verde[pl:\"verdi\"]",
+   "ok",
+   [
+    "verde>verdi"
+   ]
+  ],
+  [
+   "Fico[pl:\"Fichi\"] secco[pl:\"secchi\"]",
+   "ok",
+   [
+    "Fico>Fichi",
+    "secco>secchi"
+   ]
+  ],
+  [
+   "Bastone[pl:\"Bastoni\"]",
+   "ok",
+   [
+    "Bastone>Bastoni"
+   ]
+  ],
+  [
+   "Banana",
+   "invariabile",
+   []
+  ],
+  [
+   "<c=@x>Spada</c>",
+   "invariabile",
+   []
+  ],
+  [
+   "Spada[pl:\"Spade\"]!",
+   "ok",
+   [
+    "Spada>Spade"
+   ]
+  ],
+  [
+   "",
+   "invariabile",
+   []
+  ],
+  [
+   "Pirata[pl:\"Pirate\"]",
+   "ok",
+   [
+    "Pirata>Pirate"
+   ]
+  ],
+  [
+   "Sistema[pl:\"Sistemi\"]",
+   "ok",
+   [
+    "Sistema>Sistemi"
+   ]
+  ],
+  [
+   "Ala[pl:\"Ali\"]",
+   "ok",
+   [
+    "Ala>Ali"
+   ]
+  ],
+  [
+   "BIG ARMA[pl:\"ARMI\"]",
+   "ok",
+   [
+    "ARMA>ARMI"
+   ]
+  ],
+  [
+   "Mano[pl:\"Mani\"]",
+   "ok",
+   [
+    "Mano>Mani"
+   ]
+  ],
+  [
+   "Carta[pl:\"Carte\"]",
+   "ok",
+   [
+    "Carta>Carte"
+   ]
+  ]
+ ],
+ "num_markers": [
+  [
+   "Vinci %num2% partita[pl:\"partite\"] classificata[pl:\"classificate\"]",
+   "ok"
+  ],
+  [
+   "%num1% ora[pl:\"ore\"] e %num2% minuto[pl:\"minuti\"] nell'arco di %num3% giorno[pl:\"giorni\"]",
+   "ok"
+  ],
+  [
+   "Sconfiggi %num1% nemico[pl:\"nemici\"]",
+   "ok"
+  ],
+  [
+   "Completa tutti i %num1% obiettivi",
+   "'i' prima del numero"
+  ],
+  [
+   "Uccidi %num1% giocatore[pl:\"giocatori\"] attivo[pl:\"attivi\"] della mappa",
+   "ok"
+  ],
+  [
+   "Usa %num1% Waypoint[pl:\"Waypoints\"]",
+   "ok"
+  ],
+  [
+   "Sconfiggi %num1% Shatterer",
+   "nessun nome dopo i numeri"
+  ],
+  [
+   "Apri %num1% porta[pl:\"porte\"] difesa[pl:\"difese\"]",
+   "ok"
+  ],
+  [
+   "Vinci %num1% partite\nseconda riga",
+   "salto: a capo o marcatori gia' presenti"
+  ],
+  [
+   "Vinci %num1% partita[pl:\"partite\"]",
+   "salto: a capo o marcatori gia' presenti"
+  ],
+  [
+   "Vinci %num1% xyzzi",
+   "xyzzi: singolare sconosciuto"
+  ],
+  [
+   "Vinci %num1%",
+   "nessun nome dopo i numeri"
+  ],
+  [
+   "Vinci %num1% partita[pl:\"partite\"] ancora",
+   "ok"
+  ],
+  [
+   "Linea di specializzazione %num1% avviata[pl:\"avviate\"]",
+   "ok"
+  ],
+  [
+   "Avvia %num1% evento[pl:\"eventi\"], poi altri %num2% eventi",
+   "ok"
+  ],
+  [
+   "Caccia %num1% pirata[pl:\"pirati\"]",
+   "ok"
+  ],
+  [
+   "Uccidi %num2% nemici in %num1% minuti",
+   "marcatori legati a numeri diversi dall'inglese"
+  ],
+  [
+   "Raccogli %num1% 5 oggetti",
+   "nessun nome dopo i numeri"
+  ],
+  [
+   "Ottieni %num1% uccisione[pl:\"uccisioni\"] (totali)",
+   "ok"
+  ]
+ ],
+ "plural_word": {
+  "123": null,
+  "Artista": "Artisti",
+  "Cane": "Cani",
+  "Fuoco": "Fuochi",
+  "Lilla": "Lilla",
+  "Medaglia": "Medaglie",
+  "Ostriche": "Ostriche",
+  "UOMO": "UOMINI",
+  "a": "a",
+  "arancia": "arance",
+  "arma": "armi",
+  "bacio": "baci",
+  "banca": "banche",
+  "bar": "bar",
+  "caffè": "caffè",
+  "camicia": "camicie",
+  "città": "città",
+  "fico": "fichi",
+  "lunghe": "lunghe",
+  "magico": "magici",
+  "mago": "maghi",
+  "occhio": "occhi",
+  "problema": "problemi",
+  "re": "re",
+  "specie": "specie",
+  "strega": "streghe",
+  "valigia": "valigie",
+  "x": "x"
+ },
+ "vocabulary": {
+  "attivo": 2,
+  "di": 2,
+  "difesa": 2,
+  "difeso": 2,
+  "evento": 2,
+  "giocatore": 4,
+  "giocatori": 1,
+  "giorno": 2,
+  "globe": 2,
+  "le": 1,
+  "linea": 2,
+  "minuto": 2,
+  "nemici": 1,
+  "nemico": 2,
+  "obiettivi": 1,
+  "obiettivo": 2,
+  "ora": 2,
+  "ore": 1,
+  "partita": 3,
+  "partite": 2,
+  "pirata": 2,
+  "porta": 2,
+  "porte": 1,
+  "specializzazione": 2,
+  "uccisione": 2,
+  "una": 1,
+  "vinci": 1,
+  "vinta": 3,
+  "vinto": 2,
+  "waypoint": 1
+ }
+}

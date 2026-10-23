@@ -1,0 +1,646 @@
+{
+ "case_variants": {
+  "All caps": "Z",
+  "Big  thing": "Y",
+  "Raid god": "X",
+  "all caps": "z",
+  "big  thing": "y"
+ },
+ "files": {
+  "bad": [
+   false,
+   "582a63e9baeba6e5",
+   1
+  ],
+  "broken": [
+   false,
+   "582a63e9baeba6e5",
+   1
+  ],
+  "missing": [
+   false,
+   "582a63e9baeba6e5",
+   1
+  ],
+  "ok": [
+   true,
+   "582a63e9baeba6e5",
+   1
+  ]
+ },
+ "glossaries": {
+  "bad_pattern": {
+   "exact": {},
+   "feminine": {},
+   "fingerprint": "",
+   "fingerprint_of": "40d980d8067dcc41",
+   "load": [
+    "raises",
+    "ValueError",
+    "glossary pattern without {X}: 'Longbow'"
+   ],
+   "lookup": {
+    "%str1%Waypoint%str2%": null,
+    "1": null,
+    "<br>Waypoint": null,
+    "<c=@reminder>Strong Bandit Longbow</c>": null,
+    "<c=@x>Waypoint</c>": null,
+    "Hunter's Long Longbow": null,
+    "Lion's Arch": null,
+    "Pact Longbow": null,
+    "Pact Longbow!": null,
+    "Use All": null,
+    "Waypoint": null,
+    "Waypoint<br>": null,
+    "pact Longbow": null
+   },
+   "patterns": 0,
+   "terms": [],
+   "version": 0
+  },
+  "bad_section": {
+   "exact": {},
+   "feminine": {},
+   "fingerprint": "",
+   "fingerprint_of": [
+    "raises",
+    "AttributeError",
+    "'list' object has no attribute 'items'"
+   ],
+   "load": [
+    "raises",
+    "ValueError",
+    "glossary: 'exact', 'terms', 'patterns' and 'feminine' must be objects"
+   ],
+   "lookup": {
+    "%str1%Waypoint%str2%": null,
+    "1": null,
+    "<br>Waypoint": null,
+    "<c=@reminder>Strong Bandit Longbow</c>": null,
+    "<c=@x>Waypoint</c>": null,
+    "Hunter's Long Longbow": null,
+    "Lion's Arch": null,
+    "Pact Longbow": null,
+    "Pact Longbow!": null,
+    "Use All": null,
+    "Waypoint": null,
+    "Waypoint<br>": null,
+    "pact Longbow": null
+   },
+   "patterns": 0,
+   "terms": [],
+   "version": 0
+  },
+  "full": {
+   "exact": {
+    "Use All": "Usa tutto",
+    "Waypoint": "Waypoint"
+   },
+   "feminine": {
+    "cittadino": "Cittadina"
+   },
+   "fingerprint": "582a63e9baeba6e5",
+   "fingerprint_of": "582a63e9baeba6e5",
+   "load": null,
+   "lookup": {
+    "%str1%Waypoint%str2%": "%str1%Waypoint%str2%",
+    "1": null,
+    "<br>Waypoint": "<br>Waypoint",
+    "<c=@reminder>Strong Bandit Longbow</c>": "<c=@reminder>Arco lungo Strong Bandit</c>",
+    "<c=@x>Waypoint</c>": "<c=@x>Waypoint</c>",
+    "Hunter's Long Longbow": "Arco lunghissimo Hunter's",
+    "Lion's Arch": null,
+    "Pact Longbow": "Arco lungo Pact",
+    "Pact Longbow!": null,
+    "Use All": "Usa tutto",
+    "Waypoint": "Waypoint",
+    "Waypoint<br>": "Waypoint<br>",
+    "pact Longbow": null
+   },
+   "patterns": 2,
+   "terms": [
+    [
+     "Lion's Arch Keep",
+     "Rocca di Arco del Leone"
+    ],
+    [
+     "lion's arch keep",
+     "rocca di arco del leone"
+    ],
+    [
+     "Lion's arch keep",
+     "Rocca di arco del leone"
+    ],
+    [
+     "Big Old Thing",
+     "Cosa vecchia"
+    ],
+    [
+     "big old thing",
+     "cosa vecchia"
+    ],
+    [
+     "Big old thing",
+     "Cosa vecchia"
+    ],
+    [
+     "Lion's Arch",
+     "Arco del Leone"
+    ],
+    [
+     "lion's arch",
+     "arco del leone"
+    ],
+    [
+     "Lion's arch",
+     "Arco del leone"
+    ],
+    [
+     "Raid God",
+     "Dio dei raid"
+    ],
+    [
+     "raid god",
+     "DIO"
+    ],
+    [
+     "Raid god",
+     "Dio"
+    ],
+    [
+     "Might",
+     "Might"
+    ]
+   ],
+   "version": 1
+  },
+  "no_patterns": {
+   "exact": {
+    "Waypoint": "WP"
+   },
+   "feminine": {},
+   "fingerprint": "4c3781f4d521850d",
+   "fingerprint_of": "4c3781f4d521850d",
+   "load": null,
+   "lookup": {
+    "%str1%Waypoint%str2%": null,
+    "1": null,
+    "<br>Waypoint": null,
+    "<c=@reminder>Strong Bandit Longbow</c>": null,
+    "<c=@x>Waypoint</c>": null,
+    "Hunter's Long Longbow": null,
+    "Lion's Arch": null,
+    "Pact Longbow": null,
+    "Pact Longbow!": null,
+    "Use All": null,
+    "Waypoint": "WP",
+    "Waypoint<br>": null,
+    "pact Longbow": null
+   },
+   "patterns": 0,
+   "terms": [],
+   "version": 1
+  },
+  "numbers": {
+   "exact": {
+    "1": "2"
+   },
+   "feminine": {},
+   "fingerprint": "7384123ae0cb45a7",
+   "fingerprint_of": "7384123ae0cb45a7",
+   "load": null,
+   "lookup": {
+    "%str1%Waypoint%str2%": null,
+    "1": "2",
+    "<br>Waypoint": null,
+    "<c=@reminder>Strong Bandit Longbow</c>": null,
+    "<c=@x>Waypoint</c>": null,
+    "Hunter's Long Longbow": null,
+    "Lion's Arch": null,
+    "Pact Longbow": null,
+    "Pact Longbow!": null,
+    "Use All": null,
+    "Waypoint": null,
+    "Waypoint<br>": null,
+    "pact Longbow": null
+   },
+   "patterns": 0,
+   "terms": [
+    [
+     "3",
+     "4"
+    ]
+   ],
+   "version": 1
+  },
+  "only_terms": {
+   "exact": {},
+   "feminine": {},
+   "fingerprint": "343706200bd01f69",
+   "fingerprint_of": "343706200bd01f69",
+   "load": null,
+   "lookup": {
+    "%str1%Waypoint%str2%": null,
+    "1": null,
+    "<br>Waypoint": null,
+    "<c=@reminder>Strong Bandit Longbow</c>": null,
+    "<c=@x>Waypoint</c>": null,
+    "Hunter's Long Longbow": null,
+    "Lion's Arch": null,
+    "Pact Longbow": null,
+    "Pact Longbow!": null,
+    "Use All": null,
+    "Waypoint": null,
+    "Waypoint<br>": null,
+    "pact Longbow": null
+   },
+   "patterns": 0,
+   "terms": [
+    [
+     "A B",
+     "C D"
+    ],
+    [
+     "a b",
+     "c d"
+    ],
+    [
+     "A b",
+     "C d"
+    ]
+   ],
+   "version": 1
+  },
+  "reordered": {
+   "exact": {
+    "Use All": "Usa tutto",
+    "Waypoint": "Waypoint"
+   },
+   "feminine": {},
+   "fingerprint": "582a63e9baeba6e5",
+   "fingerprint_of": "582a63e9baeba6e5",
+   "load": null,
+   "lookup": {
+    "%str1%Waypoint%str2%": "%str1%Waypoint%str2%",
+    "1": null,
+    "<br>Waypoint": "<br>Waypoint",
+    "<c=@reminder>Strong Bandit Longbow</c>": "<c=@reminder>Arco lungo Strong Bandit</c>",
+    "<c=@x>Waypoint</c>": "<c=@x>Waypoint</c>",
+    "Hunter's Long Longbow": "Arco lunghissimo Hunter's",
+    "Lion's Arch": null,
+    "Pact Longbow": "Arco lungo Pact",
+    "Pact Longbow!": null,
+    "Use All": "Usa tutto",
+    "Waypoint": "Waypoint",
+    "Waypoint<br>": "Waypoint<br>",
+    "pact Longbow": null
+   },
+   "patterns": 2,
+   "terms": [
+    [
+     "Lion's Arch Keep",
+     "Rocca di Arco del Leone"
+    ],
+    [
+     "lion's arch keep",
+     "rocca di arco del leone"
+    ],
+    [
+     "Lion's arch keep",
+     "Rocca di arco del leone"
+    ],
+    [
+     "Big Old Thing",
+     "Cosa vecchia"
+    ],
+    [
+     "big old thing",
+     "cosa vecchia"
+    ],
+    [
+     "Big old thing",
+     "Cosa vecchia"
+    ],
+    [
+     "Lion's Arch",
+     "Arco del Leone"
+    ],
+    [
+     "lion's arch",
+     "arco del leone"
+    ],
+    [
+     "Lion's arch",
+     "Arco del leone"
+    ],
+    [
+     "raid god",
+     "DIO"
+    ],
+    [
+     "Raid God",
+     "Dio dei raid"
+    ],
+    [
+     "Raid god",
+     "Dio dei raid"
+    ],
+    [
+     "Might",
+     "Might"
+    ]
+   ],
+   "version": 1
+  }
+ },
+ "it": {
+  "article": [
+   "Insignia del mago",
+   "Una Pietra",
+   "Pietra",
+   "Martello",
+   "lo ",
+   "<c=@x>Spada</c>",
+   "Gli Elmi",
+   "Ascia",
+   "Due\nrighe",
+   ""
+  ],
+  "it_pl_re": [
+   "[pl:\"b\"]",
+   "[pl:\"d\"]",
+   "[pl:\"\"]"
+  ],
+  "lang": [
+   "it",
+   "it",
+   "IT",
+   "IT",
+   "model-it-v1/opus-mt-en-it-ct2.zip",
+   {
+    "Recipe": "Ricetta: ",
+    "Recipe[s]": "Ricetta[pl:\"Ricette\"]: ",
+    "Recipes": "Ricette: "
+   },
+   true,
+   "glossary_it.json"
+  ],
+  "num_re": [
+   "%num%",
+   "%num1%",
+   "%num22%"
+  ],
+  "percent": [
+   "aumenta del 5%% la forza",
+   "aumenta del 5%% la forza",
+   "aumenta del 5% la forza",
+   "5%% e %num1% e 3%%",
+   "%str1%%str2% 7%%",
+   "",
+   "nessuno",
+   "rotto 5%",
+   "%num1%%%",
+   "a 5%% b"
+  ],
+  "plural_name": {
+   "Chicken[s]": true,
+   "Edible Mushroom[s]\nSecond[s]": true,
+   "Lady's Fan[pl:\"Fans\"]": true,
+   "Large Bone[s] and Box[pl:\"Boxes\"]": true,
+   "No markers": false,
+   "Piece[s] of Gear": true,
+   "Recovered Tool Box[pl:\"Boxes\"]": true,
+   "Win %num2% rated arena game[s]": false,
+   "[s]alone": false
+  },
+  "plural_re": [
+   "[s]",
+   "Box[pl:\"Boxes\"]",
+   "[s]",
+   "[s]",
+   "[s]",
+   "Box[pl:\"Boxes\"]",
+   "Fan[pl:\"Fans\"]",
+   "[s]",
+   "[s]"
+  ],
+  "plural_rules": true,
+  "recipe": {
+   "<c=@x>Recipe: Pact Longbow</c>": [
+    "<c=@x>Ricetta: ",
+    "Pact Longbow",
+    "</c>"
+   ],
+   "My Recipe: X": null,
+   "Recipe: ": null,
+   "Recipe: A\nB": null,
+   "Recipe: Pact Longbow": [
+    "Ricetta: ",
+    "Pact Longbow",
+    ""
+   ],
+   "Recipe:Nope": null,
+   "Recipe[s]: Large Bone[s]": [
+    "Ricetta[pl:\"Ricette\"]: ",
+    "Large Bone[s]",
+    ""
+   ],
+   "Recipe[s]: X": [
+    "Ricetta[pl:\"Ricette\"]: ",
+    "X",
+    ""
+   ],
+   "Recipes: Things": [
+    "Ricette: ",
+    "Things",
+    ""
+   ]
+  },
+  "resolve": {
+   "Chicken[s]": "Chickens",
+   "Edible Mushroom[s]\nSecond[s]": "Edible Mushrooms\nSeconds",
+   "Lady's Fan[pl:\"Fans\"]": "Lady's Fans",
+   "Large Bone[s] and Box[pl:\"Boxes\"]": "Large Bones and Boxes",
+   "No markers": "No markers",
+   "Piece[s] of Gear": "Pieces of Gear",
+   "Recovered Tool Box[pl:\"Boxes\"]": "Recovered Tool Boxes",
+   "Win %num2% rated arena game[s]": "Win %num2% rated arena games",
+   "[s]alone": "[s]alone"
+  },
+  "singular": {
+   "Chicken[s]": "Chicken",
+   "Edible Mushroom[s]\nSecond[s]": "Edible Mushroom\nSecond",
+   "Lady's Fan[pl:\"Fans\"]": "Lady's Fan",
+   "Large Bone[s] and Box[pl:\"Boxes\"]": "Large Bone and Box",
+   "No markers": "No markers",
+   "Piece[s] of Gear": "Piece of Gear",
+   "Recovered Tool Box[pl:\"Boxes\"]": "Recovered Tool Box",
+   "Win %num2% rated arena game[s]": "Win %num2% rated arena game",
+   "[s]alone": "[s]alone"
+  },
+  "token_re": [
+   "%str1%",
+   "<c=@x>",
+   "[pl:\"Foci\"]",
+   "</c>",
+   "<br>",
+   "[s]",
+   "[the]",
+   "[f:\"Goddess\"]",
+   "%num12%",
+   "[]",
+   "%x%",
+   "<a b>"
+  ]
+ },
+ "languages": [
+  "it",
+  "pt_br"
+ ],
+ "protect_version": 5,
+ "pt_br": {
+  "article": [
+   "L'Insignia del mago",
+   "Una Pietra",
+   "Una Pietra",
+   "il Martello",
+   "lo ",
+   "<c=@x>La Spada</c>",
+   "Gli Elmi",
+   "Un'ascia",
+   "Due\nrighe",
+   ""
+  ],
+  "it_pl_re": [
+   "[pl:\"b\"]",
+   "[pl:\"d\"]",
+   "[pl:\"\"]"
+  ],
+  "lang": [
+   "pt_br",
+   "pt-BR",
+   "PT-BR",
+   "PT_BR",
+   "model-pt-br-v1/opus-mt-en-pt-br-ct2.zip",
+   {
+    "Recipe": "Receita: ",
+    "Recipe[s]": "Receita[pl:\"Receitas\"]: ",
+    "Recipes": "Receitas: "
+   },
+   false,
+   "glossary_pt_br.json"
+  ],
+  "num_re": [
+   "%num%",
+   "%num1%",
+   "%num22%"
+  ],
+  "percent": [
+   "aumenta del 5%% la forza",
+   "aumenta del 5%% la forza",
+   "aumenta del 5% la forza",
+   "5%% e %num1% e 3%%",
+   "%str1%%str2% 7%%",
+   "",
+   "nessuno",
+   "rotto 5%",
+   "%num1%%%",
+   "a 5%% b"
+  ],
+  "plural_name": {
+   "Chicken[s]": false,
+   "Edible Mushroom[s]\nSecond[s]": false,
+   "Lady's Fan[pl:\"Fans\"]": false,
+   "Large Bone[s] and Box[pl:\"Boxes\"]": false,
+   "No markers": false,
+   "Piece[s] of Gear": false,
+   "Recovered Tool Box[pl:\"Boxes\"]": false,
+   "Win %num2% rated arena game[s]": false,
+   "[s]alone": false
+  },
+  "plural_re": [
+   "[s]",
+   "Box[pl:\"Boxes\"]",
+   "[s]",
+   "[s]",
+   "[s]",
+   "Box[pl:\"Boxes\"]",
+   "Fan[pl:\"Fans\"]",
+   "[s]",
+   "[s]"
+  ],
+  "plural_rules": false,
+  "recipe": {
+   "<c=@x>Recipe: Pact Longbow</c>": [
+    "<c=@x>Receita: ",
+    "Pact Longbow",
+    "</c>"
+   ],
+   "My Recipe: X": null,
+   "Recipe: ": null,
+   "Recipe: A\nB": null,
+   "Recipe: Pact Longbow": [
+    "Receita: ",
+    "Pact Longbow",
+    ""
+   ],
+   "Recipe:Nope": null,
+   "Recipe[s]: Large Bone[s]": [
+    "Receita[pl:\"Receitas\"]: ",
+    "Large Bone[s]",
+    ""
+   ],
+   "Recipe[s]: X": [
+    "Receita[pl:\"Receitas\"]: ",
+    "X",
+    ""
+   ],
+   "Recipes: Things": [
+    "Receitas: ",
+    "Things",
+    ""
+   ]
+  },
+  "resolve": {
+   "Chicken[s]": "Chickens",
+   "Edible Mushroom[s]\nSecond[s]": "Edible Mushrooms\nSeconds",
+   "Lady's Fan[pl:\"Fans\"]": "Lady's Fans",
+   "Large Bone[s] and Box[pl:\"Boxes\"]": "Large Bones and Boxes",
+   "No markers": "No markers",
+   "Piece[s] of Gear": "Pieces of Gear",
+   "Recovered Tool Box[pl:\"Boxes\"]": "Recovered Tool Boxes",
+   "Win %num2% rated arena game[s]": "Win %num2% rated arena games",
+   "[s]alone": "[s]alone"
+  },
+  "singular": {
+   "Chicken[s]": "Chicken",
+   "Edible Mushroom[s]\nSecond[s]": "Edible Mushroom\nSecond",
+   "Lady's Fan[pl:\"Fans\"]": "Lady's Fan",
+   "Large Bone[s] and Box[pl:\"Boxes\"]": "Large Bone and Box",
+   "No markers": "No markers",
+   "Piece[s] of Gear": "Piece of Gear",
+   "Recovered Tool Box[pl:\"Boxes\"]": "Recovered Tool Box",
+   "Win %num2% rated arena game[s]": "Win %num2% rated arena game",
+   "[s]alone": "[s]alone"
+  },
+  "token_re": [
+   "%str1%",
+   "<c=@x>",
+   "[pl:\"Foci\"]",
+   "</c>",
+   "<br>",
+   "[s]",
+   "[the]",
+   "[f:\"Goddess\"]",
+   "%num12%",
+   "[]",
+   "%x%",
+   "<a b>"
+  ]
+ },
+ "unknown_language": [
+  "raises",
+  "KeyError",
+  "'xx'"
+ ]
+}

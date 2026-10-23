@@ -1,0 +1,125 @@
+{
+ "after_kill": {
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/cache_it.jsonl",
+   "IT/map_it.db",
+   "IT/map_it.db-shm",
+   "IT/map_it.db-wal",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal"
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: cache loaded: 2 translations",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: map: 1 strings known",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ]
+ },
+ "closed": {
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/cache_it.jsonl",
+   "IT/map_it.db",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal"
+  ],
+  "journal": [
+   [
+    "delete"
+   ]
+  ],
+  "map": [
+   [
+    1,
+    "Hello\r\nthere",
+    "[IT] Hello\r\n[IT] there",
+    "live"
+   ]
+  ]
+ },
+ "killed": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "[IT] Hello\r\n[IT] there"
+    ]
+   ]
+  },
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/cache_it.jsonl",
+   "IT/map_it.db",
+   "IT/map_it.db-shm",
+   "IT/map_it.db-wal",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal"
+  ]
+ },
+ "stats": {
+  "answers_6_7": [
+   [
+    [
+     0,
+     6,
+     "Way too long"
+    ]
+   ],
+   [
+    [
+     0,
+     7,
+     "IT:Line 1000"
+    ]
+   ]
+  ],
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/cache_it.jsonl",
+   "IT/map_it.db",
+   "IT/model/model.bin",
+   "IT/model/source.spm",
+   "IT/model/target.spm",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal",
+   "IT/patch_it.json"
+  ],
+  "first": [
+   "i: stats <period>: cpu <n>% of one core (<n> cores); 1006 requests (patch 0%, cache 0%, model 100%, empty 0%); model wait avg <t> s, p95 <t> s, max <t> s; queue max 1002 lines; sent <n> groups; translated 1002 lines in <t> s (<r> lines/s, glossary <t> s, model <t> s)"
+  ],
+  "log": [
+   "i: 1006 texts answered, 0 waiting for the model, 0 lines in queue",
+   "i: translated 1002 lines so far, 0 waiting",
+   "i: translated 504 lines so far, 498 waiting"
+  ]
+ },
+ "too_big": {
+  "exit": 0,
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/map_it.db",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal"
+  ],
+  "log": [
+   "e: stdin reader failed",
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ]
+ }
+}

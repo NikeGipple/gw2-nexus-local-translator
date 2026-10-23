@@ -1,0 +1,86 @@
+{
+ "build_auto": {
+  "again": [
+   9,
+   5,
+   0
+  ],
+  "again_rewritten": false,
+  "asked": [
+   [
+    "Box[pl:\"Boxes\"]",
+    "Citizen"
+   ],
+   [
+    "First",
+    "Gives 5% power"
+   ],
+   [
+    "Hello world",
+    "Large Bone[s]"
+   ],
+   [
+    "Lion's Arch",
+    "Nothing"
+   ],
+   [
+    "Second",
+    "Thief"
+   ],
+   [
+    "Lion's Arch"
+   ]
+  ],
+  "patch": "{\n\"version\":3,\n\"strings\":{\n\"10\":\"Rivista\",\n\"50\":\"Solo nella patch\"\n},\n\"auto\":{\n\"1\":\"Ciao mondo\",\n\"2\":\"Arco lungo Pact\",\n\"3\":\"Ricetta: Arco lungo Pact\",\n\"4\":\"Ladro\",\n\"5\":\"Dà 5%% potere\",\n\"7\":\"Primo\\nSecondo\",\n\"11\":\"Cittadino[f:\\\"Cittadina\\\"]\",\n\"12\":\"Ossa grandi\",\n\"60\":\"fuori dalla mappa\"\n},\n\"drop\":[\n9,\n14,\n70\n],\n\"glossary\":\"49d5c9a150c043f9\"\n}\n",
+  "printed": "  13 frasi note, 10 righe da tradurre (le altre sono gia' pronte)\n\r  prova: 2/10 (20%)  trascorso 0 min 03 s  rimanente ~0 min 12 s   \r  prova: 4/10 (40%)  trascorso 0 min 06 s  rimanente ~0 min 09 s   \r  prova: 6/10 (60%)  trascorso 0 min 09 s  rimanente ~0 min 06 s   \r  prova: 8/10 (80%)  trascorso 0 min 12 s  rimanente ~0 min 03 s   \r  prova: 10/10 (100%)  trascorso 0 min 15 s  rimanente ~0 min 00 s   \n",
+  "result": [
+   9,
+   5,
+   9
+  ],
+  "translations": {
+   "Box[pl:\"Boxes\"]": "Box[pl:\"Boxes\"]",
+   "Citizen": "Cittadino",
+   "First": "Primo",
+   "Gives 5% power": "Dà 5% potere",
+   "Hello world": "Ciao mondo",
+   "Large Bone[s]": "Ossa grandi",
+   "Nothing": "",
+   "Second": "Secondo",
+   "Thief": "Ladro/a",
+   "Untranslated": "Untranslated"
+  }
+ },
+ "progress": {
+  "hms": [
+   "0 min 00 s",
+   "0 min 59 s",
+   "1 min 01 s",
+   "1 h 00 min",
+   "2 h 02 min"
+  ],
+  "printed": "\r  lavoro: 1/10 (10%)  trascorso 0 min 00 s  rimanente ~0 min 04 s   \r  lavoro: 3/10 (30%)  trascorso 0 min 02 s  rimanente ~0 min 05 s   \r  lavoro: 6/10 (60%)  trascorso 1 h 06 min  rimanente ~44 min 28 s   \r  lavoro: 10/10 (100%)  trascorso 1 h 06 min  rimanente ~0 min 00 s   \n"
+ },
+ "review": {
+  "columns": [
+   "key",
+   "inglese",
+   "italiano_attuale",
+   "italiano_patch",
+   "nuova_traduzione"
+  ],
+  "export_csv": "﻿key;inglese;italiano_attuale;italiano_patch;nuova_traduzione\r\n1;Hello;Ciao;;\r\n2;Bye;Addio;;\r\n3;Thanks;Grazie mille;Grazie mille;\r\n4;;Quattro;;\r\n",
+  "export_no_map": 3,
+  "export_rows": 4,
+  "import": [
+   2,
+   0
+  ],
+  "import_comma": [
+   0,
+   1
+  ],
+  "patch_after": "{\n\"version\":2,\n\"strings\":{\n\"1\":\"Salve\",\n\"3\":\"Grazie mille\",\n\"4\":\"Quattro rivista\"\n},\n\"auto\":{\n\"2\":\"Addio\"\n}\n}\n",
+  "patch_after_comma": "{\n\"version\":3,\n\"strings\":{\n\"1\":\"Salve\",\n\"4\":\"Quattro rivista\"\n},\n\"auto\":{\n\"2\":\"Addio\"\n}\n}\n"
+ }
+}

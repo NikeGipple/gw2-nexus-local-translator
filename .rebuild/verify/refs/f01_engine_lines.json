@@ -1,0 +1,2003 @@
+{
+ "it": {
+  "BATCH": 24,
+  "lines_each": {
+   "%str1% evades your %str3%.": {
+    "%str1% evades your %str3%.": "%str1% schiva il tuo %str3%."
+   },
+   "%str1%%str2%": {
+    "%str1%%str2%": "%str1%%str2%"
+   },
+   "<c=@flavor>Some flavor text.</c>": {
+    "<c=@flavor>Some flavor text.</c>": "<c=@flavor>Un testo di sapore.</c>"
+   },
+   "<c=@x>Pact Longbow</c>": {
+    "<c=@x>Pact Longbow</c>": "<c=@x>Arco lungo Pact</c>"
+   },
+   "Big Chest[pl:\"Chests\"]": {
+    "Big Chest[pl:\"Chests\"]": "Grande[pl:\"Grandi\"] forziere[pl:\"forzieri\"]"
+   },
+   "Captain: Tide Turner": {
+    "Captain: Tide Turner": "Capitano: Tide Turner"
+   },
+   "Citizen": {
+    "Citizen": "Cittadino[f:\"Cittadina\"] pettegolo[f:\"pettegola\"]"
+   },
+   "Damage +5%% Fury": {
+    "Damage +5%% Fury": "Damage +5%% Fury"
+   },
+   "Dragon": {
+    "Dragon": "Drago"
+   },
+   "Dragon Slash—Boost": {
+    "Dragon Slash—Boost": "Dragon Slash—Boost"
+   },
+   "Embroidered Medal[s]": {
+    "Embroidered Medal[s]": "Medaglia[pl:\"Medaglie\"] ricamata[pl:\"ricamate\"]"
+   },
+   "First — second": {
+    "First — second": "Primo — secondo"
+   },
+   "Gives 5% power": {
+    "Gives 5% power": "Dà il 5%% di potere"
+   },
+   "Gives 5% power to %str1%": {
+    "Gives 5% power to %str1%": "Dà il 5%% di potere a %str1%"
+   },
+   "Go now. Run fast!": {
+    "Go now. Run fast!": "Vai ora. corri veloce!"
+   },
+   "Golden Feather[s]": {
+    "Golden Feather[s]": "Golden Feather[s]"
+   },
+   "Gossip citizen of the city": {
+    "Gossip citizen of the city": "Cittadino[f:\"Cittadina\"] pettegolo[f:\"pettegola\"] della città"
+   },
+   "Guild Wars 2: Janthir Wilds": {
+    "Guild Wars 2: Janthir Wilds": "IT:Guild Wars 2: Janthir Wilds"
+   },
+   "Hello world": {
+    "Hello world": "Ciao mondo"
+   },
+   "Hit %str1% now": {
+    "Hit %str1% now": "Hit %str1% now"
+   },
+   "Kill the boss": {
+    "Kill the boss": "Uccidi il boss"
+   },
+   "Large Bone[s]": {
+    "Large Bone[s]": "Osso[pl:\"Ossi\"] grande[pl:\"grandi\"]"
+   },
+   "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": {
+    "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": "lungo"
+   },
+   "Mr. Fox runs. Fast.": {
+    "Mr. Fox runs. Fast.": "IT:Mr. Fox runs. IT:Fast."
+   },
+   "Nothing here": {
+    "Nothing here": "Nothing here"
+   },
+   "Old citizen, friend": {
+    "Old citizen, friend": "Cittadino vecchio, amico"
+   },
+   "Pact Longbow": {
+    "Pact Longbow": "IT:Pact Longbow"
+   },
+   "Plaza of<br>Dwayna": {
+    "Plaza of<br>Dwayna": "IT:Plaza of<br>IT:Dwayna"
+   },
+   "Raid god": {
+    "Raid god": "Dio dei raid"
+   },
+   "Recipe: Embroidered Medal": {
+    "Embroidered Medal": "Medaglia ricamata",
+    "Recipe: Embroidered Medal": "Ricetta: Medaglia ricamata"
+   },
+   "Recipe: Waypoint": {
+    "Recipe: Waypoint": "Ricetta: Waypoint"
+   },
+   "Recipe[s]: Steel Plate[s]": {
+    "Recipe[s]: Steel Plate[s]": "Ricetta[pl:\"Ricette\"]: Piastra[pl:\"Piastre\"] d'acciaio",
+    "Steel Plate[s]": "Piastra[pl:\"Piastre\"] d'acciaio"
+   },
+   "Season Twenty-Five: Finale": {
+    "Season Twenty-Five: Finale": "Season Twenty-Five: Finale"
+   },
+   "Shiny Helm[s]": {
+    "Shiny Helm[s]": "Elmo[pl:\"Elmi\"] lucido[pl:\"lucidi\"]"
+   },
+   "Steel Plate[s]": {
+    "Steel Plate[s]": "Piastra[pl:\"Piastre\"] d'acciaio"
+   },
+   "Storyteller: Abaddon": {
+    "Storyteller: Abaddon": "Narratore: Abaddon"
+   },
+   "The thief": {
+    "The thief": "il ladro"
+   },
+   "Thief": {
+    "Thief": "Ladro"
+   },
+   "Use All": {
+    "Use All": "IT:Use All"
+   },
+   "Wait": {
+    "Wait": "Aspetta..."
+   },
+   "Welcome to Lion's Arch!": {
+    "Welcome to Lion's Arch!": "Benvenuto ad Arco del Leone!"
+   },
+   "Win %num1% rated arena game[s]": {
+    "Win %num1% rated arena game[s]": "Vinci %num1% partite classificate"
+   },
+   "You might use Might.": {
+    "You might use Might.": "IT:You might use Might."
+   },
+   "[null]": {
+    "[null]": "[null]"
+   },
+   "raid god": {
+    "raid god": "dio dei raid"
+   },
+   "6]2T": {
+    "6]2T": "IT:6]2T"
+   }
+  },
+  "lines_one_call": {
+   "%str1% evades your %str3%.": "%str1% schiva il tuo %str3%.",
+   "%str1%%str2%": "%str1%%str2%",
+   "<c=@flavor>Some flavor text.</c>": "<c=@flavor>Un testo di sapore.</c>",
+   "<c=@x>Pact Longbow</c>": "<c=@x>IT:Pact Longbow</c>",
+   "Big Chest[pl:\"Chests\"]": "Grande[pl:\"Grandi\"] forziere[pl:\"forzieri\"]",
+   "Captain: Tide Turner": "Capitano: Tide Turner",
+   "Citizen": "Cittadino[f:\"Cittadina\"] pettegolo[f:\"pettegola\"]",
+   "Damage +5%% Fury": "Damage +5%% Fury",
+   "Dragon": "Drago",
+   "Dragon Slash—Boost": "Dragon Slash—Boost",
+   "Embroidered Medal": "Medaglia ricamata",
+   "Embroidered Medal[s]": "Medaglia[pl:\"Medaglie\"] ricamata[pl:\"ricamate\"]",
+   "First — second": "Primo — secondo",
+   "Gives 5% power": "Dà il 5%% di potere",
+   "Gives 5% power to %str1%": "Dà il 5%% di potere a %str1%",
+   "Go now. Run fast!": "Vai ora. corri veloce!",
+   "Golden Feather[s]": "Golden Feather[s]",
+   "Gossip citizen of the city": "Cittadino[f:\"Cittadina\"] pettegolo[f:\"pettegola\"] della città",
+   "Guild Wars 2: Janthir Wilds": "IT:Guild Wars 2: Janthir Wilds",
+   "Hello world": "Ciao mondo",
+   "Hit %str1% now": "Hit %str1% now",
+   "Kill the boss": "Uccidi il boss",
+   "Large Bone[s]": "Osso[pl:\"Ossi\"] grande[pl:\"grandi\"]",
+   "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": "lungo",
+   "Mr. Fox runs. Fast.": "IT:Mr. Fox runs. IT:Fast.",
+   "Nothing here": "Nothing here",
+   "Old citizen, friend": "Cittadino vecchio, amico",
+   "Pact Longbow": "IT:Pact Longbow",
+   "Plaza of<br>Dwayna": "IT:Plaza of<br>IT:Dwayna",
+   "Raid god": "Dio dei raid",
+   "Recipe: Embroidered Medal": "Ricetta: Medaglia ricamata",
+   "Recipe: Waypoint": "Ricetta: Waypoint",
+   "Recipe[s]: Steel Plate[s]": "Ricetta[pl:\"Ricette\"]: Piastra[pl:\"Piastre\"] d'acciaio",
+   "Season Twenty-Five: Finale": "Season Twenty-Five: Finale",
+   "Shiny Helm[s]": "Elmo[pl:\"Elmi\"] lucido[pl:\"lucidi\"]",
+   "Steel Plate[s]": "Piastra[pl:\"Piastre\"] d'acciaio",
+   "Storyteller: Abaddon": "Narratore: Abaddon",
+   "The thief": "il ladro",
+   "Thief": "Ladro",
+   "Use All": "IT:Use All",
+   "Wait": "Aspetta...",
+   "Welcome to Lion's Arch!": "Benvenuto ad Arco del Leone!",
+   "Win %num1% rated arena game[s]": "Vinci %num1% partite classificate",
+   "You might use Might.": "IT:You might use Might.",
+   "[null]": "[null]",
+   "raid god": "dio dei raid",
+   "6]2T": "IT:6]2T"
+  },
+  "lines_one_call_model": [
+   [
+    "Hit QZ0QZ now",
+    "Damage +5%% Fury",
+    "Nothing here",
+    "Dragon",
+    "Wait",
+    "Gives 5% power",
+    "Gives 5% power to QZ0QZ",
+    "Thief",
+    "The thief",
+    "Citizen",
+    "Gossip citizen of the city",
+    "Old citizen, friend",
+    "Embroidered Medal",
+    "Shiny Helm",
+    "Steel Plate",
+    "Golden Feather",
+    "QZ0QZ evades your QZ1QZ.",
+    "You might use QZ0QZ.",
+    "Hello world",
+    "Welcome to QZ0QZ!",
+    "Big Chest",
+    "Win QZ0QZ rated arena games",
+    "Kill the boss",
+    "Pact Longbow",
+    "Use All",
+    "6]2T",
+    "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ",
+    "Guild Wars 2: Janthir Wilds",
+    "Embroidered Medal",
+    "Storyteller",
+    "Abaddon",
+    "Captain",
+    "Tide Turner",
+    "Season Twenty-Five",
+    "Finale",
+    "Go now.",
+    "Run fast!",
+    "Some flavor text.",
+    "First",
+    "second",
+    "Plaza of",
+    "Dwayna",
+    "Mr. Fox runs.",
+    "Fast."
+   ]
+  ],
+  "needs": {
+   "%str1% evades your %str3%.": true,
+   "%str1%%str2%": false,
+   "<c=@flavor>Some flavor text.</c>": true,
+   "<c=@x>Pact Longbow</c>": true,
+   "Big Chest[pl:\"Chests\"]": true,
+   "Captain: Tide Turner": true,
+   "Citizen": true,
+   "Damage +5%% Fury": true,
+   "Dragon": true,
+   "Dragon Slash—Boost": true,
+   "Embroidered Medal[s]": true,
+   "First — second": true,
+   "Gives 5% power": true,
+   "Gives 5% power to %str1%": true,
+   "Go now. Run fast!": true,
+   "Golden Feather[s]": true,
+   "Gossip citizen of the city": true,
+   "Guild Wars 2: Janthir Wilds": true,
+   "Hello world": true,
+   "Hit %str1% now": true,
+   "Kill the boss": true,
+   "Large Bone[s]": true,
+   "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": true,
+   "Mr. Fox runs. Fast.": true,
+   "Nothing here": true,
+   "Old citizen, friend": true,
+   "Pact Longbow": true,
+   "Plaza of<br>Dwayna": true,
+   "Raid god": true,
+   "Recipe: Embroidered Medal": true,
+   "Recipe: Waypoint": true,
+   "Recipe[s]: Steel Plate[s]": true,
+   "Season Twenty-Five: Finale": true,
+   "Shiny Helm[s]": true,
+   "Steel Plate[s]": true,
+   "Storyteller: Abaddon": true,
+   "The thief": true,
+   "Thief": true,
+   "Use All": true,
+   "Wait": true,
+   "Welcome to Lion's Arch!": true,
+   "Win %num1% rated arena game[s]": true,
+   "You might use Might.": true,
+   "[null]": false,
+   "raid god": true,
+   "6]2T": false
+  },
+  "outdated": {
+   "%str1% evades your %str3%.": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "%str1%%str2%": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "<c=@flavor>Some flavor text.</c>": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "<c=@x>Pact Longbow</c>": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Big Chest[pl:\"Chests\"]": [
+    true,
+    true,
+    true,
+    true,
+    false
+   ],
+   "Captain: Tide Turner": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Citizen": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Damage +5%% Fury": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Dragon": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Dragon Slash—Boost": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Embroidered Medal[s]": [
+    true,
+    true,
+    true,
+    true,
+    false
+   ],
+   "First — second": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Gives 5% power": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Gives 5% power to %str1%": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Go now. Run fast!": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Golden Feather[s]": [
+    true,
+    true,
+    true,
+    true,
+    false
+   ],
+   "Gossip citizen of the city": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Guild Wars 2: Janthir Wilds": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Hello world": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Hit %str1% now": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Kill the boss": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Large Bone[s]": [
+    true,
+    true,
+    true,
+    true,
+    false
+   ],
+   "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Mr. Fox runs. Fast.": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Nothing here": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Old citizen, friend": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Pact Longbow": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Plaza of<br>Dwayna": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Raid god": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Recipe: Embroidered Medal": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Recipe: Waypoint": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Recipe[s]: Steel Plate[s]": [
+    true,
+    true,
+    true,
+    true,
+    false
+   ],
+   "Season Twenty-Five: Finale": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Shiny Helm[s]": [
+    true,
+    true,
+    true,
+    true,
+    false
+   ],
+   "Steel Plate[s]": [
+    true,
+    true,
+    true,
+    true,
+    false
+   ],
+   "Storyteller: Abaddon": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "The thief": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Thief": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Use All": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Wait": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Welcome to Lion's Arch!": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Win %num1% rated arena game[s]": [
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "You might use Might.": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "[null]": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "raid god": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "6]2T": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ]
+  },
+  "plain_each": {
+   "%str1% evades your %str3%.": {
+    "%str1% evades your %str3%.": "%str1% schiva il tuo %str3%."
+   },
+   "%str1%%str2%": {
+    "%str1%%str2%": "%str1%%str2%"
+   },
+   "<c=@flavor>Some flavor text.</c>": {
+    "<c=@flavor>Some flavor text.</c>": "IT:<c=@flavor>Some flavor text.</c>"
+   },
+   "<c=@x>Pact Longbow</c>": {
+    "<c=@x>Pact Longbow</c>": "IT:<c=@x>Pact Longbow</c>"
+   },
+   "Big Chest[pl:\"Chests\"]": {
+    "Big Chest[pl:\"Chests\"]": "Grande[pl:\"Grandi\"] forziere[pl:\"forzieri\"]"
+   },
+   "Captain: Tide Turner": {
+    "Captain: Tide Turner": "IT:Captain: Tide Turner"
+   },
+   "Citizen": {
+    "Citizen": "Cittadino[f:\"Cittadina\"] pettegolo[f:\"pettegola\"]"
+   },
+   "Damage +5%% Fury": {
+    "Damage +5%% Fury": "Damage +5%% Fury"
+   },
+   "Dragon": {
+    "Dragon": "Drago"
+   },
+   "Dragon Slash—Boost": {
+    "Dragon Slash—Boost": "Dragon Slash—Boost"
+   },
+   "Embroidered Medal[s]": {
+    "Embroidered Medal[s]": "Medaglia[pl:\"Medaglie\"] ricamata[pl:\"ricamate\"]"
+   },
+   "First — second": {
+    "First — second": "IT:First — second"
+   },
+   "Gives 5% power": {
+    "Gives 5% power": "Dà il 5%% di potere"
+   },
+   "Gives 5% power to %str1%": {
+    "Gives 5% power to %str1%": "Dà il 5%% di potere a %str1%"
+   },
+   "Go now. Run fast!": {
+    "Go now. Run fast!": "IT:Go now. Run fast!"
+   },
+   "Golden Feather[s]": {
+    "Golden Feather[s]": "Golden Feather[s]"
+   },
+   "Gossip citizen of the city": {
+    "Gossip citizen of the city": "Cittadino[f:\"Cittadina\"] pettegolo[f:\"pettegola\"] della città"
+   },
+   "Guild Wars 2: Janthir Wilds": {
+    "Guild Wars 2: Janthir Wilds": "IT:Guild Wars 2: Janthir Wilds"
+   },
+   "Hello world": {
+    "Hello world": "Ciao mondo"
+   },
+   "Hit %str1% now": {
+    "Hit %str1% now": "Hit %str1% now"
+   },
+   "Kill the boss": {
+    "Kill the boss": "Uccidi il boss"
+   },
+   "Large Bone[s]": {
+    "Large Bone[s]": "Osso[pl:\"Ossi\"] grande[pl:\"grandi\"]"
+   },
+   "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": {
+    "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": "lungo"
+   },
+   "Mr. Fox runs. Fast.": {
+    "Mr. Fox runs. Fast.": "IT:Mr. Fox runs. Fast."
+   },
+   "Nothing here": {
+    "Nothing here": "Nothing here"
+   },
+   "Old citizen, friend": {
+    "Old citizen, friend": "Cittadino vecchio, amico"
+   },
+   "Pact Longbow": {
+    "Pact Longbow": "IT:Pact Longbow"
+   },
+   "Plaza of<br>Dwayna": {
+    "Plaza of<br>Dwayna": "Piazza di<br>Dwayna"
+   },
+   "Raid god": {
+    "Raid god": "Dio dei raid"
+   },
+   "Recipe: Embroidered Medal": {
+    "Recipe: Embroidered Medal": "IT:Recipe: Embroidered Medal"
+   },
+   "Recipe: Waypoint": {
+    "Recipe: Waypoint": "IT:Recipe: Waypoint"
+   },
+   "Recipe[s]: Steel Plate[s]": {
+    "Recipe[s]: Steel Plate[s]": "IT:Recipe: Steel Plate"
+   },
+   "Season Twenty-Five: Finale": {
+    "Season Twenty-Five: Finale": "IT:Season Twenty-Five: Finale"
+   },
+   "Shiny Helm[s]": {
+    "Shiny Helm[s]": "Elmo[pl:\"Elmi\"] lucido[pl:\"lucidi\"]"
+   },
+   "Steel Plate[s]": {
+    "Steel Plate[s]": "Piastra[pl:\"Piastre\"] d'acciaio"
+   },
+   "Storyteller: Abaddon": {
+    "Storyteller: Abaddon": "IT:Storyteller: Abaddon"
+   },
+   "The thief": {
+    "The thief": "il ladro"
+   },
+   "Thief": {
+    "Thief": "Ladro"
+   },
+   "Use All": {
+    "Use All": "IT:Use All"
+   },
+   "Wait": {
+    "Wait": "Aspetta..."
+   },
+   "Welcome to Lion's Arch!": {
+    "Welcome to Lion's Arch!": "Benvenuto ad Arco del Leone!"
+   },
+   "Win %num1% rated arena game[s]": {
+    "Win %num1% rated arena game[s]": "Vinci %num1% partite classificate"
+   },
+   "You might use Might.": {
+    "You might use Might.": "IT:You might use Might."
+   },
+   "[null]": {
+    "[null]": "[null]"
+   },
+   "raid god": {
+    "raid god": "dio dei raid"
+   },
+   "6]2T": {
+    "6]2T": "IT:6]2T"
+   }
+  },
+  "plain_empty": {},
+  "protect": {
+   "%str1% evades your %str3%.": [
+    "QZ0QZ evades your QZ1QZ.",
+    {
+     "QZ0QZ": "%str1%",
+     "QZ1QZ": "%str3%"
+    }
+   ],
+   "%str1%%str2%": [
+    "QZ0QZQZ1QZ",
+    {
+     "QZ0QZ": "%str1%",
+     "QZ1QZ": "%str2%"
+    }
+   ],
+   "<c=@flavor>Some flavor text.</c>": [
+    "QZ0QZSome flavor text.QZ1QZ",
+    {
+     "QZ0QZ": "<c=@flavor>",
+     "QZ1QZ": "</c>"
+    }
+   ],
+   "<c=@x>Pact Longbow</c>": [
+    "QZ0QZPact LongbowQZ1QZ",
+    {
+     "QZ0QZ": "<c=@x>",
+     "QZ1QZ": "</c>"
+    }
+   ],
+   "Big Chest[pl:\"Chests\"]": [
+    "Big ChestQZ0QZ",
+    {
+     "QZ0QZ": "[pl:\"Chests\"]"
+    }
+   ],
+   "Captain: Tide Turner": [
+    "Captain: Tide Turner",
+    {}
+   ],
+   "Citizen": [
+    "Citizen",
+    {}
+   ],
+   "Damage +5%% Fury": [
+    "Damage +5%% Fury",
+    {}
+   ],
+   "Dragon": [
+    "Dragon",
+    {}
+   ],
+   "Dragon Slash—Boost": [
+    "QZ0QZ",
+    {
+     "QZ0QZ": "Dragon Slash—Boost"
+    }
+   ],
+   "Embroidered Medal[s]": [
+    "Embroidered MedalQZ0QZ",
+    {
+     "QZ0QZ": "[s]"
+    }
+   ],
+   "First — second": [
+    "First — second",
+    {}
+   ],
+   "Gives 5% power": [
+    "Gives 5% power",
+    {}
+   ],
+   "Gives 5% power to %str1%": [
+    "Gives 5% power to QZ0QZ",
+    {
+     "QZ0QZ": "%str1%"
+    }
+   ],
+   "Go now. Run fast!": [
+    "Go now. Run fast!",
+    {}
+   ],
+   "Golden Feather[s]": [
+    "Golden FeatherQZ0QZ",
+    {
+     "QZ0QZ": "[s]"
+    }
+   ],
+   "Gossip citizen of the city": [
+    "Gossip citizen of the city",
+    {}
+   ],
+   "Guild Wars 2: Janthir Wilds": [
+    "Guild Wars 2: Janthir Wilds",
+    {}
+   ],
+   "Hello world": [
+    "Hello world",
+    {}
+   ],
+   "Hit %str1% now": [
+    "Hit QZ0QZ now",
+    {
+     "QZ0QZ": "%str1%"
+    }
+   ],
+   "Kill the boss": [
+    "Kill the boss",
+    {}
+   ],
+   "Large Bone[s]": [
+    "QZ1QZQZ0QZ",
+    {
+     "QZ0QZ": "[s]",
+     "QZ1QZ": "Osso grande"
+    }
+   ],
+   "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": [
+    "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ",
+    {}
+   ],
+   "Mr. Fox runs. Fast.": [
+    "Mr. Fox runs. Fast.",
+    {}
+   ],
+   "Nothing here": [
+    "Nothing here",
+    {}
+   ],
+   "Old citizen, friend": [
+    "Old citizen, friend",
+    {}
+   ],
+   "Pact Longbow": [
+    "Pact Longbow",
+    {}
+   ],
+   "Plaza of<br>Dwayna": [
+    "Plaza ofQZ0QZDwayna",
+    {
+     "QZ0QZ": "<br>"
+    }
+   ],
+   "Raid god": [
+    "QZ0QZ",
+    {
+     "QZ0QZ": "Dio dei raid"
+    }
+   ],
+   "Recipe: Embroidered Medal": [
+    "Recipe: Embroidered Medal",
+    {}
+   ],
+   "Recipe: Waypoint": [
+    "Recipe: Waypoint",
+    {}
+   ],
+   "Recipe[s]: Steel Plate[s]": [
+    "RecipeQZ0QZ: Steel PlateQZ1QZ",
+    {
+     "QZ0QZ": "[s]",
+     "QZ1QZ": "[s]"
+    }
+   ],
+   "Season Twenty-Five: Finale": [
+    "Season Twenty-Five: Finale",
+    {}
+   ],
+   "Shiny Helm[s]": [
+    "Shiny HelmQZ0QZ",
+    {
+     "QZ0QZ": "[s]"
+    }
+   ],
+   "Steel Plate[s]": [
+    "Steel PlateQZ0QZ",
+    {
+     "QZ0QZ": "[s]"
+    }
+   ],
+   "Storyteller: Abaddon": [
+    "Storyteller: Abaddon",
+    {}
+   ],
+   "The thief": [
+    "The thief",
+    {}
+   ],
+   "Thief": [
+    "Thief",
+    {}
+   ],
+   "Use All": [
+    "Use All",
+    {}
+   ],
+   "Wait": [
+    "Wait",
+    {}
+   ],
+   "Welcome to Lion's Arch!": [
+    "Welcome to QZ0QZ!",
+    {
+     "QZ0QZ": "Arco del Leone"
+    }
+   ],
+   "Win %num1% rated arena game[s]": [
+    "Win QZ0QZ rated arena gameQZ1QZ",
+    {
+     "QZ0QZ": "%num1%",
+     "QZ1QZ": "[s]"
+    }
+   ],
+   "You might use Might.": [
+    "You might use QZ0QZ.",
+    {
+     "QZ0QZ": "Might"
+    }
+   ],
+   "[null]": [
+    "QZ0QZ",
+    {
+     "QZ0QZ": "[null]"
+    }
+   ],
+   "raid god": [
+    "QZ0QZ",
+    {
+     "QZ0QZ": "dio dei raid"
+    }
+   ],
+   "6]2T": [
+    "6]2T",
+    {}
+   ]
+  },
+  "with_cache": {
+   "Captain: Tide Turner": "CAPITANO: Tide Turner",
+   "Storyteller: Abaddon": "Cantastorie: Abaddon"
+  },
+  "with_cache_model": [
+   [
+    "Abaddon",
+    "Tide Turner"
+   ]
+  ]
+ },
+ "pt_br": {
+  "BATCH": 24,
+  "lines_each": {
+   "%str1% evades your %str3%.": {
+    "%str1% evades your %str3%.": "%str1% schiva il tuo %str3%."
+   },
+   "%str1%%str2%": {
+    "%str1%%str2%": "%str1%%str2%"
+   },
+   "<c=@flavor>Some flavor text.</c>": {
+    "<c=@flavor>Some flavor text.</c>": "<c=@flavor>Un testo di sapore.</c>"
+   },
+   "<c=@x>Pact Longbow</c>": {
+    "<c=@x>Pact Longbow</c>": "<c=@x>Arco lungo Pact</c>"
+   },
+   "Big Chest[pl:\"Chests\"]": {
+    "Big Chest[pl:\"Chests\"]": "IT:Big Chests"
+   },
+   "Captain: Tide Turner": {
+    "Captain: Tide Turner": "Capitano: Tide Turner"
+   },
+   "Citizen": {
+    "Citizen": "Cittadino[f:\"Cittadina\"] pettegolo[f:\"pettegola\"]"
+   },
+   "Damage +5%% Fury": {
+    "Damage +5%% Fury": "Damage +5%% Fury"
+   },
+   "Dragon": {
+    "Dragon": "Drago"
+   },
+   "Dragon Slash—Boost": {
+    "Dragon Slash—Boost": "Dragon Slash—Boost"
+   },
+   "Embroidered Medal[s]": {
+    "Embroidered Medal[s]": "Medaglie ricamate"
+   },
+   "First — second": {
+    "First — second": "Primo — secondo"
+   },
+   "Gives 5% power": {
+    "Gives 5% power": "Dà il 5%% di potere"
+   },
+   "Gives 5% power to %str1%": {
+    "Gives 5% power to %str1%": "Dà il 5%% di potere a %str1%"
+   },
+   "Go now. Run fast!": {
+    "Go now. Run fast!": "Vai ora. corri veloce!"
+   },
+   "Golden Feather[s]": {
+    "Golden Feather[s]": "IT:Golden Feathers"
+   },
+   "Gossip citizen of the city": {
+    "Gossip citizen of the city": "Cittadino[f:\"Cittadina\"] pettegolo[f:\"pettegola\"] della città"
+   },
+   "Guild Wars 2: Janthir Wilds": {
+    "Guild Wars 2: Janthir Wilds": "IT:Guild Wars 2: Janthir Wilds"
+   },
+   "Hello world": {
+    "Hello world": "Ciao mondo"
+   },
+   "Hit %str1% now": {
+    "Hit %str1% now": "Hit %str1% now"
+   },
+   "Kill the boss": {
+    "Kill the boss": "Uccidi il boss"
+   },
+   "Large Bone[s]": {
+    "Large Bone[s]": "IT:Large Bones"
+   },
+   "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": {
+    "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": "lungo"
+   },
+   "Mr. Fox runs. Fast.": {
+    "Mr. Fox runs. Fast.": "IT:Mr. Fox runs. IT:Fast."
+   },
+   "Nothing here": {
+    "Nothing here": "Nothing here"
+   },
+   "Old citizen, friend": {
+    "Old citizen, friend": "Cittadino vecchio, amico"
+   },
+   "Pact Longbow": {
+    "Pact Longbow": "IT:Pact Longbow"
+   },
+   "Plaza of<br>Dwayna": {
+    "Plaza of<br>Dwayna": "IT:Plaza of<br>IT:Dwayna"
+   },
+   "Raid god": {
+    "Raid god": "Dio dei raid"
+   },
+   "Recipe: Embroidered Medal": {
+    "Embroidered Medal": "Medaglia ricamata",
+    "Recipe: Embroidered Medal": "Receita: Medaglia ricamata"
+   },
+   "Recipe: Waypoint": {
+    "Recipe: Waypoint": "Receita: Waypoint"
+   },
+   "Recipe[s]: Steel Plate[s]": {
+    "Recipe[s]: Steel Plate[s]": "Receita[pl:\"Receitas\"]: IT:Steel Plates",
+    "Steel Plate[s]": "IT:Steel Plates"
+   },
+   "Season Twenty-Five: Finale": {
+    "Season Twenty-Five: Finale": "Season Twenty-Five: Finale"
+   },
+   "Shiny Helm[s]": {
+    "Shiny Helm[s]": "IT:Shiny Helms"
+   },
+   "Steel Plate[s]": {
+    "Steel Plate[s]": "IT:Steel Plates"
+   },
+   "Storyteller: Abaddon": {
+    "Storyteller: Abaddon": "Narratore: Abaddon"
+   },
+   "The thief": {
+    "The thief": "il ladro"
+   },
+   "Thief": {
+    "Thief": "Ladro"
+   },
+   "Use All": {
+    "Use All": "IT:Use All"
+   },
+   "Wait": {
+    "Wait": "Aspetta..."
+   },
+   "Welcome to Lion's Arch!": {
+    "Welcome to Lion's Arch!": "Benvenuto ad Arco del Leone!"
+   },
+   "Win %num1% rated arena game[s]": {
+    "Win %num1% rated arena game[s]": "Vinci %num1% partite classificate"
+   },
+   "You might use Might.": {
+    "You might use Might.": "IT:You might use Might."
+   },
+   "[null]": {
+    "[null]": "[null]"
+   },
+   "raid god": {
+    "raid god": "dio dei raid"
+   },
+   "6]2T": {
+    "6]2T": "IT:6]2T"
+   }
+  },
+  "lines_one_call": {
+   "%str1% evades your %str3%.": "%str1% schiva il tuo %str3%.",
+   "%str1%%str2%": "%str1%%str2%",
+   "<c=@flavor>Some flavor text.</c>": "<c=@flavor>Un testo di sapore.</c>",
+   "<c=@x>Pact Longbow</c>": "<c=@x>IT:Pact Longbow</c>",
+   "Big Chest[pl:\"Chests\"]": "IT:Big Chests",
+   "Captain: Tide Turner": "Capitano: Tide Turner",
+   "Citizen": "Cittadino[f:\"Cittadina\"] pettegolo[f:\"pettegola\"]",
+   "Damage +5%% Fury": "Damage +5%% Fury",
+   "Dragon": "Drago",
+   "Dragon Slash—Boost": "Dragon Slash—Boost",
+   "Embroidered Medal": "Medaglia ricamata",
+   "Embroidered Medal[s]": "Medaglie ricamate",
+   "First — second": "Primo — secondo",
+   "Gives 5% power": "Dà il 5%% di potere",
+   "Gives 5% power to %str1%": "Dà il 5%% di potere a %str1%",
+   "Go now. Run fast!": "Vai ora. corri veloce!",
+   "Golden Feather[s]": "IT:Golden Feathers",
+   "Gossip citizen of the city": "Cittadino[f:\"Cittadina\"] pettegolo[f:\"pettegola\"] della città",
+   "Guild Wars 2: Janthir Wilds": "IT:Guild Wars 2: Janthir Wilds",
+   "Hello world": "Ciao mondo",
+   "Hit %str1% now": "Hit %str1% now",
+   "Kill the boss": "Uccidi il boss",
+   "Large Bone[s]": "IT:Large Bones",
+   "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": "lungo",
+   "Mr. Fox runs. Fast.": "IT:Mr. Fox runs. IT:Fast.",
+   "Nothing here": "Nothing here",
+   "Old citizen, friend": "Cittadino vecchio, amico",
+   "Pact Longbow": "IT:Pact Longbow",
+   "Plaza of<br>Dwayna": "IT:Plaza of<br>IT:Dwayna",
+   "Raid god": "Dio dei raid",
+   "Recipe: Embroidered Medal": "Receita: Medaglia ricamata",
+   "Recipe: Waypoint": "Receita: Waypoint",
+   "Recipe[s]: Steel Plate[s]": "Receita[pl:\"Receitas\"]: IT:Steel Plates",
+   "Season Twenty-Five: Finale": "Season Twenty-Five: Finale",
+   "Shiny Helm[s]": "IT:Shiny Helms",
+   "Steel Plate[s]": "IT:Steel Plates",
+   "Storyteller: Abaddon": "Narratore: Abaddon",
+   "The thief": "il ladro",
+   "Thief": "Ladro",
+   "Use All": "IT:Use All",
+   "Wait": "Aspetta...",
+   "Welcome to Lion's Arch!": "Benvenuto ad Arco del Leone!",
+   "Win %num1% rated arena game[s]": "Vinci %num1% partite classificate",
+   "You might use Might.": "IT:You might use Might.",
+   "[null]": "[null]",
+   "raid god": "dio dei raid",
+   "6]2T": "IT:6]2T"
+  },
+  "lines_one_call_model": [
+   [
+    "Hit QZ0QZ now",
+    "Damage +5%% Fury",
+    "Nothing here",
+    "Dragon",
+    "Wait",
+    "Gives 5% power",
+    "Gives 5% power to QZ0QZ",
+    "Thief",
+    "The thief",
+    "Citizen",
+    "Gossip citizen of the city",
+    "Old citizen, friend",
+    "Embroidered Medals",
+    "Shiny Helms",
+    "Steel Plates",
+    "Golden Feathers",
+    "QZ0QZ evades your QZ1QZ.",
+    "You might use QZ0QZ.",
+    "Hello world",
+    "Welcome to QZ0QZ!",
+    "Large Bones",
+    "Big Chests",
+    "Win QZ0QZ rated arena games",
+    "Kill the boss",
+    "Pact Longbow",
+    "Use All",
+    "6]2T",
+    "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ",
+    "Guild Wars 2: Janthir Wilds",
+    "Embroidered Medal",
+    "Storyteller",
+    "Abaddon",
+    "Captain",
+    "Tide Turner",
+    "Season Twenty-Five",
+    "Finale",
+    "Go now.",
+    "Run fast!",
+    "Some flavor text.",
+    "First",
+    "second",
+    "Plaza of",
+    "Dwayna",
+    "Mr. Fox runs.",
+    "Fast."
+   ]
+  ],
+  "needs": {
+   "%str1% evades your %str3%.": true,
+   "%str1%%str2%": false,
+   "<c=@flavor>Some flavor text.</c>": true,
+   "<c=@x>Pact Longbow</c>": true,
+   "Big Chest[pl:\"Chests\"]": true,
+   "Captain: Tide Turner": true,
+   "Citizen": true,
+   "Damage +5%% Fury": true,
+   "Dragon": true,
+   "Dragon Slash—Boost": true,
+   "Embroidered Medal[s]": true,
+   "First — second": true,
+   "Gives 5% power": true,
+   "Gives 5% power to %str1%": true,
+   "Go now. Run fast!": true,
+   "Golden Feather[s]": true,
+   "Gossip citizen of the city": true,
+   "Guild Wars 2: Janthir Wilds": true,
+   "Hello world": true,
+   "Hit %str1% now": true,
+   "Kill the boss": true,
+   "Large Bone[s]": true,
+   "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": true,
+   "Mr. Fox runs. Fast.": true,
+   "Nothing here": true,
+   "Old citizen, friend": true,
+   "Pact Longbow": true,
+   "Plaza of<br>Dwayna": true,
+   "Raid god": true,
+   "Recipe: Embroidered Medal": true,
+   "Recipe: Waypoint": true,
+   "Recipe[s]: Steel Plate[s]": true,
+   "Season Twenty-Five: Finale": true,
+   "Shiny Helm[s]": true,
+   "Steel Plate[s]": true,
+   "Storyteller: Abaddon": true,
+   "The thief": true,
+   "Thief": true,
+   "Use All": true,
+   "Wait": true,
+   "Welcome to Lion's Arch!": true,
+   "Win %num1% rated arena game[s]": true,
+   "You might use Might.": true,
+   "[null]": false,
+   "raid god": true,
+   "6]2T": false
+  },
+  "outdated": {
+   "%str1% evades your %str3%.": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "%str1%%str2%": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "<c=@flavor>Some flavor text.</c>": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "<c=@x>Pact Longbow</c>": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Big Chest[pl:\"Chests\"]": [
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "Captain: Tide Turner": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Citizen": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Damage +5%% Fury": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Dragon": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Dragon Slash—Boost": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Embroidered Medal[s]": [
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "First — second": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Gives 5% power": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Gives 5% power to %str1%": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Go now. Run fast!": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Golden Feather[s]": [
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "Gossip citizen of the city": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Guild Wars 2: Janthir Wilds": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Hello world": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Hit %str1% now": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Kill the boss": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Large Bone[s]": [
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Mr. Fox runs. Fast.": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Nothing here": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Old citizen, friend": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Pact Longbow": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Plaza of<br>Dwayna": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Raid god": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Recipe: Embroidered Medal": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Recipe: Waypoint": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Recipe[s]: Steel Plate[s]": [
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "Season Twenty-Five: Finale": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Shiny Helm[s]": [
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "Steel Plate[s]": [
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "Storyteller: Abaddon": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "The thief": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Thief": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Use All": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Wait": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Welcome to Lion's Arch!": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "Win %num1% rated arena game[s]": [
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "You might use Might.": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "[null]": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "raid god": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "6]2T": [
+    false,
+    false,
+    false,
+    false,
+    false
+   ]
+  },
+  "plain_each": {
+   "%str1% evades your %str3%.": {
+    "%str1% evades your %str3%.": "%str1% schiva il tuo %str3%."
+   },
+   "%str1%%str2%": {
+    "%str1%%str2%": "%str1%%str2%"
+   },
+   "<c=@flavor>Some flavor text.</c>": {
+    "<c=@flavor>Some flavor text.</c>": "IT:<c=@flavor>Some flavor text.</c>"
+   },
+   "<c=@x>Pact Longbow</c>": {
+    "<c=@x>Pact Longbow</c>": "IT:<c=@x>Pact Longbow</c>"
+   },
+   "Big Chest[pl:\"Chests\"]": {
+    "Big Chest[pl:\"Chests\"]": "IT:Big Chests"
+   },
+   "Captain: Tide Turner": {
+    "Captain: Tide Turner": "IT:Captain: Tide Turner"
+   },
+   "Citizen": {
+    "Citizen": "Cittadino[f:\"Cittadina\"] pettegolo[f:\"pettegola\"]"
+   },
+   "Damage +5%% Fury": {
+    "Damage +5%% Fury": "Damage +5%% Fury"
+   },
+   "Dragon": {
+    "Dragon": "Drago"
+   },
+   "Dragon Slash—Boost": {
+    "Dragon Slash—Boost": "Dragon Slash—Boost"
+   },
+   "Embroidered Medal[s]": {
+    "Embroidered Medal[s]": "Medaglie ricamate"
+   },
+   "First — second": {
+    "First — second": "IT:First — second"
+   },
+   "Gives 5% power": {
+    "Gives 5% power": "Dà il 5%% di potere"
+   },
+   "Gives 5% power to %str1%": {
+    "Gives 5% power to %str1%": "Dà il 5%% di potere a %str1%"
+   },
+   "Go now. Run fast!": {
+    "Go now. Run fast!": "IT:Go now. Run fast!"
+   },
+   "Golden Feather[s]": {
+    "Golden Feather[s]": "IT:Golden Feathers"
+   },
+   "Gossip citizen of the city": {
+    "Gossip citizen of the city": "Cittadino[f:\"Cittadina\"] pettegolo[f:\"pettegola\"] della città"
+   },
+   "Guild Wars 2: Janthir Wilds": {
+    "Guild Wars 2: Janthir Wilds": "IT:Guild Wars 2: Janthir Wilds"
+   },
+   "Hello world": {
+    "Hello world": "Ciao mondo"
+   },
+   "Hit %str1% now": {
+    "Hit %str1% now": "Hit %str1% now"
+   },
+   "Kill the boss": {
+    "Kill the boss": "Uccidi il boss"
+   },
+   "Large Bone[s]": {
+    "Large Bone[s]": "IT:Large Bones"
+   },
+   "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": {
+    "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": "lungo"
+   },
+   "Mr. Fox runs. Fast.": {
+    "Mr. Fox runs. Fast.": "IT:Mr. Fox runs. Fast."
+   },
+   "Nothing here": {
+    "Nothing here": "Nothing here"
+   },
+   "Old citizen, friend": {
+    "Old citizen, friend": "Cittadino vecchio, amico"
+   },
+   "Pact Longbow": {
+    "Pact Longbow": "IT:Pact Longbow"
+   },
+   "Plaza of<br>Dwayna": {
+    "Plaza of<br>Dwayna": "Piazza di<br>Dwayna"
+   },
+   "Raid god": {
+    "Raid god": "Dio dei raid"
+   },
+   "Recipe: Embroidered Medal": {
+    "Recipe: Embroidered Medal": "IT:Recipe: Embroidered Medal"
+   },
+   "Recipe: Waypoint": {
+    "Recipe: Waypoint": "IT:Recipe: Waypoint"
+   },
+   "Recipe[s]: Steel Plate[s]": {
+    "Recipe[s]: Steel Plate[s]": "IT:Recipes: Steel Plates"
+   },
+   "Season Twenty-Five: Finale": {
+    "Season Twenty-Five: Finale": "IT:Season Twenty-Five: Finale"
+   },
+   "Shiny Helm[s]": {
+    "Shiny Helm[s]": "IT:Shiny Helms"
+   },
+   "Steel Plate[s]": {
+    "Steel Plate[s]": "IT:Steel Plates"
+   },
+   "Storyteller: Abaddon": {
+    "Storyteller: Abaddon": "IT:Storyteller: Abaddon"
+   },
+   "The thief": {
+    "The thief": "il ladro"
+   },
+   "Thief": {
+    "Thief": "Ladro"
+   },
+   "Use All": {
+    "Use All": "IT:Use All"
+   },
+   "Wait": {
+    "Wait": "Aspetta..."
+   },
+   "Welcome to Lion's Arch!": {
+    "Welcome to Lion's Arch!": "Benvenuto ad Arco del Leone!"
+   },
+   "Win %num1% rated arena game[s]": {
+    "Win %num1% rated arena game[s]": "Vinci %num1% partite classificate"
+   },
+   "You might use Might.": {
+    "You might use Might.": "IT:You might use Might."
+   },
+   "[null]": {
+    "[null]": "[null]"
+   },
+   "raid god": {
+    "raid god": "dio dei raid"
+   },
+   "6]2T": {
+    "6]2T": "IT:6]2T"
+   }
+  },
+  "plain_empty": {},
+  "protect": {
+   "%str1% evades your %str3%.": [
+    "QZ0QZ evades your QZ1QZ.",
+    {
+     "QZ0QZ": "%str1%",
+     "QZ1QZ": "%str3%"
+    }
+   ],
+   "%str1%%str2%": [
+    "QZ0QZQZ1QZ",
+    {
+     "QZ0QZ": "%str1%",
+     "QZ1QZ": "%str2%"
+    }
+   ],
+   "<c=@flavor>Some flavor text.</c>": [
+    "QZ0QZSome flavor text.QZ1QZ",
+    {
+     "QZ0QZ": "<c=@flavor>",
+     "QZ1QZ": "</c>"
+    }
+   ],
+   "<c=@x>Pact Longbow</c>": [
+    "QZ0QZPact LongbowQZ1QZ",
+    {
+     "QZ0QZ": "<c=@x>",
+     "QZ1QZ": "</c>"
+    }
+   ],
+   "Big Chest[pl:\"Chests\"]": [
+    "Big ChestQZ0QZ",
+    {
+     "QZ0QZ": "[pl:\"Chests\"]"
+    }
+   ],
+   "Captain: Tide Turner": [
+    "Captain: Tide Turner",
+    {}
+   ],
+   "Citizen": [
+    "Citizen",
+    {}
+   ],
+   "Damage +5%% Fury": [
+    "Damage +5%% Fury",
+    {}
+   ],
+   "Dragon": [
+    "Dragon",
+    {}
+   ],
+   "Dragon Slash—Boost": [
+    "QZ0QZ",
+    {
+     "QZ0QZ": "Dragon Slash—Boost"
+    }
+   ],
+   "Embroidered Medal[s]": [
+    "Embroidered MedalQZ0QZ",
+    {
+     "QZ0QZ": "[s]"
+    }
+   ],
+   "First — second": [
+    "First — second",
+    {}
+   ],
+   "Gives 5% power": [
+    "Gives 5% power",
+    {}
+   ],
+   "Gives 5% power to %str1%": [
+    "Gives 5% power to QZ0QZ",
+    {
+     "QZ0QZ": "%str1%"
+    }
+   ],
+   "Go now. Run fast!": [
+    "Go now. Run fast!",
+    {}
+   ],
+   "Golden Feather[s]": [
+    "Golden FeatherQZ0QZ",
+    {
+     "QZ0QZ": "[s]"
+    }
+   ],
+   "Gossip citizen of the city": [
+    "Gossip citizen of the city",
+    {}
+   ],
+   "Guild Wars 2: Janthir Wilds": [
+    "Guild Wars 2: Janthir Wilds",
+    {}
+   ],
+   "Hello world": [
+    "Hello world",
+    {}
+   ],
+   "Hit %str1% now": [
+    "Hit QZ0QZ now",
+    {
+     "QZ0QZ": "%str1%"
+    }
+   ],
+   "Kill the boss": [
+    "Kill the boss",
+    {}
+   ],
+   "Large Bone[s]": [
+    "QZ1QZQZ0QZ",
+    {
+     "QZ0QZ": "[s]",
+     "QZ1QZ": "Osso grande"
+    }
+   ],
+   "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ": [
+    "Long word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ",
+    {}
+   ],
+   "Mr. Fox runs. Fast.": [
+    "Mr. Fox runs. Fast.",
+    {}
+   ],
+   "Nothing here": [
+    "Nothing here",
+    {}
+   ],
+   "Old citizen, friend": [
+    "Old citizen, friend",
+    {}
+   ],
+   "Pact Longbow": [
+    "Pact Longbow",
+    {}
+   ],
+   "Plaza of<br>Dwayna": [
+    "Plaza ofQZ0QZDwayna",
+    {
+     "QZ0QZ": "<br>"
+    }
+   ],
+   "Raid god": [
+    "QZ0QZ",
+    {
+     "QZ0QZ": "Dio dei raid"
+    }
+   ],
+   "Recipe: Embroidered Medal": [
+    "Recipe: Embroidered Medal",
+    {}
+   ],
+   "Recipe: Waypoint": [
+    "Recipe: Waypoint",
+    {}
+   ],
+   "Recipe[s]: Steel Plate[s]": [
+    "RecipeQZ0QZ: Steel PlateQZ1QZ",
+    {
+     "QZ0QZ": "[s]",
+     "QZ1QZ": "[s]"
+    }
+   ],
+   "Season Twenty-Five: Finale": [
+    "Season Twenty-Five: Finale",
+    {}
+   ],
+   "Shiny Helm[s]": [
+    "Shiny HelmQZ0QZ",
+    {
+     "QZ0QZ": "[s]"
+    }
+   ],
+   "Steel Plate[s]": [
+    "Steel PlateQZ0QZ",
+    {
+     "QZ0QZ": "[s]"
+    }
+   ],
+   "Storyteller: Abaddon": [
+    "Storyteller: Abaddon",
+    {}
+   ],
+   "The thief": [
+    "The thief",
+    {}
+   ],
+   "Thief": [
+    "Thief",
+    {}
+   ],
+   "Use All": [
+    "Use All",
+    {}
+   ],
+   "Wait": [
+    "Wait",
+    {}
+   ],
+   "Welcome to Lion's Arch!": [
+    "Welcome to QZ0QZ!",
+    {
+     "QZ0QZ": "Arco del Leone"
+    }
+   ],
+   "Win %num1% rated arena game[s]": [
+    "Win QZ0QZ rated arena gameQZ1QZ",
+    {
+     "QZ0QZ": "%num1%",
+     "QZ1QZ": "[s]"
+    }
+   ],
+   "You might use Might.": [
+    "You might use QZ0QZ.",
+    {
+     "QZ0QZ": "Might"
+    }
+   ],
+   "[null]": [
+    "QZ0QZ",
+    {
+     "QZ0QZ": "[null]"
+    }
+   ],
+   "raid god": [
+    "QZ0QZ",
+    {
+     "QZ0QZ": "dio dei raid"
+    }
+   ],
+   "6]2T": [
+    "6]2T",
+    {}
+   ]
+  },
+  "with_cache": {
+   "Captain: Tide Turner": "CAPITANO: Tide Turner",
+   "Storyteller: Abaddon": "Cantastorie: Abaddon"
+  },
+  "with_cache_model": [
+   [
+    "Abaddon",
+    "Tide Turner"
+   ]
+  ]
+ }
+}

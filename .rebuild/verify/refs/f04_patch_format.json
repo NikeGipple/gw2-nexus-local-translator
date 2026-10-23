@@ -1,0 +1,413 @@
+{
+ "patch": {
+  "apply": [
+   "raises",
+   "NotImplementedError",
+   ""
+  ],
+  "auto_current_no": false,
+  "auto_current_yes": true,
+  "dump": "{\n\"version\":4,\n\"strings\":{\n\"1\":\"Uno\",\n\"2\":\"Due\"\n},\n\"auto\":{\n\"3\":\"Tre\"\n},\n\"drop\":[\n4\n],\n\"glossary\":\"fp1\"\n}\n",
+  "keys_current": [
+   1,
+   2,
+   3
+  ],
+  "keys_not_current": [
+   1,
+   2
+  ],
+  "load_file": {
+   "broken": [
+    false,
+    0
+   ],
+   "invalid": [
+    false,
+    0
+   ],
+   "missing": false,
+   "ok": [
+    true,
+    4
+   ]
+  },
+  "loaded": [
+   4,
+   {
+    "1": "Uno",
+    "2": "Due"
+   },
+   {
+    "3": "Tre"
+   },
+   [
+    4
+   ],
+   "fp1"
+  ],
+  "parse": [
+   4,
+   {
+    "1": "Uno",
+    "2": "Due"
+   },
+   {
+    "3": "Tre"
+   }
+  ],
+  "parse_bad": [
+   [
+    "raises",
+    "ValueError",
+    "patch: 'strings' must be an object {key: text}"
+   ],
+   [
+    "raises",
+    "ValueError",
+    "patch: 'strings' must be an object {key: text}"
+   ],
+   [
+    "raises",
+    "ValueError",
+    "patch: bad entry '1' in 'strings'"
+   ],
+   [
+    "raises",
+    "ValueError",
+    "patch: bad entry 'x' in 'strings'"
+   ],
+   [
+    "raises",
+    "ValueError",
+    "patch: bad entry '1' in 'strings'"
+   ],
+   [
+    "raises",
+    "ValueError",
+    "patch: 'auto' must be an object {key: text}"
+   ],
+   [
+    "raises",
+    "ValueError",
+    "invalid literal for int() with base 10: 'x'"
+   ]
+  ],
+  "parse_drop": [
+   "{1, 2}",
+   [
+    "raises",
+    "ValueError",
+    "patch: 'drop' must be a list of keys"
+   ],
+   [
+    "raises",
+    "ValueError",
+    "patch: 'drop' must be a list of keys"
+   ],
+   "set()"
+  ],
+  "parse_glossary": [
+   "x",
+   [
+    "raises",
+    "ValueError",
+    "patch: 'glossary' must be a string"
+   ],
+   ""
+  ],
+  "skip_file": "{\"version\": 4, \"keys\": [3]}",
+  "skipped": [
+   3
+  ],
+  "skipped_no_fp_other_version": [],
+  "skipped_no_fp_same_version": [
+   3
+  ],
+  "to_dict": {
+   "auto": {
+    "3": "Tre"
+   },
+   "drop": [
+    4
+   ],
+   "glossary": "fp1",
+   "strings": {
+    "1": "Uno",
+    "2": "Due"
+   },
+   "version": 4
+  },
+  "updater": [
+   "patch",
+   "patch",
+   "patch_it.json",
+   "patch_it.etag",
+   [
+    "raises",
+    "ValueError",
+    "downloaded v4 is older than the local v5"
+   ],
+   null,
+   null,
+   6,
+   {
+    "1": "a"
+   }
+  ]
+ },
+ "pieces": {
+  "hashes": [
+   "2d06800538d394c2",
+   "38e23bf5a2a77616",
+   "8ad3bad9aa8e3f0b",
+   -1,
+   9223372036854775807,
+   -9223372036854775808,
+   0
+  ],
+  "index": "{\n \"format\": 1,\n \"version\": 3,\n \"glossary\": \"fp\",\n \"width\": 20000,\n \"pieces\": {\n  \"p0000.json\": {\n   \"sha256\": \"5758653089451cd024d47f7f83a14fe4e60c7bad409a5537614709d466d0a0bd\",\n   \"entries\": 4,\n   \"size\": 129\n  },\n  \"p0001.json\": {\n   \"sha256\": \"ce446d2f0634a0a31c82aeebb23733e3a2a7082ebf33b052b5c4fd1772841817\",\n   \"entries\": 2,\n   \"size\": 55\n  },\n  \"p0002.json\": {\n   \"sha256\": \"ac85a8cedcdfec2e865a3447fd589bd46b6991924c31b430b8f303abd00a15b2\",\n   \"entries\": 1,\n   \"size\": 74\n  }\n }\n}\n",
+  "names": [
+   "p0003.json",
+   "p12345.json",
+   3,
+   null,
+   null,
+   1,
+   20000,
+   5000000,
+   "0000000000000000",
+   "p(\\d{4,7})\\.json",
+   "[0-9a-f]{16}"
+  ],
+  "parse_index": {
+   "glossary": "fp",
+   "pieces": {
+    "p0000.json": [
+     0,
+     "5758653089451cd024d47f7f83a14fe4e60c7bad409a5537614709d466d0a0bd",
+     129
+    ],
+    "p0001.json": [
+     1,
+     "ce446d2f0634a0a31c82aeebb23733e3a2a7082ebf33b052b5c4fd1772841817",
+     55
+    ],
+    "p0002.json": [
+     2,
+     "ac85a8cedcdfec2e865a3447fd589bd46b6991924c31b430b8f303abd00a15b2",
+     74
+    ]
+   },
+   "version": 3,
+   "width": 20000
+  },
+  "parse_index_bad": {
+   "big": [
+    "raises",
+    "ValueError",
+    "patch index: bad size for p0000.json"
+   ],
+   "format": [
+    "raises",
+    "ValueError",
+    "patch index: unknown format"
+   ],
+   "glossary": [
+    "raises",
+    "ValueError",
+    "patch index: 'glossary' must be a string"
+   ],
+   "name": [
+    "raises",
+    "ValueError",
+    "patch index: bad piece 'x.json'"
+   ],
+   "notdict": [
+    "raises",
+    "ValueError",
+    "patch index: unknown format"
+   ],
+   "pieces": [
+    "raises",
+    "ValueError",
+    "patch index: 'pieces' must be an object"
+   ],
+   "sha": [
+    "raises",
+    "ValueError",
+    "patch index: bad sha256 for p0000.json"
+   ],
+   "size": [
+    "raises",
+    "ValueError",
+    "patch index: bad size for p0000.json"
+   ],
+   "version": [
+    "raises",
+    "ValueError",
+    "patch index: bad version"
+   ],
+   "width": [
+    "raises",
+    "ValueError",
+    "patch index: bad width"
+   ]
+  },
+  "parse_piece": {
+   "p0000.json": [
+    {
+     "3": "Tre",
+     "5": "Cinque"
+    },
+    {
+     "7": "Sette"
+    },
+    "{8}",
+    {
+     "5": "00000000000000aa"
+    }
+   ],
+   "p0001.json": [
+    {
+     "20001": "Ventimila e uno"
+    },
+    {},
+    "{20002}",
+    {}
+   ],
+   "p0002.json": [
+    {},
+    {
+     "40000": "Quarantamila"
+    },
+    "set()",
+    {
+     "40000": "ffffffffffffffff"
+    }
+   ]
+  },
+  "parse_piece_bad": {
+   "drop": [
+    "raises",
+    "ValueError",
+    "patch: 'drop' must be a list of keys"
+   ],
+   "empty_text": [
+    "raises",
+    "ValueError",
+    "patch: bad entry '1' in 'auto'"
+   ],
+   "hash": [
+    "raises",
+    "ValueError",
+    "patch piece: bad 'src_hash' entry '1'"
+   ],
+   "hash_obj": [
+    "raises",
+    "ValueError",
+    "patch piece: 'src_hash' must be an object"
+   ],
+   "hash_unused": [
+    {
+     "1": "x"
+    },
+    {},
+    "set()",
+    {}
+   ],
+   "key": [
+    "raises",
+    "ValueError",
+    "patch: bad entry 'a' in 'strings'"
+   ],
+   "notdict": [
+    "raises",
+    "ValueError",
+    "patch piece: not an object"
+   ],
+   "outside": [
+    "raises",
+    "ValueError",
+    "patch piece p0000.json: key 20000 outside 0-19999"
+   ]
+  },
+  "parse_versions": {
+   "p0000.json": {
+    "5": 2,
+    "7": 1
+   },
+   "p0001.json": {},
+   "p0002.json": {}
+  },
+  "parse_versions_bad": [
+   [
+    "raises",
+    "ValueError",
+    "patch piece: 'version' must be an object"
+   ],
+   [
+    "raises",
+    "ValueError",
+    "patch piece: bad 'version' entry '1'"
+   ],
+   [
+    "raises",
+    "ValueError",
+    "patch piece: bad 'version' entry '1'"
+   ],
+   [
+    "raises",
+    "ValueError",
+    "patch piece: bad 'version' entry 'x'"
+   ],
+   [
+    "raises",
+    "ValueError",
+    "patch piece: bad 'version' entry '1'"
+   ],
+   {}
+  ],
+  "split": {
+   "p0000.json": "{\"strings\":{\"3\":\"Tre\",\"5\":\"Cinque\"},\"auto\":{\"7\":\"Sette\"},\"drop\":[8],\"src_hash\":{\"5\":\"00000000000000aa\"},\"version\":{\"5\":2,\"7\":1}}\n",
+   "p0001.json": "{\"strings\":{\"20001\":\"Ventimila e uno\"},\"drop\":[20002]}\n",
+   "p0002.json": "{\"auto\":{\"40000\":\"Quarantamila\"},\"src_hash\":{\"40000\":\"ffffffffffffffff\"}}\n"
+  },
+  "split_bad_width": [
+   "raises",
+   "ValueError",
+   "width must be positive"
+  ],
+  "split_small": {
+   "p0001.json": "{\"strings\":{\"1\":\"a\"}}\n"
+  },
+  "stamp_changed": {
+   "20001": 3,
+   "3": 9,
+   "41": 9,
+   "5": 9,
+   "7": 1
+  },
+  "stamp_missing_piece": {
+   "20001": 3,
+   "3": 3,
+   "40000": 9,
+   "5": 2,
+   "7": 1
+  },
+  "stamp_none": {
+   "20001": 9,
+   "3": 9,
+   "40000": 9,
+   "5": 9,
+   "7": 9
+  },
+  "stamp_same": {
+   "20001": 3,
+   "3": 3,
+   "40000": 3,
+   "5": 2,
+   "7": 1
+  }
+ }
+}

@@ -1,0 +1,254 @@
+{
+ "commands": {
+  "export": {
+   "csv": "﻿key;inglese;italiano_attuale;italiano_patch;nuova_traduzione\r\n1;One;Uno;Uno;\r\n2;;Due;;\r\n3;Three;Tre;;\r\n",
+   "exit": 0,
+   "stderr": "",
+   "stdout": "3 rows written to review.csv\n"
+  },
+  "export_pt_br": {
+   "exit": 0,
+   "stderr": "",
+   "stdout": "0 rows written to pt.csv\n"
+  },
+  "import": {
+   "exit": 0,
+   "patch": "{\n\"version\":3,\n\"strings\":{\n\"1\":\"Uno rivisto\",\n\"3\":\"Tre rivisto\"\n},\n\"auto\":{\n\"2\":\"Due\"\n}\n}\n",
+   "stderr": "",
+   "stdout": "patch <W>/addons/text_translator/modules/local_translator_it/IT/patch_it.json: 2 added/changed, 0 removed\n"
+  },
+  "import_without_patch_file": {
+   "exit": 1,
+   "stderr": "",
+   "stdout": "--import-review needs --patch-file (the repository's patch\\patch_it.json)\n"
+  }
+ },
+ "protect": {
+  "damaged": {
+   "cache": [],
+   "log": [
+    "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+    "i: TEST MODE: answering '[IT] text', no real translation",
+    "i: addon closed the connection: exiting",
+    "i: cache loaded: 5 translations",
+    "i: glossary 13a9df6ad6c4435b (glossary_it.json): 0 exact, 3 terms, 0 patterns",
+    "i: glossary sync: cache reset (5 lines)",
+    "i: map: 0 strings known",
+    "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+    "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+   ],
+   "snapshot": {
+    "exact": {},
+    "protect": 5,
+    "terms": {
+     "Large Bone": "Osso grande",
+     "Large bone": "Osso grande",
+     "large bone": "osso grande"
+    }
+   }
+  },
+  "exact_missing": {
+   "cache": [
+    "not a json line",
+    "{\"s\": \"Edible Mushroom[s]\", \"t\": \"vecchio funghi\"}",
+    "{\"s\": \"Gives 5% power\", \"t\": \"D\\u00e0 5% potere\"}",
+    "{\"s\": \"Hello\", \"t\": \"Ciao\"}",
+    "{\"s\": \"Large Bone[s]\", \"t\": \"vecchio ossa\"}",
+    "{\"s\": \"Win %num1% game[s]\", \"t\": \"Vinci %num1% partite\"}"
+   ],
+   "log": [
+    "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+    "i: TEST MODE: answering '[IT] text', no real translation",
+    "i: addon closed the connection: exiting",
+    "i: cache loaded: 5 translations",
+    "i: glossary 13a9df6ad6c4435b (glossary_it.json): 0 exact, 3 terms, 0 patterns",
+    "i: glossary sync: 2 entries changed, 0 cached lines dropped, 5 kept",
+    "i: map: 0 strings known",
+    "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+    "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+   ],
+   "snapshot": {
+    "exact": {},
+    "protect": 5,
+    "terms": {
+     "Large Bone": "Osso grande",
+     "Large bone": "Osso grande",
+     "large bone": "osso grande"
+    }
+   }
+  },
+  "protect_1": {
+   "cache": [
+    "{\"s\": \"Hello\", \"t\": \"Ciao\"}"
+   ],
+   "log": [
+    "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+    "i: TEST MODE: answering '[IT] text', no real translation",
+    "i: addon closed the connection: exiting",
+    "i: cache loaded: 5 translations",
+    "i: cache.db: 0 old translations removed (glossary changed; asked again at next game start)",
+    "i: glossary 13a9df6ad6c4435b (glossary_it.json): 0 exact, 3 terms, 0 patterns",
+    "i: glossary sync: 2 entries changed, 4 cached lines dropped, 1 kept",
+    "i: glossary sync: 4 cached lines made with older protection rules dropped (translated again)",
+    "i: map: 0 strings known",
+    "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+    "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+   ],
+   "snapshot": {
+    "exact": {},
+    "protect": 5,
+    "terms": {
+     "Large Bone": "Osso grande",
+     "Large bone": "Osso grande",
+     "large bone": "osso grande"
+    }
+   }
+  },
+  "protect_3": {
+   "cache": [
+    "{\"s\": \"Hello\", \"t\": \"Ciao\"}",
+    "{\"s\": \"Win %num1% game[s]\", \"t\": \"Vinci %num1% partite\"}"
+   ],
+   "log": [
+    "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+    "i: TEST MODE: answering '[IT] text', no real translation",
+    "i: addon closed the connection: exiting",
+    "i: cache loaded: 5 translations",
+    "i: cache.db: 0 old translations removed (glossary changed; asked again at next game start)",
+    "i: glossary 13a9df6ad6c4435b (glossary_it.json): 0 exact, 3 terms, 0 patterns",
+    "i: glossary sync: 2 entries changed, 3 cached lines dropped, 2 kept",
+    "i: glossary sync: 3 cached lines made with older protection rules dropped (translated again)",
+    "i: map: 0 strings known",
+    "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+    "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+   ],
+   "snapshot": {
+    "exact": {},
+    "protect": 5,
+    "terms": {
+     "Large Bone": "Osso grande",
+     "Large bone": "Osso grande",
+     "large bone": "osso grande"
+    }
+   }
+  },
+  "protect_4": {
+   "cache": [
+    "{\"s\": \"Gives 5% power\", \"t\": \"Dà 5% potere\"}",
+    "{\"s\": \"Hello\", \"t\": \"Ciao\"}",
+    "{\"s\": \"Win %num1% game[s]\", \"t\": \"Vinci %num1% partite\"}"
+   ],
+   "log": [
+    "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+    "i: TEST MODE: answering '[IT] text', no real translation",
+    "i: addon closed the connection: exiting",
+    "i: cache loaded: 5 translations",
+    "i: cache.db: 0 old translations removed (glossary changed; asked again at next game start)",
+    "i: glossary 13a9df6ad6c4435b (glossary_it.json): 0 exact, 3 terms, 0 patterns",
+    "i: glossary sync: 2 cached lines made with older protection rules dropped (translated again)",
+    "i: glossary sync: 2 entries changed, 2 cached lines dropped, 3 kept",
+    "i: map: 0 strings known",
+    "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+    "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+   ],
+   "snapshot": {
+    "exact": {},
+    "protect": 5,
+    "terms": {
+     "Large Bone": "Osso grande",
+     "Large bone": "Osso grande",
+     "large bone": "osso grande"
+    }
+   }
+  },
+  "terms_only_format": {
+   "cache": [
+    "{\"s\": \"Hello\", \"t\": \"Ciao\"}"
+   ],
+   "log": [
+    "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+    "i: TEST MODE: answering '[IT] text', no real translation",
+    "i: addon closed the connection: exiting",
+    "i: cache loaded: 5 translations",
+    "i: cache.db: 0 old translations removed (glossary changed; asked again at next game start)",
+    "i: glossary 13a9df6ad6c4435b (glossary_it.json): 0 exact, 3 terms, 0 patterns",
+    "i: glossary sync: 2 entries changed, 4 cached lines dropped, 1 kept",
+    "i: glossary sync: 4 cached lines made with older protection rules dropped (translated again)",
+    "i: map: 0 strings known",
+    "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+    "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+   ],
+   "snapshot": {
+    "exact": {},
+    "protect": 5,
+    "terms": {
+     "Large Bone": "Osso grande",
+     "Large bone": "Osso grande",
+     "large bone": "osso grande"
+    }
+   }
+  }
+ },
+ "watcher": {
+  "created_later": {
+   "answers": {
+    "1": [
+     [
+      0,
+      0,
+      "Uno"
+     ]
+    ]
+   },
+   "cache_db": [
+    [
+     1,
+     "it",
+     0,
+     "Uno"
+    ]
+   ],
+   "log": [
+    "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+    "i: TEST MODE: answering '[IT] text', no real translation",
+    "i: addon closed the connection: exiting",
+    "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+    "i: glossary sync: cache reset (0 lines)",
+    "i: map: 0 strings known",
+    "i: patch archive created from the v0.4 files in <t> s: v1, 1 reviewed, 0 automatic, 0 drop",
+    "i: patch v1: 1 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary x (different from yours) (ready in <t> s)",
+    "i: patch v1: 1 translations sent to the game (1 changed, 0 new)"
+   ]
+  },
+  "old_layout": {
+   "answers": {
+    "1": [
+     [
+      0,
+      0,
+      "Uno"
+     ]
+    ]
+   },
+   "cache_db": [
+    [
+     1,
+     "it",
+     0,
+     "Uno"
+    ]
+   ],
+   "log": [
+    "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+    "i: TEST MODE: answering '[IT] text', no real translation",
+    "i: addon closed the connection: exiting",
+    "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+    "i: glossary sync: cache reset (0 lines)",
+    "i: map: 0 strings known",
+    "i: patch archive created from the v0.4 files in <t> s: v1, 1 reviewed, 0 automatic, 0 drop",
+    "i: patch v1: 1 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary x (different from yours) (ready in <t> s)",
+    "i: patch v1: 1 translations sent to the game (1 changed, 0 new)"
+   ]
+  }
+ }
+}

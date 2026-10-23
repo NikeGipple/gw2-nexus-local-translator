@@ -1,0 +1,282 @@
+{
+ "bad_sha": {
+  "answers": {},
+  "ct2_init": [],
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/map_it.db",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal"
+  ],
+  "log": [
+   "e: could not prepare the translation model in <W>/addons/text_translator/modules/local_translator_it/IT/model",
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: model not found, downloading https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-it-v1/opus-mt-en-it-ct2.zip",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "net": [
+   {
+    "headers": {
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-it-v1/opus-mt-en-it-ct2.zip"
+   },
+   {
+    "headers": {
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-it-v1/opus-mt-en-it-ct2.zip.sha256"
+   }
+  ]
+ },
+ "leftovers": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "IT:Hello there"
+    ]
+   ]
+  },
+  "ct2_init": [
+   {
+    "init": {
+     "device": "cpu",
+     "inter_threads": 1,
+     "intra_threads": 1,
+     "model": "model"
+    }
+   }
+  ],
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/cache_it.jsonl",
+   "IT/map_it.db",
+   "IT/model/config.json",
+   "IT/model/model.bin",
+   "IT/model/source.spm",
+   "IT/model/target.spm",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal"
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: model installed in <W>/addons/text_translator/modules/local_translator_it/IT/model",
+   "i: model loaded (1 threads)",
+   "i: model not found, downloading https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-it-v1/opus-mt-en-it-ct2.zip",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "net": [
+   {
+    "headers": {
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-it-v1/opus-mt-en-it-ct2.zip"
+   },
+   {
+    "headers": {
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-it-v1/opus-mt-en-it-ct2.zip.sha256"
+   }
+  ]
+ },
+ "offline": {
+  "answers": {},
+  "ct2_init": [],
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/map_it.db",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal"
+  ],
+  "log": [
+   "e: could not prepare the translation model in <W>/addons/text_translator/modules/local_translator_it/IT/model",
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: model not found, downloading https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-it-v1/opus-mt-en-it-ct2.zip",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "net": [
+   {
+    "headers": {
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-it-v1/opus-mt-en-it-ct2.zip.sha256"
+   }
+  ]
+ },
+ "ok": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "IT:Hello there"
+    ]
+   ]
+  },
+  "ct2_init": [
+   {
+    "init": {
+     "device": "cpu",
+     "inter_threads": 1,
+     "intra_threads": 1,
+     "model": "model"
+    }
+   }
+  ],
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/cache_it.jsonl",
+   "IT/map_it.db",
+   "IT/model/config.json",
+   "IT/model/model.bin",
+   "IT/model/source.spm",
+   "IT/model/target.spm",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal"
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: model installed in <W>/addons/text_translator/modules/local_translator_it/IT/model",
+   "i: model loaded (1 threads)",
+   "i: model not found, downloading https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-it-v1/opus-mt-en-it-ct2.zip",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "net": [
+   {
+    "headers": {
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-it-v1/opus-mt-en-it-ct2.zip"
+   },
+   {
+    "headers": {
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-it-v1/opus-mt-en-it-ct2.zip.sha256"
+   }
+  ]
+ },
+ "pt_br": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "IT:Hello there"
+    ]
+   ]
+  },
+  "ct2_init": [
+   {
+    "init": {
+     "device": "cpu",
+     "inter_threads": 1,
+     "intra_threads": 1,
+     "model": "model"
+    }
+   }
+  ],
+  "files": [
+   "PT_BR/cache_pt_br.glossary.json",
+   "PT_BR/cache_pt_br.jsonl",
+   "PT_BR/map_pt_br.db",
+   "PT_BR/model/config.json",
+   "PT_BR/model/model.bin",
+   "PT_BR/model/source.spm",
+   "PT_BR/model/target.spm",
+   "PT_BR/patch_pt_br.db",
+   "PT_BR/patch_pt_br.db-shm",
+   "PT_BR/patch_pt_br.db-wal"
+  ],
+  "log": [
+   "i: Local Translator PT-BR v0.10.0 started (protocol 2, result version 1, cache key pt-BR)",
+   "i: addon closed the connection: exiting",
+   "i: glossary - (none yet: downloaded from GitHub): 0 exact, 0 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: model installed in <W>/addons/text_translator/modules/local_translator_pt_br/PT_BR/model",
+   "i: model loaded (1 threads)",
+   "i: model not found, downloading https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-pt-br-v1/opus-mt-en-pt-br-ct2.zip",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "net": [
+   {
+    "headers": {
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-pt-br-v1/opus-mt-en-pt-br-ct2.zip"
+   },
+   {
+    "headers": {
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-pt-br-v1/opus-mt-en-pt-br-ct2.zip.sha256"
+   }
+  ]
+ },
+ "unsafe": {
+  "answers": {},
+  "ct2_init": [],
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/map_it.db",
+   "IT/model.zip.part",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal"
+  ],
+  "log": [
+   "e: could not prepare the translation model in <W>/addons/text_translator/modules/local_translator_it/IT/model",
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: model not found, downloading https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-it-v1/opus-mt-en-it-ct2.zip",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "net": [
+   {
+    "headers": {
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-it-v1/opus-mt-en-it-ct2.zip"
+   },
+   {
+    "headers": {
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/model-it-v1/opus-mt-en-it-ct2.zip.sha256"
+   }
+  ]
+ }
+}

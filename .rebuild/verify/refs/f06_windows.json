@@ -1,0 +1,321 @@
+{
+ "main_without_stdout": {
+  "calls": [
+   [
+    "GetStdHandle",
+    [
+     4294967286
+    ]
+   ],
+   [
+    "open_osfhandle",
+    [
+     1,
+     0
+    ]
+   ],
+   [
+    "setmode",
+    [
+     101,
+     32768
+    ]
+   ],
+   [
+    "GetStdHandle",
+    [
+     4294967285
+    ]
+   ],
+   [
+    "GetStdHandle",
+    [
+     4294967284
+    ]
+   ],
+   [
+    "open_osfhandle",
+    [
+     3,
+     0
+    ]
+   ],
+   [
+    "setmode",
+    [
+     103,
+     32768
+    ]
+   ]
+  ],
+  "exit": 2,
+  "files": []
+ },
+ "priority_not_windows": {
+  "calls": [],
+  "log": []
+ },
+ "priority_ok": {
+  "calls": [
+   [
+    "GetCurrentProcess",
+    []
+   ],
+   [
+    "SetPriorityClass",
+    [
+     65535,
+     16384
+    ]
+   ]
+  ],
+  "log": [
+   [
+    "INFO",
+    "process priority: below normal"
+   ]
+  ]
+ },
+ "priority_raises": {
+  "calls": [
+   [
+    "GetCurrentProcess",
+    []
+   ]
+  ],
+  "log": [
+   [
+    "WARNING",
+    "cannot lower the process priority: access denied"
+   ]
+  ]
+ },
+ "priority_refused": {
+  "calls": [
+   [
+    "GetCurrentProcess",
+    []
+   ],
+   [
+    "SetPriorityClass",
+    [
+     65535,
+     16384
+    ]
+   ]
+  ],
+  "log": [
+   [
+    "WARNING",
+    "cannot lower the process priority (Windows error 5)"
+   ]
+  ]
+ },
+ "streams_all": {
+  "O_BINARY": 32768,
+  "O_RDONLY": 0,
+  "calls": [
+   [
+    "GetStdHandle",
+    [
+     4294967286
+    ]
+   ],
+   [
+    "open_osfhandle",
+    [
+     1,
+     0
+    ]
+   ],
+   [
+    "setmode",
+    [
+     101,
+     32768
+    ]
+   ],
+   [
+    "GetStdHandle",
+    [
+     4294967285
+    ]
+   ],
+   [
+    "open_osfhandle",
+    [
+     2,
+     0
+    ]
+   ],
+   [
+    "setmode",
+    [
+     102,
+     32768
+    ]
+   ],
+   [
+    "GetStdHandle",
+    [
+     4294967284
+    ]
+   ],
+   [
+    "open_osfhandle",
+    [
+     3,
+     0
+    ]
+   ],
+   [
+    "setmode",
+    [
+     103,
+     32768
+    ]
+   ]
+  ],
+  "fdopen": [
+   [
+    101,
+    "rb",
+    0
+   ],
+   [
+    102,
+    "wb",
+    0
+   ],
+   [
+    103,
+    "wb",
+    0
+   ]
+  ],
+  "result": [
+   "file101",
+   "file102",
+   "file103"
+  ]
+ },
+ "streams_invalid": {
+  "O_BINARY": 32768,
+  "O_RDONLY": 0,
+  "calls": [
+   [
+    "GetStdHandle",
+    [
+     4294967286
+    ]
+   ],
+   [
+    "open_osfhandle",
+    [
+     1,
+     0
+    ]
+   ],
+   [
+    "setmode",
+    [
+     101,
+     32768
+    ]
+   ],
+   [
+    "GetStdHandle",
+    [
+     4294967285
+    ]
+   ],
+   [
+    "GetStdHandle",
+    [
+     4294967284
+    ]
+   ]
+  ],
+  "fdopen": [
+   [
+    101,
+    "rb",
+    0
+   ]
+  ],
+  "result": [
+   "file101",
+   null,
+   null
+  ]
+ },
+ "streams_no_stdin": {
+  "O_BINARY": 32768,
+  "O_RDONLY": 0,
+  "calls": [
+   [
+    "GetStdHandle",
+    [
+     4294967286
+    ]
+   ],
+   [
+    "GetStdHandle",
+    [
+     4294967285
+    ]
+   ],
+   [
+    "open_osfhandle",
+    [
+     2,
+     0
+    ]
+   ],
+   [
+    "setmode",
+    [
+     102,
+     32768
+    ]
+   ],
+   [
+    "GetStdHandle",
+    [
+     4294967284
+    ]
+   ],
+   [
+    "open_osfhandle",
+    [
+     3,
+     0
+    ]
+   ],
+   [
+    "setmode",
+    [
+     103,
+     32768
+    ]
+   ]
+  ],
+  "fdopen": [
+   [
+    102,
+    "wb",
+    0
+   ],
+   [
+    103,
+    "wb",
+    0
+   ]
+  ],
+  "result": [
+   null,
+   "file102",
+   "file103"
+  ]
+ }
+}

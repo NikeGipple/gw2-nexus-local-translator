@@ -1,0 +1,328 @@
+{
+ "debug": {
+  "answers": {},
+  "exit": 0,
+  "file_log": {
+   "local_translator_it.log": [
+    "INFO Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+    "INFO TEST MODE: answering '[IT] text', no real translation",
+    "INFO addon closed the connection: exiting",
+    "INFO glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+    "INFO glossary sync: cache reset (0 lines)",
+    "INFO map: 0 strings known",
+    "INFO patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+    "INFO patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+   ]
+  },
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/map_it.db",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal",
+   "cache.db",
+   "glossary_it.default.json",
+   "local_translator_it.log"
+  ],
+  "handshake": [
+   2,
+   0,
+   1,
+   2,
+   "it"
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ]
+ },
+ "fake_file": {
+  "answers": {},
+  "exit": 0,
+  "file_log": {
+   "local_translator_it.log": [
+    "INFO Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+    "INFO TEST MODE: answering '[IT] text', no real translation",
+    "INFO addon closed the connection: exiting",
+    "INFO glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+    "INFO glossary sync: cache reset (0 lines)",
+    "INFO map: 0 strings known",
+    "INFO patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+    "INFO patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+   ]
+  },
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/fake.txt",
+   "IT/map_it.db",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal",
+   "cache.db",
+   "glossary_it.default.json",
+   "local_translator_it.log"
+  ],
+  "handshake": [
+   2,
+   0,
+   1,
+   2,
+   "it"
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ]
+ },
+ "it_folder": {
+  "answers": {},
+  "exit": 0,
+  "file_log": {
+   "local_translator_it.log": [
+    "INFO Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+    "INFO TEST MODE: answering '[IT] text', no real translation",
+    "INFO addon closed the connection: exiting",
+    "INFO glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+    "INFO glossary sync: cache reset (0 lines)",
+    "INFO map: 0 strings known",
+    "INFO patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+    "INFO patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+   ]
+  },
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/map_it.db",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal",
+   "cache.db",
+   "glossary_it.default.json",
+   "local_translator_it.log"
+  ],
+  "handshake": [
+   2,
+   0,
+   1,
+   2,
+   "it"
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ]
+ },
+ "lang_arg": {
+  "answers": {},
+  "exit": 0,
+  "file_log": {
+   "local_translator_pt_br.log": [
+    "INFO Local Translator PT-BR v0.10.0 started (protocol 2, result version 1, cache key pt-BR)",
+    "INFO TEST MODE: answering '[PT-BR] text', no real translation",
+    "INFO addon closed the connection: exiting",
+    "INFO glossary - (none yet: downloaded from GitHub): 0 exact, 0 terms, 0 patterns",
+    "INFO glossary sync: cache reset (0 lines)",
+    "INFO map: 0 strings known",
+    "INFO patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+    "INFO patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+   ]
+  },
+  "files": [
+   "PT_BR/cache_pt_br.glossary.json",
+   "PT_BR/map_pt_br.db",
+   "PT_BR/patch_pt_br.db",
+   "PT_BR/patch_pt_br.db-shm",
+   "PT_BR/patch_pt_br.db-wal",
+   "cache.db",
+   "glossary_it.default.json",
+   "local_translator_pt_br.log"
+  ],
+  "handshake": [
+   2,
+   0,
+   1,
+   5,
+   "pt-BR"
+  ],
+  "log": [
+   "i: Local Translator PT-BR v0.10.0 started (protocol 2, result version 1, cache key pt-BR)",
+   "i: TEST MODE: answering '[PT-BR] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary - (none yet: downloaded from GitHub): 0 exact, 0 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ]
+ },
+ "other_folder_from_sources": {
+  "answers": {},
+  "exit": 0,
+  "file_log": {
+   "local_translator_it.log": [
+    "INFO Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+    "INFO TEST MODE: answering '[IT] text', no real translation",
+    "INFO addon closed the connection: exiting",
+    "INFO glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+    "INFO glossary sync: cache reset (0 lines)",
+    "INFO map: 0 strings known",
+    "INFO patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+    "INFO patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+   ]
+  },
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/map_it.db",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal",
+   "cache.db",
+   "glossary_it.default.json",
+   "local_translator_it.log"
+  ],
+  "handshake": [
+   2,
+   0,
+   1,
+   2,
+   "it"
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ]
+ },
+ "pt_br_folder": {
+  "answers": {},
+  "exit": 0,
+  "file_log": {
+   "local_translator_pt_br.log": [
+    "INFO Local Translator PT-BR v0.10.0 started (protocol 2, result version 1, cache key pt-BR)",
+    "INFO TEST MODE: answering '[PT-BR] text', no real translation",
+    "INFO addon closed the connection: exiting",
+    "INFO glossary - (none yet: downloaded from GitHub): 0 exact, 0 terms, 0 patterns",
+    "INFO glossary sync: cache reset (0 lines)",
+    "INFO map: 0 strings known",
+    "INFO patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+    "INFO patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+   ]
+  },
+  "files": [
+   "PT_BR/cache_pt_br.glossary.json",
+   "PT_BR/map_pt_br.db",
+   "PT_BR/patch_pt_br.db",
+   "PT_BR/patch_pt_br.db-shm",
+   "PT_BR/patch_pt_br.db-wal",
+   "cache.db",
+   "glossary_it.default.json",
+   "local_translator_pt_br.log"
+  ],
+  "handshake": [
+   2,
+   0,
+   1,
+   5,
+   "pt-BR"
+  ],
+  "log": [
+   "i: Local Translator PT-BR v0.10.0 started (protocol 2, result version 1, cache key pt-BR)",
+   "i: TEST MODE: answering '[PT-BR] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary - (none yet: downloaded from GitHub): 0 exact, 0 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ]
+ },
+ "unknown_args": {
+  "answers": {},
+  "exit": 0,
+  "file_log": {
+   "local_translator_it.log": [
+    "INFO Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+    "INFO TEST MODE: answering '[IT] text', no real translation",
+    "INFO addon closed the connection: exiting",
+    "INFO glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+    "INFO glossary sync: cache reset (0 lines)",
+    "INFO map: 0 strings known",
+    "INFO patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+    "INFO patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)",
+    "WARNING ignored unknown arguments: --future-option x"
+   ]
+  },
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/map_it.db",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal",
+   "cache.db",
+   "glossary_it.default.json",
+   "local_translator_it.log"
+  ],
+  "handshake": [
+   2,
+   0,
+   1,
+   2,
+   "it"
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)",
+   "w: ignored unknown arguments: --future-option x"
+  ]
+ },
+ "unknown_lang_arg": {
+  "exit": 3,
+  "files": [
+   "cache.db",
+   "glossary_it.default.json",
+   "local_translator.log"
+  ],
+  "handshake": false,
+  "log": "Local Translator v0.10.0: unknown language (--lang 'xx', folder 'local_translator_it'); known: it, pt_br\n",
+  "stderr": []
+ },
+ "unknown_lang_folder": {
+  "exit": 3,
+  "files": [
+   "cache.db",
+   "glossary_it.default.json",
+   "local_translator.log"
+  ],
+  "handshake": false,
+  "log": "Local Translator v0.10.0: unknown language (--lang None, folder 'local_translator_xx'); known: it, pt_br\n",
+  "stderr": []
+ }
+}

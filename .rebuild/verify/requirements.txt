@@ -1,0 +1,4 @@
+# Exact versions of the user's _supporto/.venv (Python 3.12.11)
+ctranslate2==4.8.2
+sentencepiece==0.2.2
+xxhash==4.0.1

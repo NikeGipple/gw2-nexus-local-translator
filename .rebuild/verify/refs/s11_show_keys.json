@@ -1,0 +1,1471 @@
+{
+ "all": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "1 - [IT] Hello there"
+    ]
+   ],
+   "2": [
+    [
+     0,
+     2,
+     "2 - [m]%str1%"
+    ]
+   ],
+   "3": [
+    [
+     0,
+     3,
+     "3 - %str1% %str2%"
+    ]
+   ],
+   "4": [
+    [
+     0,
+     4,
+     "4 - [null]"
+    ]
+   ],
+   "5": [
+    [
+     0,
+     5,
+     "   "
+    ]
+   ],
+   "6": [
+    [
+     0,
+     6,
+     "6 - Chiave della patch"
+    ]
+   ],
+   "7": [
+    [
+     0,
+     7,
+     "7 - [IT] Line one\n[IT] line two"
+    ]
+   ],
+   "8": [
+    [
+     0,
+     0,
+     "8 - Otto"
+    ]
+   ]
+  },
+  "cache_db": [
+   [
+    1,
+    "it",
+    1,
+    "1 - [IT] Hello there"
+   ],
+   [
+    10,
+    "it",
+    0,
+    "10 - [m]%str1%"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "11 - Testo"
+   ],
+   [
+    2,
+    "it",
+    2,
+    "2 - [m]%str1%"
+   ],
+   [
+    3,
+    "it",
+    3,
+    "3 - %str1% %str2%"
+   ],
+   [
+    4,
+    "it",
+    4,
+    "4 - [null]"
+   ],
+   [
+    5,
+    "it",
+    5,
+    "   "
+   ],
+   [
+    6,
+    "it",
+    6,
+    "6 - Chiave della patch"
+   ],
+   [
+    7,
+    "it",
+    7,
+    "7 - [IT] Line one\n[IT] line two"
+   ],
+   [
+    8,
+    "it",
+    0,
+    "8 - Otto"
+   ],
+   [
+    9,
+    "it",
+    0,
+    "9 - gia' con prefisso"
+   ]
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: SHOW KEYS mode 'all' (show_keys.txt): texts start with their string ID",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache.db: key prefixes set to mode all on 3 texts (visible at next game start)",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v1, 2 reviewed, 0 automatic, 0 drop",
+   "i: patch v1: 1 translations sent to the game (1 changed, 0 new)",
+   "i: patch v1: 2 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary x (different from yours) (ready in <t> s)"
+  ]
+ },
+ "cmd_all": {
+  "cache_db": [
+   [
+    10,
+    "it",
+    0,
+    "10 - [m]%str1%"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "11 - Testo"
+   ],
+   [
+    8,
+    "it",
+    0,
+    "8 - vecchio otto"
+   ],
+   [
+    9,
+    "it",
+    0,
+    "9 - gia' con prefisso"
+   ]
+  ],
+  "exit": 0,
+  "file": "all\n\nLocal Translator: the texts in the game start with their string ID.\n'text' = only real texts; 'all' = templates too.\nDelete this file to turn it off (visible after two game starts).\n",
+  "stderr": "",
+  "stdout": "show keys all: 3 texts changed in <W>/addons/text_translator/modules/local_translator_it/cache.db\n"
+ },
+ "cmd_bad_value": {
+  "exit": 2,
+  "stderr": "usage: lt_module.py [-h] [--lang LANG] [--fake] [--lang-dir LANG_DIR]\n                    [--cache-db CACHE_DB] [--patch-file PATCH_FILE]\n                    [--no-update] [--branch BRANCH] [--debug]\n                    [--editor-port PORT] [--threads THREADS]\n                    [--stats-every SECONDS] [--export-review CSV]\n                    [--import-review CSV] [--show-keys {text,all,off}]\nlt_module.py: error: argument --show-keys: invalid choice: 'bogus' (choose from text, all, off)\n",
+  "stdout": ""
+ },
+ "cmd_no_cache_db": {
+  "exit": 0,
+  "file": "text\n\nLocal Translator: the texts in the game start with their string ID.\n'text' = only real texts; 'all' = templates too.\nDelete this file to turn it off (visible after two game starts).\n",
+  "stderr": "",
+  "stdout": "show keys text: 0 texts changed in <W>/addons/text_translator/modules/local_translator_it/cache.db\n"
+ },
+ "cmd_no_lang_dir": {
+  "exit": 1,
+  "stderr": "Traceback ... FileNotFoundError: [Errno 2] No such file or directory: '<W>/addons/text_translator/modules/local_translator_it/IT/show_keys.txt'",
+  "stdout": ""
+ },
+ "cmd_off": {
+  "cache_db": [
+   [
+    10,
+    "it",
+    0,
+    "[m]%str1%"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "Testo"
+   ],
+   [
+    8,
+    "it",
+    0,
+    "vecchio otto"
+   ],
+   [
+    9,
+    "it",
+    0,
+    "gia' con prefisso"
+   ]
+  ],
+  "exit": 0,
+  "file": null,
+  "stderr": "",
+  "stdout": "show keys off: 3 texts changed in <W>/addons/text_translator/modules/local_translator_it/cache.db\n"
+ },
+ "cmd_off_again": {
+  "exit": 0,
+  "stderr": "",
+  "stdout": "show keys off: 0 texts changed in <W>/addons/text_translator/modules/local_translator_it/cache.db\n"
+ },
+ "cmd_text": {
+  "cache_db": [
+   [
+    10,
+    "it",
+    0,
+    "[m]%str1%"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "11 - Testo"
+   ],
+   [
+    8,
+    "it",
+    0,
+    "8 - vecchio otto"
+   ],
+   [
+    9,
+    "it",
+    0,
+    "9 - gia' con prefisso"
+   ]
+  ],
+  "exit": 0,
+  "file": "text\n\nLocal Translator: the texts in the game start with their string ID.\n'text' = only real texts; 'all' = templates too.\nDelete this file to turn it off (visible after two game starts).\n",
+  "stderr": "",
+  "stdout": "show keys text: 1 texts changed in <W>/addons/text_translator/modules/local_translator_it/cache.db\n"
+ },
+ "contributor_all": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "1 - [IT] Hello there"
+    ]
+   ],
+   "2": [
+    [
+     0,
+     2,
+     "2 - [m]%str1%"
+    ]
+   ],
+   "3": [
+    [
+     0,
+     3,
+     "3 - %str1% %str2%"
+    ]
+   ],
+   "4": [
+    [
+     0,
+     4,
+     "4 - [null]"
+    ]
+   ],
+   "5": [
+    [
+     0,
+     5,
+     "   "
+    ]
+   ],
+   "6": [
+    [
+     0,
+     6,
+     "6 - Chiave della patch"
+    ]
+   ],
+   "7": [
+    [
+     0,
+     7,
+     "7 - [IT] Line one\n[IT] line two"
+    ]
+   ],
+   "8": [
+    [
+     0,
+     0,
+     "8 - Otto"
+    ]
+   ]
+  },
+  "cache_db": [
+   [
+    1,
+    "it",
+    1,
+    "1 - [IT] Hello there"
+   ],
+   [
+    10,
+    "it",
+    0,
+    "10 - [m]%str1%"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "11 - Testo"
+   ],
+   [
+    2,
+    "it",
+    2,
+    "2 - [m]%str1%"
+   ],
+   [
+    3,
+    "it",
+    3,
+    "3 - %str1% %str2%"
+   ],
+   [
+    4,
+    "it",
+    4,
+    "4 - [null]"
+   ],
+   [
+    5,
+    "it",
+    5,
+    "   "
+   ],
+   [
+    6,
+    "it",
+    6,
+    "6 - Chiave della patch"
+   ],
+   [
+    7,
+    "it",
+    7,
+    "7 - [IT] Line one\n[IT] line two"
+   ],
+   [
+    8,
+    "it",
+    0,
+    "8 - Otto"
+   ],
+   [
+    9,
+    "it",
+    0,
+    "9 - gia' con prefisso"
+   ]
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: SHOW KEYS mode 'all' (contributor.json): texts start with their string ID",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache.db: key prefixes set to mode all on 3 texts (visible at next game start)",
+   "i: contributor Ann: suggestions on",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v1, 2 reviewed, 0 automatic, 0 drop",
+   "i: patch v1: 1 translations sent to the game (1 changed, 0 new)",
+   "i: patch v1: 2 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary x (different from yours) (ready in <t> s)"
+  ]
+ },
+ "contributor_bad": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "1 - [IT] Hello there"
+    ]
+   ],
+   "2": [
+    [
+     0,
+     2,
+     "2 - [m]%str1%"
+    ]
+   ],
+   "3": [
+    [
+     0,
+     3,
+     "3 - %str1% %str2%"
+    ]
+   ],
+   "4": [
+    [
+     0,
+     4,
+     "4 - [null]"
+    ]
+   ],
+   "5": [
+    [
+     0,
+     5,
+     "   "
+    ]
+   ],
+   "6": [
+    [
+     0,
+     6,
+     "6 - Chiave della patch"
+    ]
+   ],
+   "7": [
+    [
+     0,
+     7,
+     "7 - [IT] Line one\n[IT] line two"
+    ]
+   ],
+   "8": [
+    [
+     0,
+     0,
+     "8 - Otto"
+    ]
+   ]
+  },
+  "cache_db": [
+   [
+    1,
+    "it",
+    1,
+    "1 - [IT] Hello there"
+   ],
+   [
+    10,
+    "it",
+    0,
+    "10 - [m]%str1%"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "11 - Testo"
+   ],
+   [
+    2,
+    "it",
+    2,
+    "2 - [m]%str1%"
+   ],
+   [
+    3,
+    "it",
+    3,
+    "3 - %str1% %str2%"
+   ],
+   [
+    4,
+    "it",
+    4,
+    "4 - [null]"
+   ],
+   [
+    5,
+    "it",
+    5,
+    "   "
+   ],
+   [
+    6,
+    "it",
+    6,
+    "6 - Chiave della patch"
+   ],
+   [
+    7,
+    "it",
+    7,
+    "7 - [IT] Line one\n[IT] line two"
+   ],
+   [
+    8,
+    "it",
+    0,
+    "8 - Otto"
+   ],
+   [
+    9,
+    "it",
+    0,
+    "9 - gia' con prefisso"
+   ]
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: SHOW KEYS mode 'all' (show_keys.txt): texts start with their string ID",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache.db: key prefixes set to mode all on 3 texts (visible at next game start)",
+   "i: contributor Ann: suggestions on",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v1, 2 reviewed, 0 automatic, 0 drop",
+   "i: patch v1: 1 translations sent to the game (1 changed, 0 new)",
+   "i: patch v1: 2 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary x (different from yours) (ready in <t> s)",
+   "w: contributor.json: show_keys must be \"text\", \"all\" or false, not 'x'"
+  ]
+ },
+ "contributor_off": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "[IT] Hello there"
+    ]
+   ],
+   "2": [
+    [
+     0,
+     2,
+     "[m]%str1%"
+    ]
+   ],
+   "3": [
+    [
+     0,
+     3,
+     "%str1% %str2%"
+    ]
+   ],
+   "4": [
+    [
+     0,
+     4,
+     "[null]"
+    ]
+   ],
+   "5": [
+    [
+     0,
+     5,
+     "   "
+    ]
+   ],
+   "6": [
+    [
+     0,
+     6,
+     "Chiave della patch"
+    ]
+   ],
+   "7": [
+    [
+     0,
+     7,
+     "[IT] Line one\n[IT] line two"
+    ]
+   ],
+   "8": [
+    [
+     0,
+     0,
+     "Otto"
+    ]
+   ]
+  },
+  "cache_db": [
+   [
+    1,
+    "it",
+    1,
+    "[IT] Hello there"
+   ],
+   [
+    10,
+    "it",
+    0,
+    "[m]%str1%"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "Testo"
+   ],
+   [
+    2,
+    "it",
+    2,
+    "[m]%str1%"
+   ],
+   [
+    3,
+    "it",
+    3,
+    "%str1% %str2%"
+   ],
+   [
+    4,
+    "it",
+    4,
+    "[null]"
+   ],
+   [
+    5,
+    "it",
+    5,
+    "   "
+   ],
+   [
+    6,
+    "it",
+    6,
+    "Chiave della patch"
+   ],
+   [
+    7,
+    "it",
+    7,
+    "[IT] Line one\n[IT] line two"
+   ],
+   [
+    8,
+    "it",
+    0,
+    "Otto"
+   ],
+   [
+    9,
+    "it",
+    0,
+    "gia' con prefisso"
+   ]
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache.db: key prefixes set to mode off on 1 texts (visible at next game start)",
+   "i: contributor Ann: suggestions on",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v1, 2 reviewed, 0 automatic, 0 drop",
+   "i: patch v1: 1 translations sent to the game (1 changed, 0 new)",
+   "i: patch v1: 2 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary x (different from yours) (ready in <t> s)"
+  ]
+ },
+ "contributor_true": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "1 - [IT] Hello there"
+    ]
+   ],
+   "2": [
+    [
+     0,
+     2,
+     "[m]%str1%"
+    ]
+   ],
+   "3": [
+    [
+     0,
+     3,
+     "%str1% %str2%"
+    ]
+   ],
+   "4": [
+    [
+     0,
+     4,
+     "[null]"
+    ]
+   ],
+   "5": [
+    [
+     0,
+     5,
+     "   "
+    ]
+   ],
+   "6": [
+    [
+     0,
+     6,
+     "6 - Chiave della patch"
+    ]
+   ],
+   "7": [
+    [
+     0,
+     7,
+     "7 - [IT] Line one\n[IT] line two"
+    ]
+   ],
+   "8": [
+    [
+     0,
+     0,
+     "8 - Otto"
+    ]
+   ]
+  },
+  "cache_db": [
+   [
+    1,
+    "it",
+    1,
+    "1 - [IT] Hello there"
+   ],
+   [
+    10,
+    "it",
+    0,
+    "[m]%str1%"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "11 - Testo"
+   ],
+   [
+    2,
+    "it",
+    2,
+    "[m]%str1%"
+   ],
+   [
+    3,
+    "it",
+    3,
+    "%str1% %str2%"
+   ],
+   [
+    4,
+    "it",
+    4,
+    "[null]"
+   ],
+   [
+    5,
+    "it",
+    5,
+    "   "
+   ],
+   [
+    6,
+    "it",
+    6,
+    "6 - Chiave della patch"
+   ],
+   [
+    7,
+    "it",
+    7,
+    "7 - [IT] Line one\n[IT] line two"
+   ],
+   [
+    8,
+    "it",
+    0,
+    "8 - Otto"
+   ],
+   [
+    9,
+    "it",
+    0,
+    "9 - gia' con prefisso"
+   ]
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: SHOW KEYS mode 'text' (contributor.json): texts start with their string ID",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache.db: key prefixes set to mode text on 2 texts (visible at next game start)",
+   "i: contributor Ann: suggestions on",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v1, 2 reviewed, 0 automatic, 0 drop",
+   "i: patch v1: 1 translations sent to the game (1 changed, 0 new)",
+   "i: patch v1: 2 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary x (different from yours) (ready in <t> s)"
+  ]
+ },
+ "empty_file": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "1 - [IT] Hello there"
+    ]
+   ],
+   "2": [
+    [
+     0,
+     2,
+     "[m]%str1%"
+    ]
+   ],
+   "3": [
+    [
+     0,
+     3,
+     "%str1% %str2%"
+    ]
+   ],
+   "4": [
+    [
+     0,
+     4,
+     "[null]"
+    ]
+   ],
+   "5": [
+    [
+     0,
+     5,
+     "   "
+    ]
+   ],
+   "6": [
+    [
+     0,
+     6,
+     "6 - Chiave della patch"
+    ]
+   ],
+   "7": [
+    [
+     0,
+     7,
+     "7 - [IT] Line one\n[IT] line two"
+    ]
+   ],
+   "8": [
+    [
+     0,
+     0,
+     "8 - Otto"
+    ]
+   ]
+  },
+  "cache_db": [
+   [
+    1,
+    "it",
+    1,
+    "1 - [IT] Hello there"
+   ],
+   [
+    10,
+    "it",
+    0,
+    "[m]%str1%"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "11 - Testo"
+   ],
+   [
+    2,
+    "it",
+    2,
+    "[m]%str1%"
+   ],
+   [
+    3,
+    "it",
+    3,
+    "%str1% %str2%"
+   ],
+   [
+    4,
+    "it",
+    4,
+    "[null]"
+   ],
+   [
+    5,
+    "it",
+    5,
+    "   "
+   ],
+   [
+    6,
+    "it",
+    6,
+    "6 - Chiave della patch"
+   ],
+   [
+    7,
+    "it",
+    7,
+    "7 - [IT] Line one\n[IT] line two"
+   ],
+   [
+    8,
+    "it",
+    0,
+    "8 - Otto"
+   ],
+   [
+    9,
+    "it",
+    0,
+    "9 - gia' con prefisso"
+   ]
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: SHOW KEYS mode 'text' (show_keys.txt): texts start with their string ID",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache.db: key prefixes set to mode text on 2 texts (visible at next game start)",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v1, 2 reviewed, 0 automatic, 0 drop",
+   "i: patch v1: 1 translations sent to the game (1 changed, 0 new)",
+   "i: patch v1: 2 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary x (different from yours) (ready in <t> s)"
+  ]
+ },
+ "null_text_row": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "1 - [IT] Hello there"
+    ]
+   ],
+   "2": [
+    [
+     0,
+     2,
+     "[m]%str1%"
+    ]
+   ],
+   "3": [
+    [
+     0,
+     3,
+     "%str1% %str2%"
+    ]
+   ],
+   "4": [
+    [
+     0,
+     4,
+     "[null]"
+    ]
+   ],
+   "5": [
+    [
+     0,
+     5,
+     "   "
+    ]
+   ],
+   "6": [
+    [
+     0,
+     6,
+     "6 - Chiave della patch"
+    ]
+   ],
+   "7": [
+    [
+     0,
+     7,
+     "7 - [IT] Line one\n[IT] line two"
+    ]
+   ]
+  },
+  "cache_db": [
+   [
+    1,
+    "it",
+    1,
+    "1 - [IT] Hello there"
+   ],
+   [
+    10,
+    "it",
+    0,
+    "[m]%str1%"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "Testo"
+   ],
+   [
+    12,
+    "it",
+    0,
+    null
+   ],
+   [
+    2,
+    "it",
+    2,
+    "[m]%str1%"
+   ],
+   [
+    3,
+    "it",
+    3,
+    "%str1% %str2%"
+   ],
+   [
+    4,
+    "it",
+    4,
+    "[null]"
+   ],
+   [
+    5,
+    "it",
+    5,
+    "   "
+   ],
+   [
+    6,
+    "it",
+    6,
+    "6 - Chiave della patch"
+   ],
+   [
+    7,
+    "it",
+    7,
+    "7 - [IT] Line one\n[IT] line two"
+   ],
+   [
+    8,
+    "it",
+    0,
+    "vecchio otto"
+   ],
+   [
+    9,
+    "it",
+    0,
+    "9 - gia' con prefisso"
+   ]
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: SHOW KEYS mode 'text' (show_keys.txt): texts start with their string ID",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v1, 2 reviewed, 0 automatic, 0 drop",
+   "i: patch v1: 2 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary x (different from yours) (ready in <t> s)",
+   "w: cannot apply the patch to <W>/addons/text_translator/modules/local_translator_it/cache.db: 'NoneType' object has no attribute 'startswith'"
+  ]
+ },
+ "text": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "1 - [IT] Hello there"
+    ]
+   ],
+   "2": [
+    [
+     0,
+     2,
+     "[m]%str1%"
+    ]
+   ],
+   "3": [
+    [
+     0,
+     3,
+     "%str1% %str2%"
+    ]
+   ],
+   "4": [
+    [
+     0,
+     4,
+     "[null]"
+    ]
+   ],
+   "5": [
+    [
+     0,
+     5,
+     "   "
+    ]
+   ],
+   "6": [
+    [
+     0,
+     6,
+     "6 - Chiave della patch"
+    ]
+   ],
+   "7": [
+    [
+     0,
+     7,
+     "7 - [IT] Line one\n[IT] line two"
+    ]
+   ],
+   "8": [
+    [
+     0,
+     0,
+     "8 - Otto"
+    ]
+   ]
+  },
+  "cache_db": [
+   [
+    1,
+    "it",
+    1,
+    "1 - [IT] Hello there"
+   ],
+   [
+    10,
+    "it",
+    0,
+    "[m]%str1%"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "11 - Testo"
+   ],
+   [
+    2,
+    "it",
+    2,
+    "[m]%str1%"
+   ],
+   [
+    3,
+    "it",
+    3,
+    "%str1% %str2%"
+   ],
+   [
+    4,
+    "it",
+    4,
+    "[null]"
+   ],
+   [
+    5,
+    "it",
+    5,
+    "   "
+   ],
+   [
+    6,
+    "it",
+    6,
+    "6 - Chiave della patch"
+   ],
+   [
+    7,
+    "it",
+    7,
+    "7 - [IT] Line one\n[IT] line two"
+   ],
+   [
+    8,
+    "it",
+    0,
+    "8 - Otto"
+   ],
+   [
+    9,
+    "it",
+    0,
+    "9 - gia' con prefisso"
+   ]
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: SHOW KEYS mode 'text' (show_keys.txt): texts start with their string ID",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache.db: key prefixes set to mode text on 2 texts (visible at next game start)",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v1, 2 reviewed, 0 automatic, 0 drop",
+   "i: patch v1: 1 translations sent to the game (1 changed, 0 new)",
+   "i: patch v1: 2 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary x (different from yours) (ready in <t> s)"
+  ]
+ },
+ "text_then_off": {
+  "answers": {},
+  "cache_db": [
+   [
+    1,
+    "it",
+    1,
+    "[IT] Hello there"
+   ],
+   [
+    10,
+    "it",
+    0,
+    "[m]%str1%"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "Testo"
+   ],
+   [
+    2,
+    "it",
+    2,
+    "[m]%str1%"
+   ],
+   [
+    3,
+    "it",
+    3,
+    "%str1% %str2%"
+   ],
+   [
+    4,
+    "it",
+    4,
+    "[null]"
+   ],
+   [
+    5,
+    "it",
+    5,
+    "   "
+   ],
+   [
+    6,
+    "it",
+    6,
+    "Chiave della patch"
+   ],
+   [
+    7,
+    "it",
+    7,
+    "[IT] Line one\n[IT] line two"
+   ],
+   [
+    8,
+    "it",
+    0,
+    "Otto"
+   ],
+   [
+    9,
+    "it",
+    0,
+    "gia' con prefisso"
+   ]
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache loaded: 3 translations",
+   "i: cache.db: key prefixes set to mode off on 6 texts (visible at next game start)",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: map: 3 strings known",
+   "i: patch v1: 2 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary x (different from yours) (ready in <t> s)"
+  ]
+ },
+ "tutte": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "1 - [IT] Hello there"
+    ]
+   ],
+   "2": [
+    [
+     0,
+     2,
+     "2 - [m]%str1%"
+    ]
+   ],
+   "3": [
+    [
+     0,
+     3,
+     "3 - %str1% %str2%"
+    ]
+   ],
+   "4": [
+    [
+     0,
+     4,
+     "4 - [null]"
+    ]
+   ],
+   "5": [
+    [
+     0,
+     5,
+     "   "
+    ]
+   ],
+   "6": [
+    [
+     0,
+     6,
+     "6 - Chiave della patch"
+    ]
+   ],
+   "7": [
+    [
+     0,
+     7,
+     "7 - [IT] Line one\n[IT] line two"
+    ]
+   ],
+   "8": [
+    [
+     0,
+     0,
+     "8 - Otto"
+    ]
+   ]
+  },
+  "cache_db": [
+   [
+    1,
+    "it",
+    1,
+    "1 - [IT] Hello there"
+   ],
+   [
+    10,
+    "it",
+    0,
+    "10 - [m]%str1%"
+   ],
+   [
+    11,
+    "it",
+    0,
+    "11 - Testo"
+   ],
+   [
+    2,
+    "it",
+    2,
+    "2 - [m]%str1%"
+   ],
+   [
+    3,
+    "it",
+    3,
+    "3 - %str1% %str2%"
+   ],
+   [
+    4,
+    "it",
+    4,
+    "4 - [null]"
+   ],
+   [
+    5,
+    "it",
+    5,
+    "   "
+   ],
+   [
+    6,
+    "it",
+    6,
+    "6 - Chiave della patch"
+   ],
+   [
+    7,
+    "it",
+    7,
+    "7 - [IT] Line one\n[IT] line two"
+   ],
+   [
+    8,
+    "it",
+    0,
+    "8 - Otto"
+   ],
+   [
+    9,
+    "it",
+    0,
+    "9 - gia' con prefisso"
+   ]
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: SHOW KEYS mode 'all' (show_keys.txt): texts start with their string ID",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache.db: key prefixes set to mode all on 3 texts (visible at next game start)",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v1, 2 reviewed, 0 automatic, 0 drop",
+   "i: patch v1: 1 translations sent to the game (1 changed, 0 new)",
+   "i: patch v1: 2 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary x (different from yours) (ready in <t> s)"
+  ]
+ }
+}

@@ -1,0 +1,733 @@
+{
+ "changed": {
+  "answers": {
+   "201": [
+    [
+     0,
+     201,
+     "Waypoint"
+    ]
+   ],
+   "202": [
+    [
+     0,
+     202,
+     "[IT] Bank"
+    ]
+   ],
+   "203": [
+    [
+     0,
+     203,
+     "Mercato"
+    ]
+   ],
+   "204": [
+    [
+     0,
+     204,
+     "[IT] Go to Arco del Leone"
+    ]
+   ],
+   "205": [
+    [
+     0,
+     205,
+     "[IT] The Dragone wakes"
+    ]
+   ],
+   "206": [
+    [
+     0,
+     206,
+     "[IT] Tyria is big"
+    ]
+   ],
+   "207": [
+    [
+     0,
+     207,
+     "[IT] Hello"
+    ]
+   ]
+  },
+  "cache": [
+   {
+    "s": "Go to Lion's Arch",
+    "t": "[IT] Go to Arco del Leone"
+   },
+   {
+    "s": "Bank",
+    "t": "[IT] Bank"
+   },
+   {
+    "s": "Hello",
+    "t": "[IT] Hello"
+   },
+   {
+    "s": "The Dragon wakes",
+    "t": "[IT] The Dragone wakes"
+   },
+   {
+    "s": "Tyria is big",
+    "t": "[IT] Tyria is big"
+   }
+  ],
+  "cache_db": [
+   [
+    104,
+    "it",
+    104,
+    "[IT] Go to Arco del Leone"
+   ],
+   [
+    107,
+    "it",
+    107,
+    "[IT] Hello"
+   ],
+   [
+    201,
+    "it",
+    201,
+    "Waypoint"
+   ],
+   [
+    202,
+    "it",
+    202,
+    "[IT] Bank"
+   ],
+   [
+    203,
+    "it",
+    203,
+    "Mercato"
+   ],
+   [
+    204,
+    "it",
+    204,
+    "[IT] Go to Arco del Leone"
+   ],
+   [
+    205,
+    "it",
+    205,
+    "[IT] The Dragone wakes"
+   ],
+   [
+    206,
+    "it",
+    206,
+    "[IT] Tyria is big"
+   ],
+   [
+    207,
+    "it",
+    207,
+    "[IT] Hello"
+   ],
+   [
+    4,
+    "it",
+    4,
+    "[IT] Go to Arco del Leone"
+   ],
+   [
+    7,
+    "it",
+    7,
+    "[IT] Hello"
+   ]
+  ],
+  "etag": "\"g2\"",
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache loaded: 5 translations",
+   "i: cache.db: 7 old translations removed (glossary changed; asked again at next game start)",
+   "i: glossary f7097b5c625dafb5 (glossary_it.json): 2 exact, 4 terms, 0 patterns",
+   "i: glossary sync: 5 entries changed, 2 cached lines dropped, 2 kept",
+   "i: glossary updated: 822cead473d0948a (2 exact, 5 terms)",
+   "i: map: 13 strings known",
+   "i: patch update skipped: HTTP Error 404: Error",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "net": [
+   {
+    "headers": {
+     "accept": "application/vnd.github.sha",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/main"
+   },
+   {
+    "headers": {
+     "accept": "application/vnd.github.sha",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/main"
+   },
+   {
+    "headers": {
+     "accept-encoding": "gzip",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/main/patch/it/index.json"
+   },
+   {
+    "headers": {
+     "accept-encoding": "gzip",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/main/patch/patch_it.json"
+   },
+   {
+    "headers": {
+     "if-none-match": "\"g1\"",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/main/glossary/glossary_it.json"
+   }
+  ],
+  "snapshot": {
+   "exact": {
+    "Trading Post": "Mercato",
+    "Waypoint": "Waypoint"
+   },
+   "protect": 5,
+   "terms": {
+    "Dragon": "Dragone",
+    "Lion's Arch": "Arco del Leone",
+    "Lion's arch": "Arco del leone",
+    "Tyria": "Tyria",
+    "lion's arch": "arco del leone"
+   }
+  }
+ },
+ "cut": {
+  "file_kept": true,
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/glossary_it.etag",
+   "IT/glossary_it.json",
+   "IT/map_it.db",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal"
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary 822cead473d0948a (glossary_it.json): 2 exact, 5 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: glossary update skipped: download incomplete (125 of 99999 bytes)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch update skipped: <urlopen error offline (fake network)>",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "net": [
+   {
+    "headers": {
+     "accept": "application/vnd.github.sha",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/dev"
+   },
+   {
+    "headers": {
+     "accept": "application/vnd.github.sha",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/dev"
+   },
+   {
+    "headers": {
+     "accept-encoding": "gzip",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/dev/patch/it/index.json"
+   },
+   {
+    "headers": {
+     "if-none-match": "\"g2\"",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/dev/glossary/glossary_it.json"
+   }
+  ]
+ },
+ "download": {
+  "answers": {
+   "1": [
+    [
+     0,
+     1,
+     "Waypoint"
+    ]
+   ],
+   "101": [
+    [
+     0,
+     101,
+     "Punto di passaggio"
+    ]
+   ],
+   "102": [
+    [
+     0,
+     102,
+     "Banca"
+    ]
+   ],
+   "103": [
+    [
+     0,
+     103,
+     "[IT] Trading Post"
+    ]
+   ],
+   "104": [
+    [
+     0,
+     104,
+     "[IT] Go to Arco del Leone"
+    ]
+   ],
+   "105": [
+    [
+     0,
+     105,
+     "[IT] The Drago wakes"
+    ]
+   ],
+   "106": [
+    [
+     0,
+     106,
+     "[IT] Tyria is big"
+    ]
+   ],
+   "107": [
+    [
+     0,
+     107,
+     "[IT] Hello"
+    ]
+   ],
+   "2": [
+    [
+     0,
+     2,
+     "[IT] Bank"
+    ]
+   ],
+   "3": [
+    [
+     0,
+     3,
+     "[IT] Trading Post"
+    ]
+   ],
+   "4": [
+    [
+     0,
+     4,
+     "[IT] Go to Arco del Leone"
+    ]
+   ],
+   "5": [
+    [
+     0,
+     5,
+     "[IT] The Dragon wakes"
+    ]
+   ],
+   "6": [
+    [
+     0,
+     6,
+     "[IT] Tyria is big"
+    ]
+   ],
+   "7": [
+    [
+     0,
+     7,
+     "[IT] Hello"
+    ]
+   ]
+  },
+  "cache": [
+   {
+    "s": "Go to Lion's Arch",
+    "t": "[IT] Go to Arco del Leone"
+   },
+   {
+    "s": "Hello",
+    "t": "[IT] Hello"
+   },
+   {
+    "s": "The Dragon wakes",
+    "t": "[IT] The Drago wakes"
+   },
+   {
+    "s": "Trading Post",
+    "t": "[IT] Trading Post"
+   },
+   {
+    "s": "Tyria is big",
+    "t": "[IT] Tyria is big"
+   }
+  ],
+  "cache_db": [
+   [
+    101,
+    "it",
+    101,
+    "Punto di passaggio"
+   ],
+   [
+    102,
+    "it",
+    102,
+    "Banca"
+   ],
+   [
+    103,
+    "it",
+    103,
+    "[IT] Trading Post"
+   ],
+   [
+    104,
+    "it",
+    104,
+    "[IT] Go to Arco del Leone"
+   ],
+   [
+    105,
+    "it",
+    105,
+    "[IT] The Drago wakes"
+   ],
+   [
+    106,
+    "it",
+    106,
+    "[IT] Tyria is big"
+   ],
+   [
+    107,
+    "it",
+    107,
+    "[IT] Hello"
+   ],
+   [
+    3,
+    "it",
+    3,
+    "[IT] Trading Post"
+   ],
+   [
+    4,
+    "it",
+    4,
+    "[IT] Go to Arco del Leone"
+   ],
+   [
+    6,
+    "it",
+    6,
+    "[IT] Tyria is big"
+   ],
+   [
+    7,
+    "it",
+    7,
+    "[IT] Hello"
+   ]
+  ],
+  "etag": "\"g1\"",
+  "glossary_file": "{\"exact\": {\"Waypoint\": \"Punto di passaggio\", \"Bank\": \"Banca\"}, \"terms\": {\"Lion's Arch\": \"Arco del Leone\", \"Dragon\": \"Drago\"}}",
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache.db: 3 old translations removed (glossary changed; asked again at next game start)",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: 6 entries changed, 1 cached lines dropped, 4 kept",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: glossary updated: f7097b5c625dafb5 (2 exact, 4 terms)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch update skipped: HTTP Error 404: Error",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "net": [
+   {
+    "headers": {
+     "accept": "application/vnd.github.sha",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/main"
+   },
+   {
+    "headers": {
+     "accept": "application/vnd.github.sha",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/main"
+   },
+   {
+    "headers": {
+     "accept-encoding": "gzip",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/patch/it/index.json"
+   },
+   {
+    "headers": {
+     "accept-encoding": "gzip",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/patch/patch_it.json"
+   },
+   {
+    "headers": {
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/glossary/glossary_it.json"
+   }
+  ],
+  "snapshot": {
+   "exact": {
+    "Bank": "Banca",
+    "Waypoint": "Punto di passaggio"
+   },
+   "protect": 5,
+   "terms": {
+    "Dragon": "Drago",
+    "Lion's Arch": "Arco del Leone",
+    "Lion's arch": "Arco del leone",
+    "lion's arch": "arco del leone"
+   }
+  }
+ },
+ "invalid": {
+  "file_kept": true,
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/glossary_it.etag",
+   "IT/glossary_it.json",
+   "IT/map_it.db",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal"
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary 822cead473d0948a (glossary_it.json): 2 exact, 5 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: glossary update skipped: glossary pattern without {X}: 'Longbow'",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch update skipped: <urlopen error offline (fake network)>",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "net": [
+   {
+    "headers": {
+     "accept": "application/vnd.github.sha",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/dev"
+   },
+   {
+    "headers": {
+     "accept": "application/vnd.github.sha",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/dev"
+   },
+   {
+    "headers": {
+     "accept-encoding": "gzip",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/dev/patch/it/index.json"
+   },
+   {
+    "headers": {
+     "if-none-match": "\"g2\"",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/dev/glossary/glossary_it.json"
+   }
+  ]
+ },
+ "not_json": {
+  "file_kept": true,
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/glossary_it.etag",
+   "IT/glossary_it.json",
+   "IT/map_it.db",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal"
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary 822cead473d0948a (glossary_it.json): 2 exact, 5 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: glossary update skipped: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch update skipped: <urlopen error offline (fake network)>",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "net": [
+   {
+    "headers": {
+     "accept": "application/vnd.github.sha",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/dev"
+   },
+   {
+    "headers": {
+     "accept": "application/vnd.github.sha",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/dev"
+   },
+   {
+    "headers": {
+     "accept-encoding": "gzip",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/dev/patch/it/index.json"
+   },
+   {
+    "headers": {
+     "if-none-match": "\"g2\"",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/dev/glossary/glossary_it.json"
+   }
+  ]
+ },
+ "not_modified": {
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: cache loaded: 5 translations",
+   "i: glossary f7097b5c625dafb5 (glossary_it.json): 2 exact, 4 terms, 0 patterns",
+   "i: glossary up to date",
+   "i: map: 13 strings known",
+   "i: patch update skipped: HTTP Error 404: Error",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "net": [
+   {
+    "headers": {
+     "accept": "application/vnd.github.sha",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/main"
+   },
+   {
+    "headers": {
+     "accept": "application/vnd.github.sha",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/main"
+   },
+   {
+    "headers": {
+     "accept-encoding": "gzip",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/patch/it/index.json"
+   },
+   {
+    "headers": {
+     "accept-encoding": "gzip",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/patch/patch_it.json"
+   },
+   {
+    "headers": {
+     "if-none-match": "\"g1\"",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/glossary/glossary_it.json"
+   }
+  ]
+ },
+ "server_error": {
+  "file_kept": true,
+  "files": [
+   "IT/cache_it.glossary.json",
+   "IT/glossary_it.etag",
+   "IT/glossary_it.json",
+   "IT/map_it.db",
+   "IT/patch_it.db",
+   "IT/patch_it.db-shm",
+   "IT/patch_it.db-wal"
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: TEST MODE: answering '[IT] text', no real translation",
+   "i: addon closed the connection: exiting",
+   "i: glossary 822cead473d0948a (glossary_it.json): 2 exact, 5 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: glossary update skipped: HTTP Error 500: Error",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch update skipped: <urlopen error offline (fake network)>",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ],
+  "net": [
+   {
+    "headers": {
+     "accept": "application/vnd.github.sha",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/dev"
+   },
+   {
+    "headers": {
+     "accept": "application/vnd.github.sha",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://api.github.com/repos/NikeGipple/gw2-nexus-local-translator/commits/dev"
+   },
+   {
+    "headers": {
+     "accept-encoding": "gzip",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/dev/patch/it/index.json"
+   },
+   {
+    "headers": {
+     "if-none-match": "\"g2\"",
+     "user-agent": "gw2-local-translator"
+    },
+    "url": "https://raw.githubusercontent.com/NikeGipple/gw2-nexus-local-translator/dev/glossary/glossary_it.json"
+   }
+  ]
+ }
+}

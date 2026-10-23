@@ -1,0 +1,667 @@
+{
+ "broken_model": {
+  "answers": {
+   "2": [
+    [
+     0,
+     2,
+     ""
+    ]
+   ]
+  },
+  "log": [
+   "e: could not prepare the translation model in <W>/addons/text_translator/modules/local_translator_it/IT/model",
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ]
+ },
+ "first": {
+  "answers": {
+   "1": [
+    [
+     0,
+     0,
+     "IT:Sentence number 0 here"
+    ]
+   ],
+   "10": [
+    [
+     0,
+     9,
+     "IT:Sentence number 9 here"
+    ]
+   ],
+   "100": [
+    [
+     0,
+     7,
+     "Broken line"
+    ]
+   ],
+   "101": [
+    [
+     0,
+     7,
+     "Broken line"
+    ]
+   ],
+   "102": [
+    [
+     0,
+     8,
+     "Friend line"
+    ]
+   ],
+   "11": [
+    [
+     0,
+     10,
+     "IT:Sentence number 10 here"
+    ]
+   ],
+   "12": [
+    [
+     0,
+     11,
+     "IT:Sentence number 11 here"
+    ]
+   ],
+   "13": [
+    [
+     0,
+     12,
+     "IT:Sentence number 12 here"
+    ]
+   ],
+   "14": [
+    [
+     0,
+     13,
+     "IT:Sentence number 13 here"
+    ]
+   ],
+   "15": [
+    [
+     0,
+     14,
+     "IT:Sentence number 14 here"
+    ]
+   ],
+   "16": [
+    [
+     0,
+     15,
+     "IT:Sentence number 15 here"
+    ]
+   ],
+   "17": [
+    [
+     0,
+     16,
+     "IT:Sentence number 16 here"
+    ]
+   ],
+   "18": [
+    [
+     0,
+     17,
+     "IT:Sentence number 17 here"
+    ]
+   ],
+   "19": [
+    [
+     0,
+     18,
+     "IT:Sentence number 18 here"
+    ]
+   ],
+   "2": [
+    [
+     0,
+     1,
+     "IT:Sentence number 1 here"
+    ]
+   ],
+   "20": [
+    [
+     0,
+     19,
+     "IT:Sentence number 19 here"
+    ]
+   ],
+   "21": [
+    [
+     0,
+     20,
+     "IT:Sentence number 20 here"
+    ]
+   ],
+   "22": [
+    [
+     0,
+     21,
+     "IT:Sentence number 21 here"
+    ]
+   ],
+   "23": [
+    [
+     0,
+     22,
+     "IT:Sentence number 22 here"
+    ]
+   ],
+   "24": [
+    [
+     0,
+     23,
+     "IT:Sentence number 23 here"
+    ]
+   ],
+   "25": [
+    [
+     0,
+     24,
+     "IT:Sentence number 24 here"
+    ]
+   ],
+   "26": [
+    [
+     0,
+     25,
+     "IT:Sentence number 25 here"
+    ]
+   ],
+   "27": [
+    [
+     0,
+     26,
+     "IT:Sentence number 26 here"
+    ]
+   ],
+   "28": [
+    [
+     0,
+     27,
+     "IT:Sentence number 27 here"
+    ]
+   ],
+   "29": [
+    [
+     0,
+     28,
+     "IT:Sentence number 28 here"
+    ]
+   ],
+   "3": [
+    [
+     0,
+     2,
+     "IT:Sentence number 2 here"
+    ]
+   ],
+   "30": [
+    [
+     0,
+     29,
+     "IT:Sentence number 29 here"
+    ]
+   ],
+   "31": [
+    [
+     0,
+     30,
+     "Ladro"
+    ]
+   ],
+   "32": [
+    [
+     0,
+     31,
+     "Bad line"
+    ]
+   ],
+   "33": [
+    [
+     0,
+     32,
+     "IT:Long xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ]
+   ],
+   "34": [
+    [
+     0,
+     33,
+     "Ladro\nBad line"
+    ]
+   ],
+   "4": [
+    [
+     0,
+     3,
+     "IT:Sentence number 3 here"
+    ]
+   ],
+   "5": [
+    [
+     0,
+     4,
+     "IT:Sentence number 4 here"
+    ]
+   ],
+   "6": [
+    [
+     0,
+     5,
+     "IT:Sentence number 5 here"
+    ]
+   ],
+   "7": [
+    [
+     0,
+     6,
+     "IT:Sentence number 6 here"
+    ]
+   ],
+   "8": [
+    [
+     0,
+     7,
+     "IT:Sentence number 7 here"
+    ]
+   ],
+   "9": [
+    [
+     0,
+     8,
+     "IT:Sentence number 8 here"
+    ]
+   ]
+  },
+  "batches": [
+   [
+    [
+     "Sentence number 0 here",
+     "Sentence number 1 here",
+     "Sentence number 2 here",
+     "Sentence number 3 here",
+     "Sentence number 4 here",
+     "Sentence number 5 here",
+     "Sentence number 6 here",
+     "Sentence number 7 here",
+     "Sentence number 8 here",
+     "Sentence number 9 here",
+     "Sentence number 10 here",
+     "Sentence number 11 here",
+     "Sentence number 12 here",
+     "Sentence number 13 here",
+     "Sentence number 14 here",
+     "Sentence number 15 here",
+     "Sentence number 16 here",
+     "Sentence number 17 here",
+     "Sentence number 18 here",
+     "Sentence number 19 here",
+     "Sentence number 20 here",
+     "Sentence number 21 here",
+     "Sentence number 22 here",
+     "Sentence number 23 here"
+    ],
+    [
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ]
+    ],
+    2,
+    64
+   ],
+   [
+    [
+     "Sentence number 24 here",
+     "Sentence number 25 here",
+     "Sentence number 26 here",
+     "Sentence number 27 here",
+     "Sentence number 28 here",
+     "Sentence number 29 here",
+     "Thief",
+     "Bad line",
+     "Long xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    ],
+    [
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ]
+    ],
+    2,
+    512
+   ],
+   [
+    [
+     "Broken line",
+     "Friend line"
+    ],
+    [
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ]
+    ],
+    2,
+    40
+   ],
+   [
+    [
+     "Broken line",
+     "Friend line"
+    ],
+    [
+     [
+      "</s>"
+     ],
+     [
+      "</s>"
+     ]
+    ],
+    2,
+    40
+   ]
+  ],
+  "cache": [
+   {
+    "s": "Bad line",
+    "t": "Bad line"
+   },
+   {
+    "s": "Long xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "t": "IT:Long xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+   },
+   {
+    "s": "Sentence number 0 here",
+    "t": "IT:Sentence number 0 here"
+   },
+   {
+    "s": "Sentence number 1 here",
+    "t": "IT:Sentence number 1 here"
+   },
+   {
+    "s": "Sentence number 10 here",
+    "t": "IT:Sentence number 10 here"
+   },
+   {
+    "s": "Sentence number 11 here",
+    "t": "IT:Sentence number 11 here"
+   },
+   {
+    "s": "Sentence number 12 here",
+    "t": "IT:Sentence number 12 here"
+   },
+   {
+    "s": "Sentence number 13 here",
+    "t": "IT:Sentence number 13 here"
+   },
+   {
+    "s": "Sentence number 14 here",
+    "t": "IT:Sentence number 14 here"
+   },
+   {
+    "s": "Sentence number 15 here",
+    "t": "IT:Sentence number 15 here"
+   },
+   {
+    "s": "Sentence number 16 here",
+    "t": "IT:Sentence number 16 here"
+   },
+   {
+    "s": "Sentence number 17 here",
+    "t": "IT:Sentence number 17 here"
+   },
+   {
+    "s": "Sentence number 18 here",
+    "t": "IT:Sentence number 18 here"
+   },
+   {
+    "s": "Sentence number 19 here",
+    "t": "IT:Sentence number 19 here"
+   },
+   {
+    "s": "Sentence number 2 here",
+    "t": "IT:Sentence number 2 here"
+   },
+   {
+    "s": "Sentence number 20 here",
+    "t": "IT:Sentence number 20 here"
+   },
+   {
+    "s": "Sentence number 21 here",
+    "t": "IT:Sentence number 21 here"
+   },
+   {
+    "s": "Sentence number 22 here",
+    "t": "IT:Sentence number 22 here"
+   },
+   {
+    "s": "Sentence number 23 here",
+    "t": "IT:Sentence number 23 here"
+   },
+   {
+    "s": "Sentence number 24 here",
+    "t": "IT:Sentence number 24 here"
+   },
+   {
+    "s": "Sentence number 25 here",
+    "t": "IT:Sentence number 25 here"
+   },
+   {
+    "s": "Sentence number 26 here",
+    "t": "IT:Sentence number 26 here"
+   },
+   {
+    "s": "Sentence number 27 here",
+    "t": "IT:Sentence number 27 here"
+   },
+   {
+    "s": "Sentence number 28 here",
+    "t": "IT:Sentence number 28 here"
+   },
+   {
+    "s": "Sentence number 29 here",
+    "t": "IT:Sentence number 29 here"
+   },
+   {
+    "s": "Sentence number 3 here",
+    "t": "IT:Sentence number 3 here"
+   },
+   {
+    "s": "Sentence number 4 here",
+    "t": "IT:Sentence number 4 here"
+   },
+   {
+    "s": "Sentence number 5 here",
+    "t": "IT:Sentence number 5 here"
+   },
+   {
+    "s": "Sentence number 6 here",
+    "t": "IT:Sentence number 6 here"
+   },
+   {
+    "s": "Sentence number 7 here",
+    "t": "IT:Sentence number 7 here"
+   },
+   {
+    "s": "Sentence number 8 here",
+    "t": "IT:Sentence number 8 here"
+   },
+   {
+    "s": "Sentence number 9 here",
+    "t": "IT:Sentence number 9 here"
+   },
+   {
+    "s": "Thief",
+    "t": "Ladro"
+   }
+  ],
+  "init": [
+   {
+    "init": {
+     "device": "cpu",
+     "inter_threads": 1,
+     "intra_threads": 1,
+     "model": "model"
+    }
+   }
+  ],
+  "log": [
+   "e: translation of a batch failed",
+   "e: translation of a batch failed",
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: model loaded (1 threads)",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)",
+   "w: 2 lines failed 2 times: left in English until restart"
+  ]
+ },
+ "threads_default": {
+  "cpus_rule": [
+   true
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ]
+ },
+ "threads_many": {
+  "cpus_rule": [
+   true
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ]
+ },
+ "threads_zero": {
+  "cpus_rule": [
+   true
+  ],
+  "log": [
+   "i: Local Translator IT v0.10.0 started (protocol 2, result version 1, cache key it)",
+   "i: addon closed the connection: exiting",
+   "i: glossary e7b9f216dc792a7a (built-in default): 1 exact, 6 terms, 0 patterns",
+   "i: glossary sync: cache reset (0 lines)",
+   "i: map: 0 strings known",
+   "i: patch archive created from the v0.4 files in <t> s: v0, 0 reviewed, 0 automatic, 0 drop",
+   "i: patch v0: 0 reviewed, 0 automatic, 0 drop, 0 with the hash of the English; made with glossary - (different from yours) (ready in <t> s)"
+  ]
+ }
+}
