@@ -94,6 +94,8 @@ The only network connections made by the module are to this repository on GitHub
 
 The curated translations are in `patch/<language>/` ([`patch/it/`](patch/it) for Italian, `patch/pt_br/` for Brazilian Portuguese), split in pieces so that an update only downloads the pieces that changed. The patch contains no English game text.
 
+The translations of the patch are released under the [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) license (see [License](#license)).
+
 To report a wrong translation, open an issue with the text you see in game, the language and where you saw it.
 
 ## Glossary
@@ -105,6 +107,8 @@ Each language has its glossary in `glossary/glossary_<language>.json` ([Italian]
 - `patterns`: whole-text rules where `{X}` stands for one or more capitalized words, e.g. `"{X} Longbow": "Arco lungo {X}"`.
 
 The Brazilian Portuguese glossary keeps for now every name of the game in English.
+
+The glossaries are released under the [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) license, like the patch (see [License](#license)).
 
 Suggestions and corrections are welcome through issues or pull requests.
 
@@ -159,4 +163,6 @@ This is an unofficial community project. It is not affiliated with or endorsed b
 
 ## License
 
-The code of this project is released under the [MIT License](LICENSE). `text_translator.dll` and other third-party components and models keep their original authors' rights and licenses.
+- **Code:** the code of this project is released under the [MIT License](LICENSE).
+- **Translations:** the translations in [`patch/`](patch) and the glossaries in [`glossary/`](glossary) are released under the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/). If you reuse them, you must credit *GW2 Nexus Local Translator* with a link to this repository, you may not use them for commercial purposes, and you must share anything built on them under the same license. The license covers only the work of this project (the translations and their review): the original game texts belong to ArenaNet.
+- `text_translator.dll` and other third-party components and models keep their original authors' rights and licenses.
