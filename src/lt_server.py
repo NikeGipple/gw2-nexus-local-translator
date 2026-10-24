@@ -102,6 +102,11 @@ MAX_DOWNLOAD = 100_000_000
 # and the markers of the raw game strings such as [s], [the], [null], [pl:"Foci"], [f:"Goddess"]
 # (Text Translator sends them as they are; a broken marker can crash the game).
 TOKEN_RE = re.compile(r'%[A-Za-z]+\d*%|</?[A-Za-z][^<>\n]*>|\[[^\[\]\n]*\]')
+# Number ranges ("10–20", "2012–%str1%", "1253-1302", "%num1% - %num2%"): OPUS-MT breaks the dash
+# between two numbers ("10–20" -> "10 040220", "2012–%str1%" -> "2012/147/%str1%" in the copyright
+# line, key 1115532), so the whole range goes to the model as one placeholder (see Engine._protect).
+_RANGE_SIDE = r"(?:\d+(?:[.,]\d+)*(?:%%)?|%[A-Za-z]+\d*%)"
+RANGE_RE = re.compile(rf"(?<![\w.,]){_RANGE_SIDE}\s?[–-]\s?{_RANGE_SIDE}(?!\w)")
 # Version of the glossary protection rules, saved with the cache snapshot. When it grows, the
 # cached lines translated with the old rules are dropped once (see Engine.sync_glossary).
 #   2 = glossary terms glued to markup ("Large Bone[s]", "Plaza of<br>Dwayna") are protected
@@ -111,7 +116,8 @@ TOKEN_RE = re.compile(r'%[A-Za-z]+\d*%|</?[A-Za-z][^<>\n]*>|\[[^\[\]\n]*\]')
 #       and a lone "%" cuts the text after it
 #   5 = names with plural markers (no %num%) are translated in the SINGULAR and get Italian plural
 #       markers: 'Medaglia[pl:"Medaglie"] precisa[pl:"precise"]' (see plural_name)
-PROTECT_VERSION = 5
+#   6 = number ranges are protected (RANGE_RE): "© 2012–%str1%" became "© 2012/147/%str1%"
+PROTECT_VERSION = 6
 # Plural markers of the raw game strings: "Piece[s]" adds "s", "Box[pl:\"Boxes\"]" replaces the
 # word before it. The game applies [pl:"..."] to the translated text too (checked in game on
 # 2026-10-09: 'Gamberetto[pl:"Gamberetti"]' shows "Gamberetto" for 1 item, "Gamberetti" for more,
@@ -1446,7 +1452,8 @@ class Engine:
 
     def outdated(self, line: str, version: int) -> bool:
         """True if a translation made with protection rules `version` must be redone."""
-        return ((version < 5 and plural_name(line))
+        return ((version < 6 and RANGE_RE.search(line) is not None)
+                or (version < 5 and plural_name(line))
                 or (version < 3 and PLURAL_RE.search(line) is not None)
                 or (version < 2 and self._glued_term(line)))
 
@@ -1605,7 +1612,8 @@ class Engine:
             restore[ph] = match.group(0)
             return ph
 
-        protected = TOKEN_RE.sub(stash, line)
+        # number ranges first, whole: "2012–%str1%" is one placeholder, not "2012–" + "%str1%"
+        protected = TOKEN_RE.sub(stash, RANGE_RE.sub(stash, line))
         g = self.glossary
         for src, dst in g.terms:
             if src not in protected:  # cheap check first: almost no term occurs in a given line
@@ -1812,8 +1820,25 @@ class Progress:
             self.out.flush()
 
 
+# Lines of a multi-line text that may stay in English: names kept by the glossary, not sentences
+# the model failed on ("• 250 Vicious Fangs", "—Galrath", "+5%% Karma", "Ascalonian Catacombs").
+NAME_LINE_SMALL = {"of", "the", "and", "to", "de", "la", "von", "van", "a", "in", "on"}
+
+
+def name_line(line: str) -> bool:
+    """True if the line is only a name: after markup, bullet, number, "+5%%" or the dash of a
+    signature, at most 8 words that start with a capital letter or a digit (small linking words
+    like "of" allowed)."""
+    s = re.sub(r"<[^<>]*>|%%|%[a-z]+\d*%", " ", line)
+    s = re.sub(r"^[\s•\-—+:\d%]+", "", s)
+    words = re.findall(r"[^\s,():]+", s)
+    return 0 < len(words) <= 8 and all(
+        w[0].isupper() or w[0].isdigit() or w.lower() in NAME_LINE_SMALL for w in words)
+
+
 def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translations: dict[str, str],
-               translate_lines, label: str = "traduzione", batch: int = 0) -> tuple[int, int, int]:
+               translate_lines, label: str = "traduzione", batch: int = 0,
+               reject=None, report: list | None = None) -> tuple[int, int, int]:
     """Rebuild the 'auto' section by translating again the English text of every known string
     (map) with the current glossary.
 
@@ -1821,7 +1846,15 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
     translate_lines  function(list of lines) -> {line: translation}; it also saves its own cache,
                      so an interrupted run continues where it stopped
     Rows that would stay identical to the English text are skipped: they add nothing and would
-    publish English game text. Strings without English in the map keep their old entry.
+    publish English game text. So are multi-line rows with a line left in English, unless that
+    line is only a name (name_line: an item of a list, a signature, a stat): a sentence left in
+    English means the model failed on it. Strings without English in the map keep their old entry.
+    reject           optional function(key, English) -> reason, "" when the text is fine: rows with a
+                     reason (undecoded game data recognised by a filter) are not translated and,
+                     like every skipped row, leave 'auto' (into 'drop')
+    report           optional list: gets (key, English, why, detail, was in auto) for every skipped
+                     row; why = "filter" (reject), "garbled" (control characters), "empty" (no
+                     translation) or "english" (still, at least partly, in English)
 
     Returns (rows in auto, rows skipped, lines translated now).
     """
@@ -1833,12 +1866,19 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
     finally:
         m.close()
     g = glossary
+    rejected = {}
+    if reject:
+        for k, en in english.items():
+            why = reject(k, en)
+            if why:
+                rejected[k] = why
 
     def item(line: str) -> str:  # recipes are made from the item name (recipe_split)
         r = recipe_split(line)
         return r[1] if r else line
 
-    needed = sorted({line for en in english.values() for line in map(item, en.split("\n"))
+    needed = sorted({line for k, en in english.items() if k not in rejected
+                     for line in map(item, en.split("\n"))
                      if line not in translations and g.lookup(line) is None
                      and Engine._needs_translation(line)})
     log.info("build-auto: %d strings, %d lines to translate", len(english), len(needed))
@@ -1867,18 +1907,33 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
 
     auto = {k: v for k, v in patch.auto.items() if k not in english and k not in patch.strings}
     skipped = 0
+
+    def skip(key: int, en: str, why: str, detail: str = "") -> None:
+        nonlocal skipped
+        skipped += 1
+        if report is not None:
+            report.append((key, en, why, detail, key in patch.auto))
+
     for key, en in english.items():
+        if key in rejected:
+            skip(key, en, "filter", rejected[key])  # undecoded game data: never translated
+            continue
+        if GARBLED_RE.search(en):
+            skip(key, en, "garbled")  # undecoded game data: never published
+            continue
         lines = en.split("\n")
         outs = [result(line) for line in lines]
-        if GARBLED_RE.search(en) or not "\n".join(outs).strip():
-            skipped += 1  # undecoded game data or an empty result: never published
+        if not "\n".join(outs).strip():
+            skip(key, en, "empty")
             continue
         if "\n".join(outs).strip() in (en.strip(), resolve_plural(en).strip()) or any(
                 o.strip() in (e.strip(), resolve_plural(e).strip()) and Engine._needs_translation(e)
-                for e, o in zip(lines, outs)):
-            skipped += 1  # still (partly) in English: names kept as they are, failed lines
+                and not name_line(e) for e, o in zip(lines, outs)):
+            skip(key, en, "english")  # still (partly) in English: names kept as they are, failed lines
             continue
-        auto[key] = "\n".join(outs)
+        # same last check as _write_patch (lone "%" -> "%%"), so that a run with nothing new
+        # compares equal to the patch on disk and does not raise its version
+        auto[key] = fix_percent("\n".join(outs))
     # keys leaving 'auto' go into 'drop': players still holding their old text get it removed
     drop = (patch.drop | (set(patch.auto) - set(auto))) - set(auto) - set(patch.strings)
     if auto != patch.auto or drop != patch.drop or patch.glossary_fp != g.fingerprint:
