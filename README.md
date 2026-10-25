@@ -11,7 +11,7 @@ This module brings the game into languages that Guild Wars 2 does not offer:
 
 ## What makes this module different
 
-- **Local, on-the-fly translation.** Every text is translated on your own PC, as soon as the game shows it, with [OPUS-MT](https://github.com/Helsinki-NLP/Opus-MT) and [CTranslate2](https://github.com/OpenNMT/CTranslate2). It runs on the CPU: no GPU, no accounts, no API keys, and the game text never leaves your computer.
+- **Local, on-the-fly translation.** Every text is translated on your own PC, as soon as the game shows it, with [OPUS-MT](https://github.com/Helsinki-NLP/Opus-MT) and [CTranslate2](https://github.com/OpenNMT/CTranslate2). It runs on the CPU: no GPU, no accounts, no API keys. The game text stays on your computer, unless you deliberately choose to turn on the automatic upload (see [Map upload](#map-upload)).
 - **Corrected by hand.** Machine translation alone gets game names and terms wrong. Two files per language, published in this repository, fix that and update themselves at every game start:
   - the **glossary** keeps names and terms consistent in every sentence (for example *Lion's Arch* → *Arco del Leone* in Italian, while boons and proper names stay in English);
   - the **patch** holds curated translations, prepared in advance: they replace the machine translation and appear right away.
@@ -34,7 +34,8 @@ This module brings the game into languages that Guild Wars 2 does not offer:
 
 1. Go to the [latest release](../../releases/latest) and download the zip of your language:
    - Italian: `Local_Translator_<version>_IT.zip` (for example `Local_Translator_0.9.0_IT.zip`);
-   - Brazilian Portuguese: `Local_Translator_<version>_PT_BR.zip`.
+   - Brazilian Portuguese: `Local_Translator_<version>_PT_BR.zip`;
+   - Italian, helping the project: `Local_Translator_<version>_IT_autosend.zip`. It is the Italian zip with the map upload turned on (`--upload`): it sends to the project the new English texts you meet in game, so that they get translated and reviewed sooner. Read [Map upload](#map-upload) first and choose it only if you agree.
 
    These zips also set the module as active in Text Translator, with the recommended options. If you already use Text Translator and want to keep your settings, download instead `Local_Translator_<version>.zip` (all languages, Text Translator settings untouched), then choose the module in Text Translator's options, *Modules* tab.
 2. Extract it into your **Guild Wars 2** folder. The `addons` folder inside the zip merges with the one you already have; your other addons are not touched.
@@ -45,6 +46,8 @@ On the very first start the model of your language is downloaded and loaded, whi
 **Changing language.** You can install more than one language: each one is a separate module. Choose the one to use in Text Translator's options, *Modules* tab. The model of a language is downloaded only the first time that language starts.
 
 ### Updating from older versions
+
+Download the zip you use and extract it over the old one, as in the installation. If you used the *autosend* zip, updating with a normal zip turns the map upload off; download the *autosend* zip again to keep it on.
 
 - **v0.6 or older:** Text Translator v0.2.0 changed the module protocol and older modules stop working with it (Nexus updates Text Translator by itself). Download the newest release and extract it over the old one, as in the installation. After the update the texts translated on the fly before are checked once more, the first time you see them: nothing to do on your side.
 - **v0.2.x or older:** those versions can no longer download patch updates (the patch has grown past the size they can read) and keep using an old copy without any warning. Update as above. Updating is also recommended from v0.3 and v0.4, which download the whole patch at every update.
@@ -76,6 +79,7 @@ addons\
         patch_it.db                   curated translations (updated automatically)
         cache_it.jsonl                local translation cache
         map_it.db                     local map of the texts seen in game
+        upload_state.json             last text sent (autosend zip only)
       local_translator_it.log         module log
 ```
 
@@ -88,7 +92,7 @@ Brazilian Portuguese uses the same layout: `modules\local_translator_pt_br\`, `L
 - Text Translator saves the translations and shows them in game. The patch is saved in advance too, so its texts appear translated even the first time you see them.
 - When a game update changes an English text, the old translation is no longer used and the new text is translated again.
 
-The only network connections made by the module are to this repository on GitHub: the glossary and patch checks (at start and every few hours) and the one-time model download. Text Translator itself also connects to its author's server.
+The only network connections made by the module are to this repository on GitHub: the glossary and patch checks (at start and every few hours) and the one-time model download. Only if you turn on the automatic upload, the module also sends the new texts to the project's server (see [Map upload](#map-upload)). Text Translator itself also connects to its author's server.
 
 ## Translation patch
 
@@ -114,7 +118,25 @@ Suggestions and corrections are welcome through issues or pull requests.
 
 ## Your local files
 
-`cache.db`, `cache_<language>.jsonl` and `map_<language>.db` are built on your PC while you play and contain game text owned by ArenaNet. They are for your own use only: please do not share or publish them.
+`cache.db`, `cache_<language>.jsonl` and `map_<language>.db` are built on your PC while you play and contain game text owned by ArenaNet. They are for your own use only: please do not share or publish them. If you turn on the automatic upload, part of `map_<language>.db` is sent to the project only, which does not publish it (see [Map upload](#map-upload)).
+
+## Map upload
+
+**Off by default.** The module sends nothing anywhere unless `--upload` is in the `args` line of `module.toml`. You can add it yourself, or download `Local_Translator_<version>_IT_autosend.zip`: it is the normal Italian zip, and its only difference is this argument in `module.toml`. For now the map upload is available for Italian only.
+
+**By turning it on you agree** to contribute to the shared map of game texts, and to the sending of the data described here and in the [privacy notice](PRIVACY.md) to the project's server.
+
+**Why.** The patch translates in advance the texts that players actually meet in game. The texts met by many players tell the project what to translate and review next, and which texts a game update has changed.
+
+**What is sent.** For each text met in game since 5 October 2026: its string ID in the game, the English text and when it was last seen. Together with them, the language (`it`) and the version of the module. Nothing else: no translations, no account or character names, no settings, no ID of you or of your PC.
+
+**When.** 5 minutes after the game starts, then every 3 hours while you play, only the texts seen since the last upload. The module log says how many were sent (`map upload: N texts sent`).
+
+**What the server keeps.** Only the data above: it never stores your IP address. The project merges the uploads into its map of texts, which is not published. Details, including Cloudflare and DigitalOcean, how long data is kept and your rights, are in the [privacy notice](PRIVACY.md).
+
+**How to stop.** Remove `"--upload"` from the `args` line of `module.toml` (`args = []`), or install the normal zip over it, then restart the game.
+
+**Questions:** open an issue; for privacy requests write to privacy@kindling.nexus. The code that sends the texts is [`src/map_upload.py`](src/map_upload.py).
 
 ## Troubleshooting
 
@@ -123,7 +145,7 @@ Suggestions and corrections are welcome through issues or pull requests.
 - If texts stay in English right after the first launch, the model is probably still downloading.
 - If new texts stay in English, check *Pause Refreshes* in Text Translator's options (see [Smooth play](#smooth-play-pause-refreshes)): press **Refresh Now** or turn it off.
 - If the game stutters every few seconds, turn **Pause Refreshes** on.
-- Advanced: the `args` line of `module.toml` accepts `--threads N` (CPU threads used by the translator, default 2) and `--stats-every SECONDS` (writes a performance line in the log every SECONDS, default 300). Keep the arguments already there: for example, in Brazilian Portuguese, `args = ["--lang", "pt_br", "--threads", "1"]`.
+- Advanced: the `args` line of `module.toml` accepts `--threads N` (CPU threads used by the translator, default 2) and `--stats-every SECONDS` (writes a performance line in the log every SECONDS, default 300). Keep the arguments already there: for example, in Brazilian Portuguese, `args = ["--lang", "pt_br", "--threads", "1"]`. `--upload` turns the map upload on (see [Map upload](#map-upload)).
 
 ## Source code
 
@@ -133,7 +155,8 @@ The source code of the module is in [`src/`](src):
 - `patch_db.py`: the local patch archive (`patch_<language>.db`), its download piece by piece and its application to `cache.db`;
 - `lt_server.py`: languages, glossary, patch format, local map and the OPUS-MT engine, used by the module as a library;
 - `plurale_it.py`: Italian plural rules, so item names get both forms (`Medaglia[pl:"Medaglie"]`, the game picks the right one);
-- `text_translator/`: the `module.toml` and the initial `settings.toml` shipped in the zip (Italian; Brazilian Portuguese in `text_translator/pt_br/`).
+- `map_upload.py`: the map upload of the *autosend* zip (see [Map upload](#map-upload)), used only with `--upload`;
+- `text_translator/`: the `module.toml` and the initial `settings.toml` shipped in the zip (Italian; Brazilian Portuguese in `text_translator/pt_br/`; the `module.toml` of the *autosend* zip in `text_translator/autosend/`).
 
 The language comes from `--lang` in `module.toml` or, without it, from the name of the module folder (`local_translator_<language>`).
 
@@ -145,6 +168,8 @@ pyinstaller --noconsole --onedir --name Local_Translator_IT --paths src --collec
 ```
 
 Then copy the content of `dist\Local_Translator_IT\` and `src\text_translator\module.toml` into `addons\text_translator\modules\local_translator_it\`.
+
+For the *autosend* zip, copy `src\text_translator\autosend\module.toml` instead of `src\text_translator\module.toml`.
 
 For Brazilian Portuguese use `--name Local_Translator_PT_BR` without `--add-data`, then copy `dist\Local_Translator_PT_BR\` and `src\text_translator\pt_br\module.toml` into `addons\text_translator\modules\local_translator_pt_br\`.
 
