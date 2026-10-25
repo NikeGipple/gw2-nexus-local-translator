@@ -28,6 +28,10 @@ start with their string ID, "44547 - Bambini"; the file holds "text" or "all", s
 Contributors (file IT\\contributor.json, see editor.py): the correction page on 127.0.0.1 saves
 suggestions into map_it.db, shown in game at once and kept over the patch until the patch entry
 of their key changes (lt_server.SUGGESTIONS_SCHEMA).
+
+Map upload (only with "--upload" in module.toml, the "autosend" zip): the new rows of map_it.db
+(string ID, English text, when seen) go to the project's collector every few hours, in a thread
+of their own (map_upload.py). Without "--upload" nothing is ever sent.
 """
 from __future__ import annotations
 
@@ -50,8 +54,9 @@ import lt_server as lt  # noqa: E402
 from patch_db import (CachePatch, PieceUpdater, SHOW_MODES, has_table, key_tag,  # noqa: E402
                       sync_key_tags)
 import editor  # noqa: E402
+import map_upload  # noqa: E402
 
-VERSION = "0.10.1"       # version of the release: raise it at every new zip (shown in the log)
+VERSION = "0.11.0"       # version of the release: raise it at every new zip (shown in the log)
 PROTOCOL = 2              # Text Translator v0.2.0 (texts carry the hash of the English)
 SOURCE_LANG = 0          # English: the game must be set to English
 RESULT_VERSION = 1       # raise it to make the addon ask again for every cached text
@@ -595,6 +600,12 @@ def main() -> int:
                     help="CPU threads for the model (default: a quarter of the CPUs, at most 2)")
     ap.add_argument("--stats-every", type=int, default=STATS_EVERY, metavar="SECONDS",
                     help=f"seconds between two 'stats' lines in the log (default {STATS_EVERY}, min 10)")
+    ap.add_argument("--upload", action="store_true",
+                    help="send the new rows of the map (string ID, English, when seen) to the "
+                         "project's collector (the 'autosend' zip; see README, 'Map upload')")
+    ap.add_argument("--upload-url", default=map_upload.UPLOAD_URL, help=argparse.SUPPRESS)  # tests
+    ap.add_argument("--upload-first", type=float, default=map_upload.FIRST_DELAY,
+                    help=argparse.SUPPRESS)  # tests: seconds before the first round
     ap.add_argument("--export-review", type=Path, metavar="CSV",
                     help="developers: write the ID/English/translation map of this module to a CSV, then exit")
     ap.add_argument("--import-review", type=Path, metavar="CSV",
@@ -785,6 +796,15 @@ def main() -> int:
 
     threading.Thread(target=cache_db_watcher, args=(patch, args.cache_db), daemon=True,
                      name="cache-db").start()
+    if args.upload:
+        if keymap is None:
+            log.warning("map upload: no map, nothing to send")
+        else:
+            try:
+                map_upload.MapUploader(keymap.path, args.lang_dir, lang.code, VERSION, args.upload_url,
+                                       max(0.0, args.upload_first)).start()
+            except ValueError as exc:
+                log.warning("map upload off: %s", exc)
     if not args.no_update:
         def glossary_changed() -> None:
             engine.sync_glossary()
