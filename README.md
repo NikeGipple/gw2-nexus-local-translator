@@ -34,8 +34,7 @@ This module brings the game into languages that Guild Wars 2 does not offer:
 
 1. Go to the [latest release](../../releases/latest) and download the zip of your language:
    - Italian: `Local_Translator_<version>_IT.zip` (for example `Local_Translator_0.9.0_IT.zip`);
-   - Brazilian Portuguese: `Local_Translator_<version>_PT_BR.zip`;
-   - Italian, helping the project: `Local_Translator_<version>_IT_autosend.zip`. It is the Italian zip with the map upload turned on (`--upload`): it sends to the project the new English texts you meet in game, so that they get translated and reviewed sooner. Read [Map upload](#map-upload) first and choose it only if you agree.
+   - Brazilian Portuguese: `Local_Translator_<version>_PT_BR.zip`.
 
    These zips also set the module as active in Text Translator, with the recommended options. If you already use Text Translator and want to keep your settings, download instead `Local_Translator_<version>.zip` (all languages, Text Translator settings untouched), then choose the module in Text Translator's options, *Modules* tab.
 2. Extract it into your **Guild Wars 2** folder. The `addons` folder inside the zip merges with the one you already have; your other addons are not touched.
