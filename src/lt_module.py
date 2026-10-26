@@ -52,7 +52,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))  # lt_server.py sits next to this file
 import lt_server as lt  # noqa: E402
 from patch_db import (CachePatch, PieceUpdater, SHOW_MODES, has_table, key_tag,  # noqa: E402
-                      sync_key_tags)
+                      sync_key_tags, untagged)
 import editor  # noqa: E402
 import map_upload  # noqa: E402
 
@@ -220,19 +220,42 @@ class ModuleEngine(lt.Engine):
     """lt_server.Engine whose glossary cleanup works on cache.db (rows found by their translated text)."""
 
     def _purge_addon_db(self, texts: set[str]) -> None:
-        db = self.addon_db
         texts = {t for t in texts if len(t.strip()) >= 3}
-        if not texts or not has_table(db):
+        if not texts:
+            return
+
+        def find(con: sqlite3.Connection) -> set[int]:
+            doomed: set[int] = set()
+            for t in texts:
+                doomed.update(k for (k,) in con.execute(
+                    "SELECT id FROM translations WHERE cache_key = ? AND instr(text, ?) > 0",
+                    (CACHE_KEY, t)))
+            return doomed
+
+        self._forget(find, "glossary changed")
+
+    def _purge_addon_lines(self, lines: set[str]) -> None:
+        if not lines:
+            return
+
+        def find(con: sqlite3.Connection) -> set[int]:
+            return {k for k, text in con.execute(
+                        "SELECT id, text FROM translations WHERE cache_key = ?", (CACHE_KEY,))
+                    if any(line in lines for line in untagged(k, text).split("\n"))}
+
+        self._forget(find, "left in English or with invented text, translated again")
+
+    def _forget(self, find, why: str) -> None:
+        """Delete from cache.db the rows that find(connection) returns, except the reviewed rows
+        of the patch and its automatic ones made with this glossary: the addon asks them again."""
+        db = self.addon_db
+        if not has_table(db):
             return
         try:
             con = sqlite3.connect(str(db), timeout=10)
             try:
                 with con:
-                    doomed: set[int] = set()
-                    for t in texts:
-                        doomed.update(k for (k,) in con.execute(
-                            "SELECT id FROM translations WHERE cache_key = ? AND instr(text, ?) > 0",
-                            (CACHE_KEY, t)))
+                    doomed = find(con)
                     if self.patch:  # reviewed rows, and automatic ones made with this glossary
                         doomed -= self.patch.protected(doomed)
                     if self.patch:
@@ -241,8 +264,8 @@ class ModuleEngine(lt.Engine):
                                     [(CACHE_KEY, k) for k in doomed])
             finally:
                 con.close()
-            log.info("cache.db: %d old translations removed (glossary changed; "
-                     "asked again at next game start)", len(doomed))
+            log.info("cache.db: %d old translations removed (%s; asked again at next game start)",
+                     len(doomed), why)
         except Exception as exc:  # noqa: BLE001
             log.warning("cannot clean %s: %s", db, exc)
 
@@ -542,12 +565,30 @@ class Dispatcher:
             try:
                 # answers from a suggestion stay out of the map: its texts keep the translation of
                 # the patch or of the model, the one undoing the suggestion goes back to
-                self.keymap.save([(k, en, it, "live") for k, _h, en, it in out
-                                   if en.strip() and en != it and k not in self.suggested])
+                self.keymap.save(map_rows(out, self.suggested))
                 self.keymap.learn_english([(k, en) for k, _h, en, _it in out if k in self.suggested])
             except Exception as exc:  # noqa: BLE001
                 log.debug("map save failed: %s", exc)
         self.suggested.difference_update(k for k, _h, _en, _it in out)
+
+
+def map_rows(out: list[tuple[int, int, str, str]], suggested: set[int]
+             ) -> list[tuple[int, str, str | None, str]]:
+    """Rows of the map for these answers (key, hash, English, translation): (key, English,
+    translation, 'live'). A text answered in English (a name the glossary keeps, a line the model
+    failed on) goes in with no translation (NULL, like the rows of the collector): the key and its
+    English are what the map is for, and the developer translation (option 5) needs them. Not
+    saved: answers from a suggestion, empty texts and texts with nothing to translate (undecoded
+    game data, numbers and markup only)."""
+    rows: list[tuple[int, str, str | None, str]] = []
+    for k, _h, en, it in out:
+        if k in suggested or not en.strip():
+            continue
+        if en != it:
+            rows.append((k, en, it, "live"))
+        elif lt.Engine._needs_translation(en):
+            rows.append((k, en, None, "live"))
+    return rows
 
 
 def cache_db_watcher(patch: CachePatch, cache_db: Path) -> None:

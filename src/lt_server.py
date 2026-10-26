@@ -117,7 +117,14 @@ RANGE_RE = re.compile(rf"(?<![\w.,]){_RANGE_SIDE}\s?[–-]\s?{_RANGE_SIDE}(?!\w)
 #   5 = names with plural markers (no %num%) are translated in the SINGULAR and get Italian plural
 #       markers: 'Medaglia[pl:"Medaglie"] precisa[pl:"precise"]' (see plural_name)
 #   6 = number ranges are protected (RANGE_RE): "© 2012–%str1%" became "© 2012/147/%str1%"
-PROTECT_VERSION = 6
+#   7 = lines left in English in the cache (translation = English text) are translated again
+#       once: most are failures of the modules before v0.8.1 (a lost placeholder kept the whole
+#       line in English, e.g. the last sentence of a dialogue dropped by the model), that the
+#       translation in pieces now gets right; the others come back the same and, being asked
+#       again, enter the map (lt_module.map_rows)
+#   8 = short lines (INVENTED_WORDS) with text invented by the model ("Rheoln" -> "RheolinCity in
+#       Minnesota USA") stay in English; the ones already in the cache are translated again once
+PROTECT_VERSION = 8
 # Plural markers of the raw game strings: "Piece[s]" adds "s", "Box[pl:\"Boxes\"]" replaces the
 # word before it. The game applies [pl:"..."] to the translated text too (checked in game on
 # 2026-10-09: 'Gamberetto[pl:"Gamberetti"]' shows "Gamberetto" for 1 item, "Gamberetti" for more,
@@ -370,12 +377,28 @@ def _english_numbers(text: str) -> set[int]:
 
 def invented_piece(src: str, out: str) -> bool:
     """The model added text that is not in a short piece: "Tide Turner" -> "Tide TurnerCity in New
-    Jersey USA", "Season Twenty-Five" -> "Season 22 Episode 17". Then the piece stays in English."""
-    if len(out.split()) > 2 * len(src.split()) + 1:
+    Jersey USA", "Season Twenty-Five" -> "Season 22 Episode 17". Then the piece stays in English.
+    Also used for whole lines of at most INVENTED_WORDS words (Engine._translate_plain).
+    The English followed by lower-case letters only is an Italian word with the same root, not
+    invented text: "Percent" -> "Percentuale", "Terror" -> "Terrorismo"."""
+    # words of the English also when glued by "..." or an apostrophe ("Silas...play dead." -> 3,
+    # "Zojja's Wristguards" -> 3): Italian needs more words for them
+    words = max(len(src.split()), len(re.findall(r"\w+", src)))
+    if len(out.split()) > 2 * words + 1:
         return True
-    if out.startswith(src.rstrip()) and len(out) > len(src.rstrip()) + 3:
+    head = src.rstrip()
+    rest = out[len(head):]
+    if out.startswith(head) and len(rest) > 3 and (rest[0].isupper() or not rest.isalpha()):
         return True
     return bool({int(n) for n in re.findall(r"\d+", out)} - _english_numbers(src))
+
+
+# Whole lines up to this many words get the invented_piece check too: "Rheoln" became
+# "RheolinCity in Minnesota USA", "Nallas" "NallasCity in New Jersey USA" (the model's habit with
+# names it does not know). Longer lines are sentences: there the check would reject good translations.
+INVENTED_WORDS = 3
+# Markers the module adds to a translation: plural forms and the feminine of NPC names.
+ADDED_MARKER_RE = re.compile(r'\[(?:pl|f):"[^"\[\]\n]*"\]')
 
 
 def same_case(src: str, out: str) -> str:
@@ -1481,6 +1504,7 @@ class Engine:
         new_terms = dict(self.glossary.terms)
         new_exact = dict(self.glossary.exact)
         purge: set[str] = set()  # old translated texts to remove from the addon database
+        english: set[str] = set()  # lines left in English: removed from it line by line
         with self.cv:
             self.gen += 1
             old = self._read_snapshot() if self.snapshot_path else None
@@ -1520,6 +1544,24 @@ class Engine:
                     if redo:
                         log.info("glossary sync: %d cached lines made with older protection "
                                  "rules dropped (translated again)", len(redo))
+                    if old["protect"] < 7:
+                        english = {s for s, t in self.cache.items()
+                                   if t == s and self._needs_translation(s)}
+                        for s in english:
+                            del self.cache[s]
+                        dropped += len(english)
+                        if english:
+                            log.info("glossary sync: %d cached lines left in English dropped "
+                                     "(translated again)", len(english))
+                    if old["protect"] < 8:
+                        invented = {s: t for s, t in self.cache.items() if self._invented(s, t)}
+                        for s in invented:
+                            del self.cache[s]
+                        english |= set(invented.values())  # their wrong translations, line by line
+                        dropped += len(invented)
+                        if invented:
+                            log.info("glossary sync: %d cached short lines with invented text "
+                                     "dropped (translated again)", len(invented))
             upgrade = old is not None and old["protect"] < PROTECT_VERSION
             try:
                 if dropped or purge or (changed is None and self.cache_path
@@ -1541,11 +1583,26 @@ class Engine:
                      len(changed), dropped, len(self.cache))
         if purge:
             self._purge_addon_db(purge)
+        if english:
+            self._purge_addon_lines(english)
 
     def _purge_addon_db(self, texts: set[str]) -> None:
         """Remove old translations containing these texts from the addon's database.
         Implemented by lt_module.ModuleEngine; without an addon database there is nothing to do."""
 
+    def _purge_addon_lines(self, lines: set[str]) -> None:
+        """Remove from the addon's database the texts with one of these lines (whole lines, so
+        thousands of them cost one pass on the database). Implemented by lt_module.ModuleEngine."""
+
+
+    @classmethod
+    def _invented(cls, line: str, out: str) -> bool:
+        """True if `out`, the translation of a short line, has text the model invented."""
+        if out == line or not cls._needs_translation(line):
+            return False
+        src = english_singular(line) if plural_name(line) else resolve_plural(line)
+        return (len(src.split()) <= INVENTED_WORDS
+                and invented_piece(src, ADDED_MARKER_RE.sub("", out)))
 
     # -- lines -------------------------------------------------------------------------------
     @staticmethod
@@ -1689,6 +1746,10 @@ class Engine:
                 continue
             for ph, original in restore.items():
                 out = out.replace(ph, original)
+            # a short line with text the model made up ("Rheoln" -> "RheolinCity in Minnesota USA")
+            if len(src.split()) <= INVENTED_WORDS and invented_piece(src, out):
+                results[line] = line
+                continue
             # final full stop added by the model to a name or title ("Dragon" -> "Dragão.")
             if out.endswith(".") and not out.endswith("..") and not line.rstrip().endswith(END_PUNCT):
                 out = out[:-1]
