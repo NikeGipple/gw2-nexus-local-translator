@@ -466,12 +466,17 @@ class Glossary:
     feminine: role names and their feminine {"Cittadino": "Cittadina"} (see feminine(); not part
               of the fingerprint: older modules ignore it and the patch stays valid for them)
     terms:  words kept/translated as given inside sentences {"Lion's Arch": "Arco del Leone"}
-    patterns: whole-line rules, {X} = one or more capitalized words (item prefixes)
+    patterns: whole-line rules, {X} = one or more capitalized words (item prefixes) or a number
               {"{X} Longbow": "Arco lungo {X}"}  ->  "Pact Longbow" = "Arco lungo Pact"
+              {"+{X}%% Burning Duration": "+{X}%% Durata del Burning"}
+                  ->  "+4%% Burning Duration" = "+4%% Durata del Burning"
     """
 
-    # {X}: capitalized words such as "Pact", "Strong Bandit", "Hunter's"
-    WORDS = r"[A-Z][\w'’-]*(?: [A-Z][\w'’-]*)*"
+    # {X}: capitalized words such as "Pact", "Strong Bandit", "Hunter's", or a number such as "70" or
+    # "2.5" (stats and durations: "+{X} Power", "-{X}%% Incoming Stun Duration"; the sign and the %%
+    # are written in the pattern). Older modules load such patterns too: their {X} never matches a
+    # number, so the line is just translated as before.
+    WORDS = r"(?:[A-Z][\w'’-]*(?: [A-Z][\w'’-]*)*|\d+(?:[.,]\d+)?)"
     # markup around a whole line, e.g. <c=@reminder>Pact Longbow</c> or %str1%Pact Longbow%str2%
     WRAP_RE = re.compile(
         r"((?:<[^<>\n]*>|%[A-Za-z]+\d*%)*)(.*?)((?:<[^<>\n]*>|%[A-Za-z]+\d*%)*)", re.S)
