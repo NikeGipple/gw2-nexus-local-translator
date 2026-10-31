@@ -22,6 +22,8 @@ This module brings the game into languages that Guild Wars 2 does not offer:
 
 > **Status:** early testing. Expect rough edges and breaking changes.
 
+> **To ArenaNet:** this is a free, non-commercial fan project: nobody earns anything from it. It is made in good faith to let more players enjoy Guild Wars 2 in their own language. If anything here is a problem for you, please contact us, publicly with an [issue](../../issues) or privately at EMAIL. We will reply quickly and change or remove it.
+
 ## Requirements
 
 - Guild Wars 2 on Windows (64-bit), **game language set to English**

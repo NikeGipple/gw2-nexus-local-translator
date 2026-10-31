@@ -46,7 +46,7 @@ def raw_url(path: str, branch: str = DEFAULT_BRANCH) -> str:
 # Italian is the default of the developer tools; the module never falls back to it (lt_module).
 class Language:
     def __init__(self, code: str, cache_key: str, label: str, model: str, recipe: dict[str, str],
-                 article: str, plural: bool) -> None:
+                 article: str, plural: bool, mini: str | None = None) -> None:
         self.code = code            # folder local_translator_<code>, files *_<code>, patch/<code>/
         self.cache_key = cache_key  # Text Translator's cache key (shown in its menu)
         self.label = label          # in the log
@@ -55,6 +55,7 @@ class Language:
         self.recipe = recipe        # Italian/Portuguese head of "Recipe: X" (see recipe_split)
         self.article = re.compile(article, re.IGNORECASE)  # articles dropped from names
         self.plural = plural        # plural markers for names (plurale_it): Italian only for now
+        self.mini = mini            # head of "Mini X" (see recipe_split); None = translated whole
 
     def file(self, stem: str, ext: str) -> str:
         """glossary + .json -> glossary_it.json / glossary_pt_br.json"""
@@ -65,7 +66,7 @@ LANGUAGES = {
     "it": Language("it", "it", "IT", "model-it-v1/opus-mt-en-it-ct2.zip",
                    {"Recipe": "Ricetta: ", "Recipes": "Ricette: ",
                     "Recipe[s]": 'Ricetta[pl:"Ricette"]: '},
-                   r"(?:(?:il|lo|la|i|gli|le|un|uno|una) |(?:l|un)['’])", plural=True),
+                   r"(?:(?:il|lo|la|i|gli|le|un|uno|una) |(?:l|un)['’])", plural=True, mini="Mini "),
     # model: OPUS-MT Tatoeba eng-por (opus-2021-02-18), label >>pob<< in its config.json
     "pt_br": Language("pt_br", "pt-BR", "PT-BR", "model-pt-br-v1/opus-mt-en-pt-br-ct2.zip",
                       {"Recipe": "Receita: ", "Recipes": "Receitas: ",
@@ -124,7 +125,9 @@ RANGE_RE = re.compile(rf"(?<![\w.,]){_RANGE_SIDE}\s?[–-]\s?{_RANGE_SIDE}(?!\w)
 #       again, enter the map (lt_module.map_rows)
 #   8 = short lines (INVENTED_WORDS) with text invented by the model ("Rheoln" -> "RheolinCity in
 #       Minnesota USA") stay in English; the ones already in the cache are translated again once
-PROTECT_VERSION = 8
+#   9 = "Mini X" names are made from the translation of X, like recipes (recipe_split): the model
+#       wrote "Piccola Choya blu" for "Mini Blue Choya"; the cached ones are translated again once
+PROTECT_VERSION = 9
 # Plural markers of the raw game strings: "Piece[s]" adds "s", "Box[pl:\"Boxes\"]" replaces the
 # word before it. The game applies [pl:"..."] to the translated text too (checked in game on
 # 2026-10-09: 'Gamberetto[pl:"Gamberetti"]' shows "Gamberetto" for 1 item, "Gamberetti" for more,
@@ -271,17 +274,47 @@ def drop_article(text: str, english: str) -> str:
 # "Recipe: X" / "Recipe[s]: X": the item name is translated on its own (the same translation as
 # the item itself, glossary patterns included) and gets the Italian prefix.
 RECIPE_RE = re.compile(r"(Recipe(?:\[s\]|s)?): (\S.*)")
+# "Mini X" (miniatures): the same, with "Mini" kept in front. Translated whole, more than half of
+# the 1,260 "Mini" names of the map lost it ("Mini Blue Choya" -> "Piccola Choya blu"). A sentence
+# that starts with "Mini" ("Mini jackal pups are handcrafted...") is not a name.
+MINI_RE = re.compile(r"Mini ([A-Z0-9][^<>]*)")
+SENTENCE_END_RE = re.compile(r"(?<!\bMr)(?<!\bMrs)(?<!\bMs)(?<!\bDr)(?<!\bSt)[.!?](?:\s|$)")
 
 
 def recipe_split(line: str) -> tuple[str, str, str] | None:
-    """(Italian head with the markup before, English item name, markup after) or None."""
-    if "Recipe" not in line or "\n" in line:
+    """(Italian head with the markup before, English item name, markup after) or None:
+    "Recipe[s]: X" and "Mini X"."""
+    if "\n" in line or ("Recipe" not in line and "Mini " not in line):
         return None
     pre, core, post = Glossary.WRAP_RE.fullmatch(line).groups()
     m = RECIPE_RE.fullmatch(core)
+    if m:
+        return pre + LANG.recipe[m.group(1)], m.group(2), post
+    m = MINI_RE.fullmatch(core) if LANG.mini else None
+    if m and not SENTENCE_END_RE.search(m.group(1)):
+        return pre + LANG.mini, m.group(1), post
+    return None
+
+
+def recipe_name(head: str, text: str, english: str) -> str:
+    """Translated name `text` (of the English `english`) as it goes after `head`: without article;
+    after "Mini" with a lower case initial ("Mini orso polare"), unless its first word is English
+    as in the original ("Mini Choya blu", "Mini Drake di fiume")."""
+    text = drop_article(text, english)
+    if not (LANG.mini and head.endswith(LANG.mini)):
+        return text
+    m = re.match(r"[A-ZÀ-ÖØ-Þ][\w'’-]*", text)
     if not m:
-        return None
-    return pre + LANG.recipe[m.group(1)], m.group(2), post
+        return text
+    # the first word is one of the English name, also in its plural form ("Dhuum[s]" -> "Dhuums",
+    # "Rox[pl:\"Roxes\"]" -> "Rox"): a name of GW2, it stays as it is
+    w = m.group(0).casefold()
+    words = re.findall(r"[\w'’-]+", resolve_plural(english) + " " + english_singular(english))
+    if any(w in (e.casefold(), e.casefold() + "s") for e in words):
+        return text
+    # markers glued to the first word (plural, feminine) start in lower case too
+    rest = re.sub(r'^((?:\[(?:pl|f):"[^"\[\]\n]*"\])*)', lambda k: re.sub(r':"(.)', lambda c: ':"' + c.group(1).lower(), k.group(1)), text[m.end():])
+    return text[:1].lower() + text[1:m.end()] + rest
 
 
 # --- Lines translated in pieces --------------------------------------------------------------------
@@ -466,6 +499,13 @@ class Glossary:
     feminine: role names and their feminine {"Cittadino": "Cittadina"} (see feminine(); not part
               of the fingerprint: older modules ignore it and the patch stays valid for them)
     terms:  words kept/translated as given inside sentences {"Lion's Arch": "Arco del Leone"}
+    any_case: single words that also count in lower case, with the translation in lower case too
+             ["Charr", "Rune"]: "charr" = "charr", "rune" = "runa" (terms of two or more words get
+             their variants anyway, see case_variants). Not part of the fingerprint.
+    advice:  advice for the developer's model (option 5) when the word appears in a line, e.g.
+             {"ascended": "The adjective \"ascended\" ... agreeing with its noun ..."}: words that
+             cannot be a fixed term (an adjective that agrees). Not used by the module, not part of
+             the fingerprint (like feminine).
     patterns: whole-line rules, {X} = one or more capitalized words (item prefixes) or a number
               {"{X} Longbow": "Arco lungo {X}"}  ->  "Pact Longbow" = "Arco lungo Pact"
               {"+{X}%% Burning Duration": "+{X}%% Durata del Burning"}
@@ -489,6 +529,8 @@ class Glossary:
         self.fingerprint = ""  # identifies the glossary content (see fingerprint_of)
         self.feminine: dict[str, str] = {}  # role name -> feminine, lower case keys (see feminine())
         self._term_rx: dict[str, re.Pattern] = {}  # compiled term regexes, built once per term
+        self.problems: list[str] = []  # entries skipped by the last load (see load_dict)
+        self.advice: dict[str, str] = {}  # word -> advice for the developer's model (see above)
 
     def term_regex(self, src: str) -> re.Pattern:
         """Whole-word regex for a glossary term, compiled only the first time it is needed.
@@ -516,22 +558,64 @@ class Glossary:
         fem = data.get("feminine", {})
         if not all(isinstance(x, dict) for x in (exact, terms, patterns, fem)):
             raise ValueError("glossary: 'exact', 'terms', 'patterns' and 'feminine' must be objects")
+        # An entry written badly (a pattern without {X} or with two, an empty term) is skipped with
+        # a warning instead of refusing the whole glossary: before, one bad entry made every player
+        # keep the old glossary ("glossary update skipped") until it was fixed.
+        problems: list[str] = []
         compiled = []
         for k, v in patterns.items():
             k, v = str(k), str(v)
-            if "{X}" not in k:
-                raise ValueError(f"glossary pattern without {{X}}: {k!r}")
+            n = k.count("{X}")
+            if n != 1:
+                problems.append(f"pattern with {n} {{X}} instead of 1: {k!r}")
+                continue
             rx = re.escape(k).replace(re.escape("{X}"), f"(?P<X>{self.WORDS})")
-            compiled.append((re.compile(rx), v))
+            try:
+                compiled.append((re.compile(rx), v))
+            except re.error as exc:
+                problems.append(f"pattern {k!r}: {exc}")
         self.exact = {str(k): str(v) for k, v in exact.items()}
         terms = {str(k): str(v) for k, v in terms.items()}
+        for k in [k for k in terms if not k.strip()]:
+            problems.append(f"empty term (translation {terms.pop(k)!r})")
+        # any_case: the lower case form goes right after its word, as if written by hand
+        any_case = data.get("any_case", [])
+        if not isinstance(any_case, list):
+            problems.append("'any_case' must be a list of words")
+            any_case = []
+        lower: dict[str, str] = {}
+        for k in any_case:
+            k = str(k).strip()
+            if k not in terms:
+                problems.append(f"any_case word without its term: {k!r}")
+                continue
+            low = k[:1].lower() + k[1:]
+            if low != k and low not in terms:
+                v = terms[k]
+                lower[k] = v[:1].lower() + v[1:]
+        if lower:
+            terms = {kk: vv for k, v in terms.items()
+                     for kk, vv in ([(k, v)] + ([(k[:1].lower() + k[1:], lower[k])] if k in lower else []))}
         terms.update(self.case_variants(terms))
         # longest first, so "Lion's Arch Keep" wins over "Lion's Arch"
         self.terms = sorted(terms.items(), key=lambda kv: -len(kv[0]))
         self.patterns = sorted(compiled, key=lambda p: -len(p[0].pattern))
         self.feminine = {str(k).strip().lower(): str(v).strip() for k, v in fem.items()
                          if str(k).strip() and str(v).strip()}
+        advice = data.get("advice", {})
+        if not isinstance(advice, dict):
+            problems.append("'advice' must be an object {word: advice}")
+            advice = {}
+        self.advice = {}
+        for k, v in advice.items():
+            if str(k).strip() and str(v).strip():
+                self.advice[str(k).strip()] = str(v).strip()
+            else:
+                problems.append(f"empty advice entry: {k!r}")
         self.fingerprint = self.fingerprint_of(data)
+        self.problems = problems
+        if problems:
+            log.warning("glossary: %d entries skipped: %s", len(problems), "; ".join(problems[:5]))
         self.version += 1
 
     @staticmethod
@@ -1480,7 +1564,8 @@ class Engine:
 
     def outdated(self, line: str, version: int) -> bool:
         """True if a translation made with protection rules `version` must be redone."""
-        return ((version < 6 and RANGE_RE.search(line) is not None)
+        return ((version < 9 and recipe_split(line) is not None and "Mini " in line)
+                or (version < 6 and RANGE_RE.search(line) is not None)
                 or (version < 5 and plural_name(line))
                 or (version < 3 and PLURAL_RE.search(line) is not None)
                 or (version < 2 and self._glued_term(line)))
@@ -1712,7 +1797,7 @@ class Engine:
         for line, (head, name, tail) in recipes.items():
             fixed_name = g.lookup(name)
             it = fixed_name if fixed_name is not None else results.get(name, self.cache.get(name, name))
-            results[line] = head + drop_article(it, name) + tail
+            results[line] = head + recipe_name(head, it, name) + tail
         done.update({t: results[t] for t in texts if t in results})
         for line, parts in pieces.items():
             results[line] = join_pieces(parts, done, fixed)
@@ -1904,7 +1989,8 @@ def name_line(line: str) -> bool:
 
 def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translations: dict[str, str],
                translate_lines, label: str = "traduzione", batch: int = 0,
-               reject=None, report: list | None = None) -> tuple[int, int, int]:
+               reject=None, report: list | None = None,
+               reviewed: set[str] | None = None) -> tuple[int, int, int]:
     """Rebuild the 'auto' section by translating again the English text of every known string
     (map) with the current glossary.
 
@@ -1921,6 +2007,8 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
     report           optional list: gets (key, English, why, detail, was in auto) for every skipped
                      row; why = "filter" (reject), "garbled" (control characters), "empty" (no
                      translation) or "english" (still, at least partly, in English)
+    reviewed         optional set of lines whose translation in `translations` was reviewed: they
+                     are used whole, also when they are recipes or "Mini" names (recipe_split)
 
     Returns (rows in auto, rows skipped, lines translated now).
     """
@@ -1939,8 +2027,10 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
             if why:
                 rejected[k] = why
 
+    reviewed = reviewed or set()
+
     def item(line: str) -> str:  # recipes are made from the item name (recipe_split)
-        r = recipe_split(line)
+        r = None if line in reviewed else recipe_split(line)
         return r[1] if r else line
 
     needed = sorted({line for k, en in english.items() if k not in rejected
@@ -1964,9 +2054,9 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
             log.info("build-auto: %d of %d lines translated", done, len(needed))
 
     def result(line: str) -> str:
-        r = recipe_split(line)
+        r = None if line in reviewed else recipe_split(line)
         if r:
-            return r[0] + drop_article(result(r[1]), r[1]) + r[2]
+            return r[0] + recipe_name(r[0], result(r[1]), r[1]) + r[2]
         fixed = g.lookup(line)
         return fixed if fixed is not None else feminine(
             masculine(fix_percent(translations.get(line, line), line)), g.feminine)
