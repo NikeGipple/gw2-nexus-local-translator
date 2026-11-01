@@ -2,11 +2,13 @@
 
 A translation module for [**Text Translator**](https://github.com/ideka/text-translator-public), the [Nexus](https://raidcore.gg/Nexus) addon by [Ideka](https://github.com/ideka) that translates Guild Wars 2 in real time as you play.
 
+> **To ArenaNet:** this is a free, non-commercial fan project: nobody earns anything from it. It is made in good faith to let more players enjoy Guild Wars 2 in their own language. If anything here is a problem for you, please contact us, publicly with an [issue](../../issues) or privately. We will reply quickly and change or remove it.
+
 This module brings the game into languages that Guild Wars 2 does not offer:
 
-| Language | Module | Download | Status |
-|---|---|---|---|
-| Italian | Italiano (Local Translator) | `Local_Translator_<version>_IT.zip` | early testing |
+| Language             | Module                                 | Download                               | Status                                              |
+| -------------------- | -------------------------------------- | -------------------------------------- | --------------------------------------------------- |
+| Italian              | Italiano (Local Translator)            | `Local_Translator_<version>_IT.zip`    | early testing                                       |
 | Brazilian Portuguese | Português do Brasil (Local Translator) | `Local_Translator_<version>_PT_BR.zip` | first test: it works, translations not reviewed yet |
 
 ## What makes this module different
@@ -22,8 +24,6 @@ This module brings the game into languages that Guild Wars 2 does not offer:
 
 > **Status:** early testing. Expect rough edges and breaking changes.
 
-> **To ArenaNet:** this is a free, non-commercial fan project: nobody earns anything from it. It is made in good faith to let more players enjoy Guild Wars 2 in their own language. If anything here is a problem for you, please contact us, publicly with an [issue](../../issues) or privately at EMAIL. We will reply quickly and change or remove it.
-
 ## Requirements
 
 - Guild Wars 2 on Windows (64-bit), **game language set to English**
@@ -35,11 +35,14 @@ This module brings the game into languages that Guild Wars 2 does not offer:
 ## Installation
 
 1. Go to the [latest release](../../releases/latest) and download the zip of your language:
+   
    - Italian: `Local_Translator_<version>_IT.zip` (for example `Local_Translator_0.9.0_IT.zip`);
    - Brazilian Portuguese: `Local_Translator_<version>_PT_BR.zip`.
-
+   
    These zips also set the module as active in Text Translator, with the recommended options. If you already use Text Translator and want to keep your settings, download instead `Local_Translator_<version>.zip` (all languages, Text Translator settings untouched), then choose the module in Text Translator's options, *Modules* tab.
+
 2. Extract it into your **Guild Wars 2** folder. The `addons` folder inside the zip merges with the one you already have; your other addons are not touched.
+
 3. Start the game. If needed, enable **Text Translator** from the Nexus addon list: the module of your language starts by itself.
 
 On the very first start the model of your language is downloaded and loaded, which takes a little while. Until then text stays in English. Later starts are immediate.
