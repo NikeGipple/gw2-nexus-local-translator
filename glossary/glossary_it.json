@@ -1321,7 +1321,10 @@
     "Woven Stride": "Woven Stride",
     "Wrought-Iron Will": "Wrought-Iron Will",
     "Wuthering Wind": "Wuthering Wind",
-    "Yearning Empowerment": "Yearning Empowerment"
+    "Yearning Empowerment": "Yearning Empowerment",
+    "Mine": "Scava",
+    "Gather": "Raccogli",
+    "Harvest": "Raccogli"
   },
   "patterns": {
     "+{X}%% Boon Duration": "+{X}%% Boon Duration",
