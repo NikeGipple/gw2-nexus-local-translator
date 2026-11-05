@@ -524,6 +524,7 @@ class Glossary:
     def __init__(self) -> None:
         self.exact: dict[str, str] = {}
         self.terms: list[tuple[str, str]] = []
+        self.term_map: dict[str, str] = {}
         self.patterns: list[tuple[re.Pattern, str]] = []
         self.version = 0
         self.fingerprint = ""  # identifies the glossary content (see fingerprint_of)
@@ -599,6 +600,7 @@ class Glossary:
         terms.update(self.case_variants(terms))
         # longest first, so "Lion's Arch Keep" wins over "Lion's Arch"
         self.terms = sorted(terms.items(), key=lambda kv: -len(kv[0]))
+        self.term_map = dict(terms)  # a term that is a whole line (lookup)
         self.patterns = sorted(compiled, key=lambda p: -len(p[0].pattern))
         self.feminine = {str(k).strip().lower(): str(v).strip() for k, v in fem.items()
                          if str(k).strip() and str(v).strip()}
@@ -648,19 +650,54 @@ class Glossary:
         return out
 
     def lookup(self, line: str) -> str | None:
-        """Fixed translation for a whole line (exact or pattern), or None."""
-        if line in self.exact:
-            return self.exact[line]
-        if not self.patterns:
+        """Fixed translation for a whole line, or None: an exact entry, a pattern, or a term that is
+        the whole line ("Copper Ore", "Greatsword": until 2026-11-03 those went to the model, that
+        often dropped the term, e.g. "Greatsword" -> "Spada a due mani"; the feminine markers of
+        the role names are added like on the model's translations).
+
+        A name with plural markers ("Hard Wood Pulp[s]", "Box[pl:\"Boxes\"]") without an entry of its
+        own is looked up in the singular ("Hard Wood Pulp"): the entry gives the singular and the
+        plural rules add the Italian markers (Polpa[pl:"Polpe"] di legno duro), like for the names
+        the model translates. An entry that already has [pl:"..."] markers is used as it is; an
+        entry that keeps the English name gives back the raw English line, so the game shows it
+        with its own markers. Until 2026-11-03 these names went to the model, that dropped the
+        glossary translation in about 85 of them ("Arrow Cart Blueprint[s]" -> "Progetto per la
+        costruzione di un arco")."""
+        fixed, term = self._lookup(line)
+        if fixed is not None:
+            return feminine(fixed, self.feminine) if term else fixed
+        if not plural_name(line):
             return None
         pre, core, post = self.WRAP_RE.fullmatch(line).groups()
+        singular = english_singular(core)
+        fixed, term = self._lookup(singular)
+        if fixed is None:
+            return None
+        if IT_PL_RE.search(fixed):
+            out = fixed
+        else:
+            out = italian_plural(core, singular, fixed)
+            if out == core:  # the entry keeps the English name
+                return line
+        out = pre + out + post
+        return feminine(out, self.feminine) if term else out
+
+    def _lookup(self, line: str) -> tuple[str | None, bool]:
+        """(translation, True when it comes from a term) for a whole line, without the singular of
+        plural names; (None, False) when the glossary has nothing for it."""
+        if line in self.exact:
+            return self.exact[line], False
+        pre, core, post = self.WRAP_RE.fullmatch(line).groups()
         if core in self.exact:
-            return pre + self.exact[core] + post
+            return pre + self.exact[core] + post, False
+        term = self.term_map.get(core)
+        if term is not None:
+            return pre + term + post, True
         for rx, repl in self.patterns:
             m = rx.fullmatch(core)
             if m:
-                return pre + repl.replace("{X}", m.group("X")) + post
-        return None
+                return pre + repl.replace("{X}", m.group("X")) + post, False
+        return None, False
 
     def load_file(self, path: Path) -> bool:
         try:
