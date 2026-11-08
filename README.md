@@ -138,7 +138,7 @@ Suggestions and corrections are welcome through issues or pull requests.
 
 **What the server keeps.** Only the data above: it never stores your IP address. The project merges the uploads into its map of texts, which is not published. Details, including Cloudflare and DigitalOcean, how long data is kept and your rights, are in the [privacy notice](PRIVACY.md).
 
-**How to stop.** Remove `"--upload"` from the `args` line of `module.toml` (Italian: `args = []`; Brazilian Portuguese: `args = ["--lang", "pt_br"]`), or install the normal zip over it, then restart the game.
+**How to stop.** Remove `"--upload"` from the `args` line of `module.toml` (`args = []`), or install the normal zip over it, then restart the game.
 
 **Questions:** open an issue; for privacy requests write to privacy@kindling.nexus. The code that sends the texts is [`src/map_upload.py`](src/map_upload.py).
 
@@ -149,7 +149,7 @@ Suggestions and corrections are welcome through issues or pull requests.
 - If texts stay in English right after the first launch, the model is probably still downloading.
 - If new texts stay in English, check *Pause Refreshes* in Text Translator's options (see [Smooth play](#smooth-play-pause-refreshes)): press **Refresh Now** or turn it off.
 - If the game stutters every few seconds, turn **Pause Refreshes** on.
-- Advanced: the `args` line of `module.toml` accepts `--threads N` (CPU threads used by the translator, default 2) and `--stats-every SECONDS` (writes a performance line in the log every SECONDS, default 300). Keep the arguments already there: for example, in Brazilian Portuguese, `args = ["--lang", "pt_br", "--threads", "1"]`. `--upload` turns the map upload on (see [Map upload](#map-upload)).
+- Advanced: the `args` line of `module.toml` accepts `--threads N` (CPU threads used by the translator, default 2) and `--stats-every SECONDS` (writes a performance line in the log every SECONDS, default 300). Keep the arguments already there: for example, with the map upload on, `args = ["--upload", "--threads", "1"]`. `--upload` turns the map upload on (see [Map upload](#map-upload)).
 
 ## Source code
 
