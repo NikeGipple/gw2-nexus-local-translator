@@ -126,19 +126,19 @@ Suggestions and corrections are welcome through issues or pull requests.
 
 ## Map upload
 
-**Off by default.** The module sends nothing anywhere unless `--upload` is in the `args` line of `module.toml`. You can add it yourself, or download `Local_Translator_<version>_IT_autosend.zip`: it is the normal Italian zip, and its only difference is this argument in `module.toml`. For now the map upload is available for Italian only.
+**Off by default.** The module sends nothing anywhere unless `--upload` is in the `args` line of `module.toml`. You can add it yourself, or download the *autosend* zip of your language, `Local_Translator_<version>_IT_autosend.zip` (Italian) or `Local_Translator_<version>_PT_BR_autosend.zip` (Brazilian Portuguese): it is the normal zip of that language, and its only difference is this argument in `module.toml`.
 
 **By turning it on you agree** to contribute to the shared map of game texts, and to the sending of the data described here and in the [privacy notice](PRIVACY.md) to the project's server.
 
 **Why.** The patch translates in advance the texts that players actually meet in game. The texts met by many players tell the project what to translate and review next, and which texts a game update has changed.
 
-**What is sent.** For each text met in game since 5 October 2026: its string ID in the game, the English text and when it was last seen. Together with them, the language (`it`) and the version of the module. Nothing else: no translations, no account or character names, no settings, no ID of you or of your PC.
+**What is sent.** For each text met in game since 5 October 2026: its string ID in the game, the English text and when it was last seen. Together with them, the language of the module (`it` or `pt_br`) and its version. Nothing else: no translations, no account or character names, no settings, no ID of you or of your PC.
 
 **When.** 5 minutes after the game starts, then every 3 hours while you play, only the texts seen since the last upload. The module log says how many were sent (`map upload: N texts sent`).
 
 **What the server keeps.** Only the data above: it never stores your IP address. The project merges the uploads into its map of texts, which is not published. Details, including Cloudflare and DigitalOcean, how long data is kept and your rights, are in the [privacy notice](PRIVACY.md).
 
-**How to stop.** Remove `"--upload"` from the `args` line of `module.toml` (`args = []`), or install the normal zip over it, then restart the game.
+**How to stop.** Remove `"--upload"` from the `args` line of `module.toml` (Italian: `args = []`; Brazilian Portuguese: `args = ["--lang", "pt_br"]`), or install the normal zip over it, then restart the game.
 
 **Questions:** open an issue; for privacy requests write to privacy@kindling.nexus. The code that sends the texts is [`src/map_upload.py`](src/map_upload.py).
 
@@ -160,7 +160,7 @@ The source code of the module is in [`src/`](src):
 - `lt_server.py`: languages, glossary, patch format, local map and the OPUS-MT engine, used by the module as a library;
 - `plurale_it.py`: Italian plural rules, so item names get both forms (`Medaglia[pl:"Medaglie"]`, the game picks the right one);
 - `map_upload.py`: the map upload of the *autosend* zip (see [Map upload](#map-upload)), used only with `--upload`;
-- `text_translator/`: the `module.toml` and the initial `settings.toml` shipped in the zip (Italian; Brazilian Portuguese in `text_translator/pt_br/`; the `module.toml` of the *autosend* zip in `text_translator/autosend/`).
+- `text_translator/`: the `module.toml` and the initial `settings.toml` shipped in the zip (Italian; Brazilian Portuguese in `text_translator/pt_br/`; the `module.toml` of the *autosend* zips in `text_translator/autosend/` and `text_translator/pt_br/autosend/`).
 
 The language comes from `--lang` in `module.toml` or, without it, from the name of the module folder (`local_translator_<language>`).
 
@@ -173,7 +173,7 @@ pyinstaller --noconsole --onedir --name Local_Translator_IT --paths src --collec
 
 Then copy the content of `dist\Local_Translator_IT\` and `src\text_translator\module.toml` into `addons\text_translator\modules\local_translator_it\`.
 
-For the *autosend* zip, copy `src\text_translator\autosend\module.toml` instead of `src\text_translator\module.toml`.
+For the *autosend* zip, copy `src\text_translator\autosend\module.toml` instead of `src\text_translator\module.toml` (Brazilian Portuguese: `src\text_translator\pt_br\autosend\module.toml`).
 
 For Brazilian Portuguese use `--name Local_Translator_PT_BR` without `--add-data`, then copy `dist\Local_Translator_PT_BR\` and `src\text_translator\pt_br\module.toml` into `addons\text_translator\modules\local_translator_pt_br\`.
 

@@ -1,8 +1,8 @@
 # Privacy notice: map upload
 
-Notice version 1, last updated 25 October 2026. It applies to module v0.11.0 and later.
+Notice version 2, last updated 8 November 2026. It applies to module v0.11.0 and later.
 
-This notice covers only the optional **map upload** of the module, described in the [README](README.md#map-upload). Without `--upload` in the `args` line of `module.toml`, the module sends nothing to the project and this notice does not apply. For now the map upload is available for Italian only.
+This notice covers only the optional **map upload** of the module, described in the [README](README.md#map-upload). Without `--upload` in the `args` line of `module.toml`, the module sends nothing to the project and this notice does not apply. The map upload is available for Italian and Brazilian Portuguese.
 
 The other connections of the module go to GitHub, to download the glossary, the patch and the model. GitHub handles them under the [GitHub General Privacy Statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement), and the project receives no data from them.
 
@@ -18,7 +18,7 @@ For each text met in game since 5 October 2026:
 - the English text, as the game gives it to Text Translator: these are the templates of the game, with placeholders such as `%str1%` instead of names, so the names of players and characters never appear in them;
 - when it was last seen (date and time).
 
-Together with them: the language (`it`) and the version of the module. Nothing else: no translations, no account or character names, no settings, no ID of you or of your PC.
+Together with them: the language of the module (`it` or `pt_br`) and its version. Nothing else: no translations, no account or character names, no settings, no ID of you or of your PC.
 
 ## Your IP address
 
@@ -50,7 +50,7 @@ The English texts of the game belong to ArenaNet. The project uses them only, wi
 
 Under the GDPR you have the right to access, rectify and erase your personal data, and to object to its processing. The project keeps nothing that identifies you: it does not store the IP address, and an upload carries no ID. For this reason it cannot find, show or delete "your" uploads (GDPR art. 11). For the data kept by Cloudflare or DigitalOcean, refer to their own privacy policies.
 
-For questions or requests, write to privacy@kindling.nexus. You also have the right to lodge a complaint with a data protection authority: in Italy, the [Garante per la protezione dei dati personali](https://www.garanteprivacy.it), or the authority of the country where you live.
+For questions or requests, write to privacy@kindling.nexus. You also have the right to lodge a complaint with a data protection authority: in Italy, the [Garante per la protezione dei dati personali](https://www.garanteprivacy.it); in Brazil, the [Autoridade Nacional de Proteção de Dados (ANPD)](https://www.gov.br/anpd); or the authority of the country where you live.
 
 ## Minors
 
@@ -59,3 +59,6 @@ If you are under 14, ask a parent or guardian before turning the map upload on.
 ## Changes
 
 Every change to this notice gets a new version number and date, here and in the history of this repository. A future version of the module will not send more kinds of data than those described here, unless this notice is updated first and the change is announced in the release notes.
+
+- Version 2, 8 November 2026: the map upload is also available for Brazilian Portuguese. The data sent and how it is handled do not change.
+- Version 1, 25 October 2026: first version, Italian only.
