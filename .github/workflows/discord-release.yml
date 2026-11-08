@@ -1,0 +1,24 @@
+# Posts every published GitHub Release to the #announcements channel
+# of the Local Translator Discord server.
+# Needs the repository secret DISCORD_WEBHOOK_URL (Settings > Secrets and variables > Actions).
+name: Announce release on Discord
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send release to Discord
+        uses: SethCohen/github-releases-to-discord@v1.15.1
+        with:
+          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          username: "Local Translator Releases"
+          color: "5793266"
+          footer_title: "Local Translator"
+          footer_timestamp: true
