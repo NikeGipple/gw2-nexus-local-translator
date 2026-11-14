@@ -1,7 +1,8 @@
 """Posts to Discord what changed in the patches and glossaries between two commits.
 
 Usage: python translations_summary.py <before> <after> [--dry-run]
-The webhook comes from the DISCORD_WEBHOOK_URL environment variable.
+Each language has its own Discord channel: its webhook comes from the environment
+variable named in LANGS (a language whose variable is empty is only printed).
 Only counts are posted: no game text and no translation leaves the repository.
 """
 import json
@@ -10,9 +11,9 @@ import subprocess
 import sys
 import urllib.request
 
-LANGS = {
-    "it": "🇮🇹 Italian",
-    "pt_br": "🇧🇷 Brazilian Portuguese",
+LANGS = {  # language folder: (title, environment variable with its webhook)
+    "it": ("🇮🇹 Italian", "DISCORD_UPDATES_WEBHOOK_IT"),
+    "pt_br": ("🇧🇷 Brazilian Portuguese", "DISCORD_UPDATES_WEBHOOK_PT_BR"),
 }
 GLOSSARY_SECTIONS = ("exact", "terms", "patterns")
 
@@ -64,47 +65,53 @@ def describe(label, added, changed, removed):
     return f"{label}: " + ", ".join(parts) if parts else None
 
 
-def summary(before, after):
-    blocks = []
-    for lang, title in LANGS.items():
-        old_p, new_p = load_patch(before, lang), load_patch(after, lang)
-        lines = [
-            describe("Hand-made translations", *diff_dict(old_p["strings"], new_p["strings"])),
-            describe("Machine translations", *diff_dict(old_p["auto"], new_p["auto"])),
-        ]
-        old_g = git_show(before, f"glossary/glossary_{lang}.json") or {}
-        new_g = git_show(after, f"glossary/glossary_{lang}.json") or {}
-        totals = [0, 0, 0]
-        for section in GLOSSARY_SECTIONS:
-            for i, n in enumerate(diff_dict(old_g.get(section) or {}, new_g.get(section) or {})):
-                totals[i] += n
-        lines.append(describe("Glossary", *totals))
-        lines = [line for line in lines if line]
-        if lines:
-            total = len(new_p["strings"]) + len(new_p["auto"])
-            lines.append(f"Texts in the patch: {total:,}")
-            blocks.append(f"**{title}**\n" + "\n".join(f"- {line}" for line in lines))
-    return blocks
+def language_lines(before, after, lang):
+    """The summary lines of one language, empty if nothing changed."""
+    old_p, new_p = load_patch(before, lang), load_patch(after, lang)
+    lines = [
+        describe("Hand-made translations", *diff_dict(old_p["strings"], new_p["strings"])),
+        describe("Machine translations", *diff_dict(old_p["auto"], new_p["auto"])),
+    ]
+    old_g = git_show(before, f"glossary/glossary_{lang}.json") or {}
+    new_g = git_show(after, f"glossary/glossary_{lang}.json") or {}
+    totals = [0, 0, 0]
+    for section in GLOSSARY_SECTIONS:
+        for i, n in enumerate(diff_dict(old_g.get(section) or {}, new_g.get(section) or {})):
+            totals[i] += n
+    lines.append(describe("Glossary", *totals))
+    lines = [line for line in lines if line]
+    if lines:
+        total = len(new_p["strings"]) + len(new_p["auto"])
+        lines.append(f"Texts in the patch: {total:,}")
+    return lines
 
 
-def main():
-    before, after = sys.argv[1], sys.argv[2]
-    blocks = summary(before, after)
-    if not blocks:
-        print("No translation changed: nothing to post.")
-        return
-    text = ("## 🔄 Translations updated\n\n" + "\n\n".join(blocks) +
-            "\n\nNothing to do: the module checks for updates every 15 minutes "
-            "and applies them by itself, even while you play.")
-    print(text)
-    if "--dry-run" in sys.argv:
-        return
+def post(webhook, text):
     request = urllib.request.Request(
-        os.environ["DISCORD_WEBHOOK_URL"],
+        webhook,
         data=json.dumps({"content": text[:2000], "allowed_mentions": {"parse": []}}).encode(),
         headers={"Content-Type": "application/json", "User-Agent": "local-translator-updates"},
     )
     urllib.request.urlopen(request).read()
+
+
+def main():
+    before, after = sys.argv[1], sys.argv[2]
+    dry = "--dry-run" in sys.argv
+    for lang, (title, env) in LANGS.items():
+        lines = language_lines(before, after, lang)
+        if not lines:
+            print(f"{lang}: no translation changed, nothing to post.")
+            continue
+        text = (f"## 🔄 {title} translations updated\n\n" +
+                "\n".join(f"- {line}" for line in lines) +
+                "\n\nNothing to do: the module checks for updates every 15 minutes "
+                "and applies them by itself, even while you play.")
+        print(text, end="\n\n")
+        webhook = os.environ.get(env, "")
+        if dry or not webhook:
+            continue
+        post(webhook, text)
 
 
 if __name__ == "__main__":

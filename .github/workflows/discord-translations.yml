@@ -1,5 +1,6 @@
 # Posts a short summary to Discord when the patches or glossaries change on main.
-# Needs the repository secret DISCORD_UPDATES_WEBHOOK_URL (Settings > Secrets and variables > Actions).
+# Needs one repository secret per language (Settings > Secrets and variables > Actions):
+# DISCORD_UPDATES_WEBHOOK_IT and DISCORD_UPDATES_WEBHOOK_PT_BR. A missing one just skips that language.
 name: Announce translation updates on Discord
 
 on:
@@ -16,12 +17,13 @@ jobs:
   discord:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 1
       - name: Fetch the previous version
         run: git fetch --depth=1 origin ${{ github.event.before }}
-      - name: Send the summary to Discord
+      - name: Send the summary to Discord, one channel per language
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_UPDATES_WEBHOOK_URL }}
+          DISCORD_UPDATES_WEBHOOK_IT: ${{ secrets.DISCORD_UPDATES_WEBHOOK_IT }}
+          DISCORD_UPDATES_WEBHOOK_PT_BR: ${{ secrets.DISCORD_UPDATES_WEBHOOK_PT_BR }}
         run: python3 .github/scripts/translations_summary.py ${{ github.event.before }} ${{ github.sha }}
