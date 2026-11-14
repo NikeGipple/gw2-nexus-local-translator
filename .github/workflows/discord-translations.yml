@@ -1,0 +1,27 @@
+# Posts a short summary to Discord when the patches or glossaries change on main.
+# Needs the repository secret DISCORD_UPDATES_WEBHOOK_URL (Settings > Secrets and variables > Actions).
+name: Announce translation updates on Discord
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "patch/**"
+      - "glossary/**"
+
+permissions:
+  contents: read
+
+jobs:
+  discord:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Fetch the previous version
+        run: git fetch --depth=1 origin ${{ github.event.before }}
+      - name: Send the summary to Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_UPDATES_WEBHOOK_URL }}
+        run: python3 .github/scripts/translations_summary.py ${{ github.event.before }} ${{ github.sha }}
