@@ -46,7 +46,8 @@ def raw_url(path: str, branch: str = DEFAULT_BRANCH) -> str:
 # Italian is the default of the developer tools; the module never falls back to it (lt_module).
 class Language:
     def __init__(self, code: str, cache_key: str, label: str, model: str, recipe: dict[str, str],
-                 article: str, plural: bool, mini: str | None = None) -> None:
+                 article: str, plural: bool, mini: str | None = None,
+                 gender: str | None = None) -> None:
         self.code = code            # folder local_translator_<code>, files *_<code>, patch/<code>/
         self.cache_key = cache_key  # Text Translator's cache key (shown in its menu)
         self.label = label          # in the log
@@ -56,22 +57,32 @@ class Language:
         self.article = re.compile(article, re.IGNORECASE)  # articles dropped from names
         self.plural = plural        # plural markers for names (plurale_it): Italian only for now
         self.mini = mini            # head of "Mini X" (see recipe_split); None = translated whole
+        # double masculine/feminine forms of this language (see masculine): a regex whose first
+        # group that matched is the masculine. None = nothing is touched: a new language gets its
+        # own forms when they are decided (Russian "готов(а)", Polish "gotowy/a"), never the Italian ones
+        self.gender = re.compile(gender, re.IGNORECASE) if gender else None
 
     def file(self, stem: str, ext: str) -> str:
         """glossary + .json -> glossary_it.json / glossary_pt_br.json"""
         return f"{stem}_{self.code}{ext}"
 
 
+# Double masculine/feminine forms (see masculine): the translation keeps the masculine only.
+GENDER_IT = (r"(?<![\w/])([^\W\d_]*o)/a(?![\w/])"                      # Ladro/a, pronto/a
+             r"|(?<![\w/])(il|lo|un|uno)/(?:la|una)(?![\w/])")         # il/la, un/una
+GENDER_PT = GENDER_IT + r"|(?<![\w/(])([^\W\d_]+)\((?:a|as)\)(?![\w(])"  # obrigado(a), um(a)
+
 LANGUAGES = {
     "it": Language("it", "it", "IT", "model-it-v1/opus-mt-en-it-ct2.zip",
                    {"Recipe": "Ricetta: ", "Recipes": "Ricette: ",
                     "Recipe[s]": 'Ricetta[pl:"Ricette"]: '},
-                   r"(?:(?:il|lo|la|i|gli|le|un|uno|una) |(?:l|un)['’])", plural=True, mini="Mini "),
+                   r"(?:(?:il|lo|la|i|gli|le|un|uno|una) |(?:l|un)['’])", plural=True, mini="Mini ",
+                   gender=GENDER_IT),
     # model: OPUS-MT Tatoeba eng-por (opus-2021-02-18), label >>pob<< in its config.json
     "pt_br": Language("pt_br", "pt-BR", "PT-BR", "model-pt-br-v1/opus-mt-en-pt-br-ct2.zip",
                       {"Recipe": "Receita: ", "Recipes": "Receitas: ",
                        "Recipe[s]": 'Receita[pl:"Receitas"]: '},
-                      r"(?:(?:o|a|os|as|um|uma|uns|umas) )", plural=False),
+                      r"(?:(?:o|a|os|as|um|uma|uns|umas) )", plural=False, gender=GENDER_PT),
 }
 LANG = LANGUAGES["it"]
 
@@ -194,17 +205,14 @@ def fix_percent(text: str, english: str | None = None) -> str:
     return PERCENT_RE.sub(lambda m: "%%" if m.group(0) == "%" else m.group(0), text)
 
 
-# Double masculine/feminine forms written by the models ("Ladro/a", "pronto/a", "il/la"):
-# the translation keeps the masculine only. "Attiva/Disattiva", "%num1%/%num2%" are not touched.
-GENDER_RE = re.compile(r"(?<![\w/])([^\W\d_]*o)/a(?![\w/])"
-                       r"|(?<![\w/])(il|lo|un|uno)/(?:la|una)(?![\w/])", re.IGNORECASE)
-
-
 def masculine(text: str) -> str:
-    """Keep only the masculine of the "o/a" forms: "Ladro/a" -> "Ladro", "il/la" -> "il"."""
-    if not text or "/" not in text:
+    """Keep only the masculine of the double forms written by the models, with the forms of the
+    language of the module (Language.gender): "Ladro/a" -> "Ladro", "il/la" -> "il",
+    "obrigado(a)" -> "obrigado". "Attiva/Disattiva", "%num1%/%num2%", "vez(es)" are not touched."""
+    rx = LANG.gender
+    if rx is None or not text or ("/" not in text and "(" not in text):
         return text
-    return GENDER_RE.sub(lambda m: m.group(1) or m.group(2), text)
+    return rx.sub(lambda m: next(g for g in m.groups() if g is not None), text)
 
 
 # Feminine of the role names (glossary section "feminine", e.g. {"Cittadino": "Cittadina"}).
