@@ -9,11 +9,11 @@ Guild Wars 2 non esiste in italiano. **Local Translator** traduce in italiano di
 
 Lavorano insieme tre elementi:
 
-| Elemento             | Cos'è                           | Cosa fa                                                      |
-| -------------------- | ------------------------------- | ------------------------------------------------------------ |
-| **Nexus**            | il gestore di addon di Raidcore | permette di aggiungere addon a Guild Wars 2                  |
-| **Text Translator**  | l'addon di Ideka                | legge i testi del gioco e mostra al loro posto le traduzioni |
-| **Local Translator** | il modulo di questo progetto    | prepara e gestisce le traduzioni in italiano                 |
+| Elemento             | Cos'è                             | Cosa fa                                      |
+| -------------------- | --------------------------------- | -------------------------------------------- |
+| **Nexus**            | il gestore di addon di Raidcore   | permette di aggiungere addon a Guild Wars 2  |
+| **Text Translator**  | l'addon di sostituzione dei testi | legge e modifica i testi del gioco           |
+| **Local Translator** | il modulo di questo progetto      | prepara e gestisce le traduzioni in italiano |
 
 **Nexus** carica **Text Translator**, **Text Translator** chiede a **Local Translator** la traduzione di ogni testo e **Local Translator** la restituisce.
 
