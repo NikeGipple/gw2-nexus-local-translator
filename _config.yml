@@ -1,0 +1,13 @@
+# Aspetto delle pagine pubblicate con GitHub Pages
+# (https://nikegipple.github.io/gw2-nexus-local-translator/).
+# Su GitHub i file .md si vedono come sempre: questo file cambia solo il sito.
+theme: jekyll-theme-cayman
+title: GW2 Nexus Local Translator
+# Nel sito servono solo le pagine (README, LEGGIMI, PRIVACY): il resto non va pubblicato qui.
+# Il modulo scarica patch e glossari da GitHub, non da questo sito.
+exclude:
+  - patch
+  - glossary
+  - src
+  - "Claude outputs"
+  - LICENSE

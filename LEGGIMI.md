@@ -42,7 +42,7 @@ Patch e glossario si aggiornano da soli a ogni avvio del gioco.
 
 3. **Scarica Local Translator.** Scarica **[Local_Translator_0.12.0_IT_autosend.zip](https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/v0.12.0/Local_Translator_0.12.0_IT_autosend.zip)**.
    
-   > **Verifica che sia l'ultima versione.** Il link porta alla versione 0.12.0. Apri la pagina dell'[ultima versione](../../releases/latest): se il numero è più alto, scarica da lì, nella sezione **Assets**, il file che finisce con **`_IT_autosend.zip`**.
+   > **Verifica che sia l'ultima versione.** Il link porta alla versione 0.12.0. Apri la pagina dell'[ultima versione](https://github.com/NikeGipple/gw2-nexus-local-translator/releases/latest): se il numero è più alto, scarica da lì, nella sezione **Assets**, il file che finisce con **`_IT_autosend.zip`**.
    > 
    > Autosend è un'opzione che permette di collaborare con la raccolta dei testi del gioco. Se non vuoi inviare nulla leggi la sezione [Il modulo manda dati da qualche parte?](#domande-frequenti) nelle domande frequenti.
 
@@ -81,7 +81,7 @@ Patch e glossario si aggiornano da soli a ogni avvio del gioco.
 ## Aggiornamenti
 
 - **Patch e glossario** si aggiornano da soli all'avvio: non devi preoccuparti di tenere aggiornate le traduzioni.
-- **Nuove versioni del modulo:** quando esce una nuova versione la trovi nell'[ultima versione](../../releases/latest).
+- **Nuove versioni del modulo:** quando esce una nuova versione la trovi nell'[ultima versione](https://github.com/NikeGipple/gw2-nexus-local-translator/releases/latest).
   Scarica lo stesso tipo di zip che usi (`_IT_autosend.zip` o `_IT.zip`) ed estrailo nella cartella di Guild Wars 2 come nell'installazione, sostituendo i file vecchi. Attenzione: se aggiorni con lo zip `_IT.zip`, l'invio automatico si spegne.
 
 ## Problemi comuni
@@ -95,8 +95,8 @@ Patch e glossario si aggiornano da soli a ogni avvio del gioco.
 
 ## Supporto
 
-- **Discord dell'Arco del Leone**: https://discord.gg/EBTnpkFr2x. Scrivi in privato a **NikeGipple** per qualsiasi necessità collegata. Attraverso un ruolo dedicato potrai ricevere gli avvisi su nuove versioni e novità ma anche supporto e risposte.
-- **Discord di Local Translator** (in inglese): https://discord.gg/8w2TZnNYG5
+- **Discord dell'Arco del Leone**: [discord.gg/EBTnpkFr2x](https://discord.gg/EBTnpkFr2x). Scrivi in privato a **NikeGipple** per qualsiasi necessità collegata. Attraverso un ruolo dedicato potrai ricevere gli avvisi su nuove versioni e novità ma anche supporto e risposte.
+- **Discord di Local Translator** (in inglese): [discord.gg/8w2TZnNYG5](https://discord.gg/8w2TZnNYG5)
 
 ## Domande frequenti
 
