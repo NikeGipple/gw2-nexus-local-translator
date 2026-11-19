@@ -108,11 +108,22 @@ Local Translator non modifica i file del gioco e non gioca al posto tuo: cambia 
 La traduzione lavora solo quando arrivano testi nuovi, con priorità bassa, così il gioco viene sempre prima. Su PC con poca RAM potresti notare qualcosa.
 
 **Il modulo manda dati da qualche parte?**\
-La traduzione avviene sempre sul tuo PC. In più, il modulo si collega a GitHub per scaricare il modello, il glossario e la patch.
+La sostituzione e la traduzione dei testi avvengono solo in locale sul tuo PC.
+Il modulo si collega a GitHub solo per scaricare:
 
-Se usi lo zip **autosend** (`_IT_autosend.zip`, come consigliato nell'installazione) stai aiutando il progetto a raccogliere i testi del gioco. Con l'opzione attiva il modulo manda in automatico l'elenco dei testi del gioco che incontri (solo il numero del testo, il testo inglese e quando l'hai visto; non salviamo nessun IP, niente nomi dei personaggi, niente account, niente traduzioni). Serve a sapere cosa tradurre nel modo migliore possibile. Scaricando questo zip accetti l'invio; dettagli nell'[informativa sulla privacy](PRIVACY.md) (in inglese).
+- il modello di traduzione (una volta sola)
+- il glossario e la patch (se ci sono aggiornamenti)
 
-Per non inviare niente usa lo zip normale (`_IT.zip`). Per spegnere l'invio dopo l'installazione, estrai lo zip `_IT.zip` sopra quello autosend e riavvia il gioco.
+Se usi volontariamente lo zip **autosend** (`_IT_autosend.zip`), aiuti il progetto a crescere. In questo modo il modulo invia in automatico a un server i testi non ancora conosciuti che incontri durante il gioco, così possono essere tradotti e arrivare a tutti con la patch.
+
+L'invio contiene solo l'identificatore del testo, il testo inglese e la data e l'ora in cui l'hai visto.
+Non manda nomi dei personaggi, account o traduzioni, e il tuo IP non viene salvato.
+Scaricando questo zip accetti l'invio (i dettagli sono nell'[informativa sulla privacy](PRIVACY.md), in inglese).
+
+Se NON vuoi collaborare alla raccolta dei testi e preferisci usare il modulo nella versione base, hai due possibilità:
+
+1. usa lo zip normale: [Local_Translator_0.12.0_IT.zip](https://github.com/NikeGipple/gw2-nexus-local-translator/releases/download/v0.12.0/Local_Translator_0.12.0_IT.zip) (se hai già installato lo zip autosend, estrai questo sopra e riavvia il gioco);
+2. se hai già installato lo zip autosend, togli `"--upload"` dalla riga `args` del file `module.toml` (nella cartella `addons\text_translator\modules\local_translator_it`), così: `args = []`, poi riavvia il gioco.
 
 **Come si disinstalla?**
 
