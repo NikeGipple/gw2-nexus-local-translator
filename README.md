@@ -2,6 +2,8 @@
 
 A translation module for [**Text Translator**](https://github.com/ideka/text-translator-public), the [Nexus](https://raidcore.gg/Nexus) addon by [Ideka](https://github.com/ideka) that translates Guild Wars 2 in real time as you play.
 
+> 🇮🇹 **Italiano:** qui istruzioni in lingua italiana → [Local Translator: traduzione italiana per GW2](LEGGIMI.md)
+
 > **To ArenaNet:** this is a free, non-commercial fan project: nobody earns anything from it. It is made in good faith to let more players enjoy Guild Wars 2 in their own language. If anything here is a problem for you, please contact us, publicly with an [issue](../../issues) or privately. We will reply quickly and change or remove it.
 
 This module brings the game into languages that Guild Wars 2 does not offer:
