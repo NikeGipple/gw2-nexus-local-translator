@@ -1,5 +1,3 @@
-# Local Translator: traduzione italiana per GW2
-
 ## Cos'è
 
 Guild Wars 2 non esiste in italiano. **Local Translator** traduce in italiano dialoghi, missioni, oggetti, abilità, menu mentre giochi.
