@@ -2,7 +2,7 @@
 
 A translation module for [**Text Translator**](https://github.com/ideka/text-translator-public), the [Nexus](https://raidcore.gg/Nexus) addon by [Ideka](https://github.com/ideka) that translates Guild Wars 2 in real time as you play.
 
-> 🇮🇹 **Italiano:** qui istruzioni in lingua italiana → [Local Translator: traduzione italiana per GW2](LEGGIMI.md)
+> 🇮🇹 **Italiano:** qui istruzioni in lingua italiana → [Local Translator: traduzione italiana per GW2](https://nikegipple.github.io/gw2-nexus-local-translator/LEGGIMI.html)
 
 > **To ArenaNet:** this is a free, non-commercial fan project: nobody earns anything from it. It is made in good faith to let more players enjoy Guild Wars 2 in their own language. If anything here is a problem for you, please contact us, publicly with an [issue](../../issues) or privately. We will reply quickly and change or remove it.
 
