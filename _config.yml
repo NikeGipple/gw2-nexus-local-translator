@@ -11,3 +11,11 @@ exclude:
   - src
   - "Claude outputs"
   - LICENSE
+# Testi della fascia in alto per le singole pagine (senza toccare i .md).
+# Senza questo, sotto il titolo comparirebbe la descrizione inglese del repository.
+defaults:
+  - scope:
+      path: "LEGGIMI.md"
+    values:
+      title: "Local Translator"
+      description: "Traduzione offline in gioco per Guild Wars 2 - OPUS-MT + CTranslate2 - nessun servizio esterno, nessuna chiave API."
