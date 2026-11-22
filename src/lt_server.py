@@ -2035,7 +2035,7 @@ def name_line(line: str) -> bool:
 def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translations: dict[str, str],
                translate_lines, label: str = "traduzione", batch: int = 0,
                reject=None, report: list | None = None,
-               reviewed: set[str] | None = None) -> tuple[int, int, int]:
+               reviewed: set[str] | None = None, finish=None) -> tuple[int, int, int]:
     """Rebuild the 'auto' section by translating again the English text of every known string
     (map) with the current glossary.
 
@@ -2054,6 +2054,9 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
                      translation) or "english" (still, at least partly, in English)
     reviewed         optional set of lines whose translation in `translations` was reviewed: they
                      are used whole, also when they are recipes or "Mini" names (recipe_split)
+    finish           optional function(key, English, text) -> text, called on the finished text of
+                     every row before it goes into 'auto' (e.g. the gender marks of
+                     tools/genere_lingue.py); None = the text as it is
 
     Returns (rows in auto, rows skipped, lines translated now).
     """
@@ -2134,7 +2137,10 @@ def build_auto(map_path: Path, patch_path: Path, glossary: Glossary, translation
             continue
         # same last check as _write_patch (lone "%" -> "%%"), so that a run with nothing new
         # compares equal to the patch on disk and does not raise its version
-        auto[key] = fix_percent("\n".join(outs))
+        text = "\n".join(outs)
+        if finish:
+            text = finish(key, en, text)
+        auto[key] = fix_percent(text)
     # keys leaving 'auto' go into 'drop': players still holding their old text get it removed
     drop = (patch.drop | (set(patch.auto) - set(auto))) - set(auto) - set(patch.strings)
     if auto != patch.auto or drop != patch.drop or patch.glossary_fp != g.fingerprint:
